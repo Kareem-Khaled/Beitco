@@ -57,3 +57,5 @@ yarn-error.log*
 
 # ─── Docker ─────────────────────────────────────────
 docker-data/
+# Local compose overrides (machine-specific port maps, etc.)
+docker-compose.override.yml

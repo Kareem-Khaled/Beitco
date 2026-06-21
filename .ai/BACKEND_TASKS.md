@@ -11,11 +11,16 @@
 
 ## 🟢 In Progress
 
-_(B-0 done — next up: B-0.1 seed parity, then B-1 listings read)_
+_(B-0 + B-0.1 done — next up: B-1 listings read + wire the frontend)_
 
 ---
 
 ## ✅ Done
+
+### B-0.1 · Seed parity ✅ (June 17)
+- First migration applied: `prisma/migrations/20260621160438_init_bed_level_trust` (26 tables incl. PostGIS) against Postgres.
+- `prisma/seed.ts` ports `apps/web/src/lib/beitco/seed-data.ts`: **12 users** (admin + 6 owners + 5 renters), **7 properties** (all published) with **17 rooms, 24 beds** (9 available), **4 reviews**, 1 consent-linked occupant, 8 nearby places, the sale listing (#7) and the nightly listing (#4). Arabic display strings preserved; only enum fields mapped to Latin (`type`, `unitType`, `nearby.type`). Idempotent (wipes demo tables first). Configured via `package.json#prisma.seed` (`ts-node --transpile-only`) → `pnpm --filter @beitco/api db:seed`.
+- **Local DB note:** this machine runs a native Postgres on 5432, so the Beitco container is exposed on **5433** via `docker-compose.override.yml`; `apps/api/.env` `DATABASE_URL` points at 5433. The committed `docker-compose.yml` keeps 5432 for clean envs.
 
 ### B-0 · Rewrite the Prisma schema to the bed-level + trust model ✅ (June 17)
 - New `apps/api/prisma/schema.prisma`: **22 models, 21 enums**, mirroring `apps/web/src/lib/beitco/types.ts`. UUID PKs, `snake_case` columns via `@map`, soft deletes (`deleted_at`), PostGIS extension preserved.
@@ -27,9 +32,6 @@ _(B-0 done — next up: B-0.1 seed parity, then B-1 listings read)_
 ---
 
 ## 🔥 Phase 0 — Foundation (do first, unblocks everything)
-
-### B-0.1 · Seed parity ⭐ **NEXT**
-- Port `apps/web/src/lib/beitco/seed-data.ts` into a Prisma seed so the API serves the same demo listings/users the frontend shows today (smooth swap from mock → API). Run the first `prisma migrate dev` here (needs Postgres up).
 
 ### B-0.2 · API response envelope + conventions
 - Enforce `{ success, data, meta?: { cursor, hasMore }, error?: { code, message } }` globally (interceptor + exception filter). Cursor pagination only. `camelCase` JSON.
