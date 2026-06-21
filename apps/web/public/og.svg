@@ -1,0 +1,38 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#14534c"/>
+      <stop offset="1" stop-color="#0c302c"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="0" y1="0" x2="0" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2bd49b"/>
+      <stop offset="1" stop-color="#1c9c72"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- subtle corner glow -->
+  <circle cx="120" cy="540" r="260" fill="#2bd49b" opacity="0.08"/>
+
+  <!-- brand mark (house) top-right -->
+  <g transform="translate(960, 110)">
+    <rect width="120" height="120" rx="28" fill="url(#mark)"/>
+    <path d="M60 22 L98 56 H22 Z" fill="#ffffff"/>
+    <rect x="31" y="54" width="58" height="48" rx="6" fill="#ffffff"/>
+    <rect x="50" y="72" width="20" height="30" rx="3" fill="#1c9c72"/>
+  </g>
+
+  <!-- wordmark + tagline (RTL, right-aligned) -->
+  <text x="1080" y="330" text-anchor="end" font-family="'Cairo','IBM Plex Sans Arabic','Segoe UI',sans-serif" font-size="132" font-weight="800" fill="#ffffff">بيتكو</text>
+  <text x="1080" y="420" text-anchor="end" font-family="'Cairo','IBM Plex Sans Arabic','Segoe UI',sans-serif" font-size="52" font-weight="700" fill="#e8f6f0">لاقي بيتك في مصر — بثقة</text>
+  <text x="1080" y="492" text-anchor="end" font-family="'IBM Plex Sans Arabic','Segoe UI',sans-serif" font-size="38" font-weight="500" fill="#9ed0c1">شقة · أوضة · سرير — للإيجار والبيع</text>
+
+  <!-- trust chips -->
+  <g font-family="'IBM Plex Sans Arabic','Segoe UI',sans-serif" font-size="30" font-weight="600">
+    <rect x="858" y="528" width="222" height="58" rx="29" fill="#ffffff" opacity="0.1"/>
+    <text x="969" y="566" text-anchor="middle" fill="#d9f2e8">✓ متأكدين منه</text>
+    <rect x="612" y="528" width="222" height="58" rx="29" fill="#ffffff" opacity="0.1"/>
+    <text x="723" y="566" text-anchor="middle" fill="#d9f2e8">★ آراء الساكنين</text>
+  </g>
+</svg>

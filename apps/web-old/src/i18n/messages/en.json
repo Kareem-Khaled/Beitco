@@ -1,0 +1,48 @@
+{
+  "common": {
+    "appName": "Beitco",
+    "tagline": "Your Real Estate Community",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Try again",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "share": "Share",
+    "report": "Report",
+    "search": "Search",
+    "seeAll": "See all",
+    "noResults": "No results found"
+  },
+  "nav": {
+    "home": "Home",
+    "search": "Search",
+    "create": "Create",
+    "groups": "Groups",
+    "profile": "Profile"
+  },
+  "feed": {
+    "forYou": "For You",
+    "following": "Following",
+    "videos": "Videos"
+  },
+  "post": {
+    "likes": "{count, plural, =0 {No likes} one {# like} other {# likes}}",
+    "comments": "{count, plural, =0 {No comments} one {# comment} other {# comments}}",
+    "publish": "Publish",
+    "submitForApproval": "Submit for Review",
+    "pending": "Pending Review",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  },
+  "auth": {
+    "login": "Sign In",
+    "logout": "Sign Out",
+    "phoneNumber": "Phone Number",
+    "enterOtp": "Enter verification code",
+    "sendOtp": "Send Code",
+    "verifyOtp": "Verify",
+    "welcomeBack": "Welcome back!"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "بيتكو — لاقي بيتك في مصر",
+  "short_name": "بيتكو",
+  "description": "منصة السكن الموثوقة في مصر. لاقي شقة، أوضة، أو سرير للإيجار أو للبيع — بأسعار واضحة وآراء حقيقية ودرجة ثقة لكل مكان.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#14534c",
+  "categories": ["lifestyle", "shopping", "business"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

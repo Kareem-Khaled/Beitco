@@ -1,0 +1,57 @@
+services:
+  # ─── PostgreSQL 16 + PostGIS ────────────────────────
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: beitco-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: beitco
+      POSTGRES_PASSWORD: beitco_dev
+      POSTGRES_DB: beitco_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U beitco"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Redis ──────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: beitco-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Meilisearch ────────────────────────────────────
+  meilisearch:
+    image: getmeili/meilisearch:v1.11
+    container_name: beitco-meilisearch
+    restart: unless-stopped
+    environment:
+      MEILI_MASTER_KEY: beitco_master_key_dev
+      MEILI_ENV: development
+    ports:
+      - "7700:7700"
+    volumes:
+      - meilisearch_data:/meili_data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:
+  meilisearch_data:

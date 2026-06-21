@@ -1,0 +1,83 @@
+# Beitco — Cursor Rules
+# This file configures Cursor AI for this project.
+
+You are working on **Beitco**, an Egyptian real estate social network.
+
+## Quick Context
+- Read `.ai/ENTRY_PROMPT.md` for full project context
+- Read `.ai/TASKS.md` for current task board
+- Read `.ai/CURRENT_STATE.md` for what's built vs not
+
+## Tech Stack (Non-Negotiable)
+- Backend: NestJS 11 + TypeScript 5.x + Prisma ORM + PostgreSQL 16 + PostGIS
+- Frontend: Next.js 15 (App Router) + TypeScript + Tailwind CSS + shadcn/ui
+- Mobile: Capacitor 6.x (wraps Next.js → iOS App Store + Google Play)
+- Video: Mux (HLS streaming)
+- Search: Meilisearch
+- Cache: Redis (Upstash in prod)
+- Jobs: BullMQ
+- Payments: Paymob (Egyptian methods)
+- Monorepo: Turborepo + pnpm
+
+## Coding Rules
+1. TypeScript strict mode — no `any`, no `as` casts, no `@ts-ignore`
+2. All API responses use `ApiResponse<T>` wrapper: `{ success, data, meta?, error? }`
+3. UUID primary keys, `snake_case` DB columns, `camelCase` TypeScript
+4. Soft deletes with `deleted_at` column
+5. Arabic is the primary language — RTL is the default direction
+6. All user-facing strings must be in both Arabic and English
+7. Permission checks use `@RequireTier(X)` decorator
+8. Cursor-based pagination everywhere (no offset)
+9. NestJS: one module per feature, services inject PrismaService
+10. Frontend: Server Components by default, 'use client' only when needed
+11. Use logical CSS properties (`margin-inline-start`, not `margin-left`)
+
+## File Organization
+```
+apps/api/src/{module}/
+├── {module}.module.ts
+├── {module}.controller.ts
+├── {module}.service.ts
+├── {module}.service.spec.ts
+└── dto/
+    ├── create-{module}.dto.ts
+    └── update-{module}.dto.ts
+
+apps/web/src/
+├── app/[locale]/(app)/     # authenticated pages
+├── app/[locale]/(auth)/    # login, register
+├── app/[locale]/(admin)/   # admin panel (Tier 1)
+├── components/{feature}/   # feature components
+├── components/ui/          # shadcn primitives
+├── hooks/                  # custom hooks
+├── lib/                    # utilities, API client, capacitor helpers
+└── i18n/                   # ar.json, en.json
+
+apps/web/
+├── ios/                    # Capacitor iOS shell (auto-generated)
+├── android/                # Capacitor Android shell (auto-generated)
+└── capacitor.config.ts     # Capacitor config
+```
+
+## Capacitor Rules
+- ALWAYS provide web fallbacks for native features
+- Use `Capacitor.isNativePlatform()` for platform detection
+- Dynamic import Capacitor plugins — never at module top level
+- Test on web, iOS Simulator, and Android Emulator
+
+## Key Patterns
+- NestJS guards: `JwtAuthGuard` for auth, `TierGuard` for tier checks
+- Error format: `throw new ForbiddenException({ code: 'TIER_REQUIRED', message: '...' })`
+- Post creation: Tier 2 auto-publishes, Tier 3 goes to approval queue
+- Feed: 3 tabs (For You = algorithmic, Following = chronological, Videos = watch-time)
+
+## Before Writing Code
+1. Check `.ai/AI_RULES.md` for detailed coding standards
+2. Check `.ai/API_SPEC.md` for endpoint request/response schemas
+3. Check `.ai/DB_SCHEMA.md` for Prisma models
+4. Check `.ai/TASKS.md` for acceptance criteria
+
+## After Writing Code
+1. Update `.ai/CURRENT_STATE.md` with module status
+2. Update `.ai/TASKS.md` with task status
+3. Add entry to `.ai/SESSION_LOG.md`

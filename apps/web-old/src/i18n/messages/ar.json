@@ -1,0 +1,48 @@
+{
+  "common": {
+    "appName": "بيتكو",
+    "tagline": "مجتمعك العقاري",
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ",
+    "retry": "حاول مرة أخرى",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "share": "مشاركة",
+    "report": "إبلاغ",
+    "search": "بحث",
+    "seeAll": "عرض الكل",
+    "noResults": "لا توجد نتائج"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "search": "بحث",
+    "create": "إنشاء",
+    "groups": "مجموعات",
+    "profile": "حسابي"
+  },
+  "feed": {
+    "forYou": "لك",
+    "following": "المتابَعون",
+    "videos": "فيديوهات"
+  },
+  "post": {
+    "likes": "{count, plural, =0 {بدون إعجاب} one {إعجاب واحد} two {إعجابان} few {# إعجابات} many {# إعجاب} other {# إعجاب}}",
+    "comments": "{count, plural, =0 {بدون تعليقات} one {تعليق واحد} two {تعليقان} few {# تعليقات} many {# تعليق} other {# تعليق}}",
+    "publish": "نشر",
+    "submitForApproval": "إرسال للمراجعة",
+    "pending": "في انتظار المراجعة",
+    "approved": "تم القبول",
+    "rejected": "تم الرفض"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "phoneNumber": "رقم الموبايل",
+    "enterOtp": "أدخل رمز التحقق",
+    "sendOtp": "إرسال رمز التحقق",
+    "verifyOtp": "تأكيد",
+    "welcomeBack": "أهلاً بيك!"
+  }
+}
