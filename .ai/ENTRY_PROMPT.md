@@ -110,11 +110,14 @@ Guard: `@RequireTier(2)` decorator on controllers.
 ## Reference Files
 
 - `.ai/PROJECT_OVERVIEW.md` — product vision, personas, MVP scope
-- `.ai/CURRENT_STATE.md` — what's actually built right now
+- `.ai/CURRENT_STATE.md` — what's actually built right now (start here)
+- `.ai/PRD.md` — product requirements + feature inventory + roadmap
+- `.ai/TRUST_SPEC.md` — the computed trust system (T-1→T-5)
 - `.ai/BUSINESS_MODEL.md` — monetization & unit economics
-- `.ai/TASKS.md` — active task board
+- `.ai/TASKS.md` — frontend task board
+- `.ai/BACKEND_TASKS.md` — **backend task board (current focus)**
 - `.ai/ROADMAP.md` — 90-day plan
-- `.ai/ARCHITECTURE.md` — system design (⚠️ needs update for bed-level model)
-- `.ai/DB_SCHEMA.md` — Prisma schema (⚠️ needs update for bed-level model)
-- `.ai/API_SPEC.md` — endpoint contracts (⚠️ needs update for bed-level model)
 - `.ai/AI_RULES.md` — detailed coding standards
+- `.ai/ARCHITECTURE.md` — system design (⚠️ pre-pivot, see CURRENT_STATE + BACKEND_TASKS)
+- `.ai/DB_SCHEMA.md` — Prisma schema (⚠️ pre-pivot; rewrite tracked as B-0)
+- `.ai/API_SPEC.md` — endpoint contracts (⚠️ pre-pivot; new plan in BACKEND_TASKS)

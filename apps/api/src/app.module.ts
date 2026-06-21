@@ -8,15 +8,8 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { TierGuard } from './auth/guards/tier.guard';
 import { UsersModule } from './users/users.module';
-import { PostsModule } from './posts/posts.module';
-import { CommentsModule } from './comments/comments.module';
-import { SocialModule } from './social/social.module';
-import { LikesModule } from './likes/likes.module';
-import { FeedModule } from './feed/feed.module';
-import { GroupsModule } from './groups/groups.module';
 import { ModerationModule } from './moderation/moderation.module';
 import { ListingsModule } from './listings/listings.module';
-import { VideosModule } from './videos/videos.module';
 import { SearchModule } from './search/search.module';
 import { ChatModule } from './chat/chat.module';
 import { NotificationsModule } from './notifications/notifications.module';
@@ -46,15 +39,8 @@ import { AnalyticsModule } from './analytics/analytics.module';
     // ─── Feature Modules ───────────────────────────
     AuthModule,
     UsersModule,
-    PostsModule,
-    CommentsModule,
-    SocialModule,
-    LikesModule,
-    FeedModule,
-    GroupsModule,
-    ModerationModule,
     ListingsModule,
-    VideosModule,
+    ModerationModule,
     SearchModule,
     ChatModule,
     NotificationsModule,

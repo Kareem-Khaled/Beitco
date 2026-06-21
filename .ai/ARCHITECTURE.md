@@ -1,4 +1,4 @@
-> ⚠️ **STALE — pre-pivot doc.** Beitco pivoted to a trust-first **bed-level housing marketplace** (June 2026). This doc was written before the pivot and references the old social-network/real-estate model. Trust `.ai/ENTRY_PROMPT.md`, `.ai/PROJECT_OVERVIEW.md`, `.ai/CURRENT_STATE.md`, `.ai/BUSINESS_MODEL.md`, `.ai/ROADMAP.md`, and `.ai/TASKS.md` instead. This file is kept for historical reference only and is on the cleanup list.
+> ⚠️ **STALE — pre-pivot doc.** Beitco pivoted to a trust-first **bed-level housing marketplace** (June 2026). This doc describes the old social-network/real-estate architecture. For the current system read `.ai/CURRENT_STATE.md` (what's built) and `.ai/BACKEND_TASKS.md` (the backend plan). Trust `.ai/ENTRY_PROMPT.md`, `.ai/CURRENT_STATE.md`, `.ai/BACKEND_TASKS.md`, and `.ai/TASKS.md` instead. Kept for historical reference only.
 
 ---
 

@@ -1,15 +1,17 @@
-# Task Board — Beitco
+# Task Board — Beitco (Frontend)
 
-> Active working board. Update as work happens.
-> Last updated: June 16, 2026 · Aligned with `.ai/PRD.md` and `.ai/TRUST_SPEC.md`.
+> Active working board for the **frontend** (`apps/web`). Update as work happens.
+> Last updated: June 17, 2026 · Aligned with `.ai/PRD.md` and `.ai/TRUST_SPEC.md`.
 >
-> **Reality note:** Frontend is now polished and broad. Since the last board, we shipped: notifications + bell, settings, KYC verification (ID + selfie), public profiles (`/u/$id`), the "ليه الدرجة دي؟" trust popover, consent-based occupant linking, bed/room-level booking (multi-select), gender search filter, functional mobile nav + header search, global toasts, legal pages (privacy/terms), auth-gated detail pages, role-aware `/me`, owner analytics, loading skeletons, review UX (sort + helpful + owner reply), working share, dark mode, branded favicon/OG, and many fixes. **The real frontier is unchanged:** (1) make the **trust wedge real** (compute scores), (2) finish **role coherence** + **moderation**, (3) **wire a backend**. See PRD §6 (gaps) and §12 (roadmap).
+> ➡️ **Backend work is tracked separately in `.ai/BACKEND_TASKS.md`** (the current focus after the June 17 git setup + backend cleanup).
+>
+> **Reality note:** The frontend is a **feature-complete prototype** on a localStorage mock. We shipped the full trust wedge (T-1→T-5: computed listing/owner/renter scores, real response-rate, two-sided reputation, transparency UI), the matching engine, moderation queue (MOD-1), bed-level booking, sale + nightly, KYC verification, public profiles, maps (Leaflet pin-drop + Google embeds), mobile bottom-nav, PWA, dark mode, accessibility pass, and 31 engine unit tests — plus a `store.ts` split and a wave of UX polish. **The frontier is now the backend:** make it all real on a server (see `.ai/BACKEND_TASKS.md`). Remaining FE-only items below are optional polish.
 
 ---
 
 ## 🟢 In Progress
 
-_(nothing currently in flight)_
+_(nothing currently in flight — frontend prototype is feature-complete; focus has moved to `.ai/BACKEND_TASKS.md`)_
 
 ---
 
