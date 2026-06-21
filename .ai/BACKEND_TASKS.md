@@ -11,22 +11,25 @@
 
 ## 🟢 In Progress
 
-_(nothing yet — start with B-0)_
+_(B-0 done — next up: B-0.1 seed parity, then B-1 listings read)_
+
+---
+
+## ✅ Done
+
+### B-0 · Rewrite the Prisma schema to the bed-level + trust model ✅ (June 17)
+- New `apps/api/prisma/schema.prisma`: **22 models, 21 enums**, mirroring `apps/web/src/lib/beitco/types.ts`. UUID PKs, `snake_case` columns via `@map`, soft deletes (`deleted_at`), PostGIS extension preserved.
+- Models: `User`, `RenterProfile`, `Property` → `Room` → `Bed`, `Occupant` (consent link), `NearbyPlace`, `CustomSpec`, `Review` + `ReviewHelpfulVote`, `RenterReview`, `ResponseEvent`, `Question`, `Thread` + `Message`, `Lead` + `LeadUnit`, `Tenancy`, `SavedListing`, `SavedSearch`, `Notification`, `VerificationRequest`. Enums use Latin values (Arabic mapped in the app layer).
+- `prisma validate` ✅, `prisma format` ✅, `prisma generate` ✅ (client exposes the new models; old social models gone).
+- **Minimal compiling core:** the legacy social-coupled services were moved to `apps/api/src/_unported/` (excluded from `tsconfig` + `tsconfig.build`), `app.module.ts` trimmed to infra (Config, Throttler, Prisma, Health). `tsc --noEmit` ✅, `nest build` ✅ (dist = app.module/common/health/main/prisma only). The `_unported` modules are ported back onto the new schema one at a time (A-1, B-1, B-2, MOD-1…).
+- ⏳ **`prisma migrate dev` not yet run** — needs a running Postgres (`docker compose up -d postgres`). The schema is validated and the client is generated; the first migration lands with B-0.1/B-1 once the DB is up.
 
 ---
 
 ## 🔥 Phase 0 — Foundation (do first, unblocks everything)
 
-### B-0 · Rewrite the Prisma schema to the bed-level + trust model ⭐ **START HERE**
-- Replace the pre-pivot social schema (`apps/api/prisma/schema.prisma`) with the housing model. Drop: `Post`, `Comment`, `Like`, `Follow`, `Block`, `Group`, `GroupMember`, `Share`, `Video`, `Hashtag`, `PollVote` (+ their enums).
-- Model the real inventory: `Property` → `Room` → `Bed` (with `BedStatus`), plus `rentalMode` (whole / by_room / by_bed), `listingType` (rent/sale), `nightlyPrice`, `rentToGender`, `lat`/`lng`, `ApartmentSpec` fields.
-- Trust tables: `Review` (with category scores), `RenterReview`, `ResponseEvent`, denormalized `trust`/`trustBreakdown` JSON on `Property`/`User`, `responseRate`, `renterReputation`.
-- Supporting: `User` (phone identity, `role`, `permissionTier`, `isAdmin`, verification), `Lead` (+ `LeadUnit`), `Tenancy`, `Occupant` (consent link), `SavedListing`, `SavedSearch`, `Question`/`Answer` (Q&A), `Thread`/`Message`, `Notification`, `VerificationRequest`.
-- **Source of truth:** mirror `apps/web/src/lib/beitco/types.ts`. UUID PKs, `snake_case` columns via `@map`, `deleted_at` soft-deletes.
-- **DoD:** `prisma migrate dev` runs clean on a fresh Postgres; generated client matches the frontend types; `tsc --noEmit` green.
-
-### B-0.1 · Seed parity
-- Port `apps/web/src/lib/beitco/seed-data.ts` into a Prisma seed so the API serves the same demo listings/users the frontend shows today (smooth swap from mock → API).
+### B-0.1 · Seed parity ⭐ **NEXT**
+- Port `apps/web/src/lib/beitco/seed-data.ts` into a Prisma seed so the API serves the same demo listings/users the frontend shows today (smooth swap from mock → API). Run the first `prisma migrate dev` here (needs Postgres up).
 
 ### B-0.2 · API response envelope + conventions
 - Enforce `{ success, data, meta?: { cursor, hasMore }, error?: { code, message } }` globally (interceptor + exception filter). Cursor pagination only. `camelCase` JSON.

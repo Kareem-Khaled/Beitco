@@ -1,3 +1,9 @@
+// Beitco - Prisma schema (bed-level trust-first housing marketplace)
+// Post-pivot schema (B-0). Mirrors apps/web/src/lib/beitco/types.ts.
+// UUID PKs; snake_case columns via @map; soft deletes via deletedAt.
+// Enums use Latin values; Arabic display is mapped in the app layer.
+// The pre-pivot social/video schema lives on the `old` git branch.
+
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
@@ -9,726 +15,614 @@ datasource db {
   extensions = [postgis]
 }
 
-// ═══════════════════════════════════════════════════════
-// ENUMS
-// ═══════════════════════════════════════════════════════
-
 enum UserRole {
-  buyer
-  seller
-  agent
-  agency_admin
-  admin
+  renter
+  owner
+  both
 }
 
-enum PermissionTier {
-  admin             // Tier 1
-  verified_contributor // Tier 2
-  trusted_member    // Tier 3
-  new_user          // Tier 4
-  restricted        // Tier 5
+enum Gender {
+  male
+  female
 }
 
-enum PostType {
-  text
-  image
-  video
-  listing
-  poll
-  discussion
-  repost
+enum GenderPref {
+  male
+  female
+  any
 }
 
-enum PostStatus {
-  published
-  pending_approval
-  rejected
-  hidden
-  deleted
+enum RentalGenderPolicy {
+  male_only
+  female_only
 }
 
-enum ApprovalStatus {
-  auto_approved
+enum VerificationStatus {
+  unverified
   pending
-  approved
-  rejected
-}
-
-enum CommentStatus {
-  visible
-  hidden
-  deleted
-}
-
-enum LikeTargetType {
-  post
-  comment
-}
-
-enum ShareType {
-  whatsapp
-  in_app_repost
-  copy_link
-  instagram
-  facebook
-}
-
-enum GroupType {
-  neighborhood
-  topic
-  compound
-  custom
-}
-
-enum GroupPrivacy {
-  public
-  private
-}
-
-enum PostingRules {
-  open
-  moderated
-  admin_only
-}
-
-enum GroupMemberRole {
-  member
-  moderator
-  admin
-}
-
-enum GroupMemberStatus {
-  active
-  pending
-  banned
-}
-
-enum ListingType {
-  sale
-  rent
-  commercial
+  verified
 }
 
 enum PropertyType {
   apartment
-  villa
-  office
-  land
-  duplex
-  penthouse
+  room
+  bed
+}
+
+enum UnitType {
+  apartment
   studio
-  chalet
-  townhouse
-  twin_house
+  duplex
+  roof
+  villa
 }
 
-enum FinishingType {
-  fully_finished
-  semi_finished
-  core_shell
+enum PropertyStatus {
+  draft
+  pending_approval
+  published
+  paused
+  rejected
 }
 
-enum ListingStatus {
-  active
-  pending
+enum RentalMode {
+  whole
+  by_room
+  by_bed
+}
+
+enum ListingType {
+  rent
+  sale
+}
+
+enum SaleStatus {
+  available
   sold
-  rented
-  expired
 }
 
-enum VideoStatus {
-  uploading
-  processing
-  ready
-  error
+enum BedStatus {
+  available
+  occupied
+  reserved
 }
 
-enum ReportReason {
-  spam
-  inappropriate
-  fake
-  harassment
-  fraud
+enum FurnishedPref {
+  furnished
+  unfurnished
+  any
+}
+
+enum Occupation {
+  student
+  employee
+  remote
+  freelance
   other
 }
 
-enum ReportStatus {
-  pending
-  reviewed
-  resolved
-  dismissed
+enum NearbyType {
+  metro
+  university
+  transit
+  mall
+  hospital
+  supermarket
+  other
 }
 
-enum ReportAction {
-  none
-  warning
-  content_removed
-  user_suspended
-  user_banned
+enum LinkStatus {
+  pending
+  confirmed
+}
+
+enum LeadStatus {
+  pending
+  approved
+  declined
+  completed
+}
+
+enum LeadIntent {
+  viewing
+  booking
+}
+
+enum LeadUnitKind {
+  bed
+  room
+  whole
+}
+
+enum MessageType {
+  text
+  viewing_request
 }
 
 enum NotificationType {
+  lead
   message
-  match
-  price_drop
-  listing_status
-  follow
-  like
-  comment
-  share
-  group_activity
-  post_approval
-  mention
-  system
+  review
+  verification
+  link
 }
 
-// ═══════════════════════════════════════════════════════
-// MODELS
-// ═══════════════════════════════════════════════════════
-
-// ─── USERS ─────────────────────────────────────────────
-
 model User {
-  id                   String         @id @default(uuid()) @db.Uuid
-  phone                String         @unique
-  email                String?        @unique
-  username             String?        @unique
-  nameAr               String         @map("name_ar")
-  nameEn               String?        @map("name_en")
-  role                 UserRole       @default(buyer)
-  permissionTier       PermissionTier @default(new_user) @map("permission_tier")
-  avatarUrl            String?        @map("avatar_url")
-  coverPhotoUrl        String?        @map("cover_photo_url")
-  bio                  String?
-  nationalIdVerified   Boolean        @default(false) @map("national_id_verified")
-  agentLicenseVerified Boolean        @default(false) @map("agent_license_verified")
-  trustScore           Int            @default(0) @map("trust_score")
-  reputationScore      Int            @default(0) @map("reputation_score")
-  followerCount        Int            @default(0) @map("follower_count")
-  followingCount       Int            @default(0) @map("following_count")
-  postCount            Int            @default(0) @map("post_count")
-  preferences          Json           @default("{}")
-  createdAt            DateTime       @default(now()) @map("created_at")
-  updatedAt            DateTime       @updatedAt @map("updated_at")
-  deletedAt            DateTime?      @map("deleted_at")
+  id     String   @id @default(uuid())
+  phone  String   @unique
+  name   String
+  avatar String?
+  role   UserRole @default(renter)
+  gender Gender?
 
-  // Relations
-  posts            Post[]                     @relation("PostAuthor")
-  comments         Comment[]                  @relation("CommentAuthor")
-  likes            Like[]
-  followers        Follow[]                   @relation("Following")
-  following        Follow[]                   @relation("Follower")
-  blockedBy        Block[]                    @relation("Blocked")
-  blocking         Block[]                    @relation("Blocker")
-  groups           GroupMember[]
-  createdGroups    Group[]                    @relation("GroupCreator")
-  listings         Listing[]
-  videos           Video[]
-  shares           Share[]
-  reports          Report[]                   @relation("Reporter")
-  notifications    Notification[]
-  reviewsGiven     Review[]                   @relation("ReviewAuthor")
-  reviewsReceived  Review[]                   @relation("ReviewTarget")
-  conversations    ConversationParticipant[]
-  messages         Message[]
-  savedListings    SavedListing[]
-  savedSearches    SavedSearch[]
-  pollVotes        PollVote[]
-  approvedPosts    Post[]                     @relation("PostApprover")
+  isAdmin            Boolean            @default(false)
+  verified           Boolean            @default(false)
+  verificationStatus VerificationStatus @default(unverified) @map("verification_status")
+  trust              Float              @default(5.0)
+  trustBreakdown     Json?              @map("trust_breakdown")
+  responseRate       Int?               @map("response_rate")
+  renterReputation   Float?             @map("renter_reputation")
+  renterReviewsCount Int                @default(0) @map("renter_reviews_count")
 
-  @@index([phone])
-  @@index([email])
-  @@index([username])
-  @@index([permissionTier])
-  @@index([createdAt])
+  notificationPrefs Json?          @map("notification_prefs")
+  profile           RenterProfile?
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  properties         Property[]            @relation("PropertyOwner")
+  reviewsAuthored    Review[]              @relation("ReviewAuthor")
+  reviewHelpfulVotes ReviewHelpfulVote[]
+  renterReviewsAbout RenterReview[]        @relation("RenterReviewSubject")
+  renterReviewsBy    RenterReview[]        @relation("RenterReviewAuthor")
+  responseEvents     ResponseEvent[]
+  questionsAsked     Question[]            @relation("QuestionAsker")
+  questionsAnswered  Question[]            @relation("QuestionAnswerer")
+  threadsAsOwner     Thread[]              @relation("ThreadOwner")
+  threadsAsRenter    Thread[]              @relation("ThreadRenter")
+  messages           Message[]
+  leads              Lead[]
+  tenancies          Tenancy[]
+  occupantLinks      Occupant[]
+  savedListings      SavedListing[]
+  savedSearches      SavedSearch[]
+  notifications      Notification[]
+  verificationReqs   VerificationRequest[]
+
+  @@index([role])
+  @@index([verificationStatus])
   @@map("users")
 }
 
-// ─── POSTS ─────────────────────────────────────────────
+model RenterProfile {
+  id     String @id @default(uuid())
+  userId String @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-model Post {
-  id                 String         @id @default(uuid()) @db.Uuid
-  authorId           String         @map("author_id") @db.Uuid
-  postType           PostType       @map("post_type")
-  contentText        String?        @map("content_text")
-  contentAr          String?        @map("content_ar")
-  media              Json           @default("[]")
-  listingId          String?        @map("listing_id") @db.Uuid
-  videoId            String?        @map("video_id") @db.Uuid
-  groupId            String?        @map("group_id") @db.Uuid
-  repostOfId         String?        @map("repost_of_id") @db.Uuid
-  hashtags           String[]       @default([])
-  status             PostStatus     @default(pending_approval)
-  approvalStatus     ApprovalStatus @default(pending) @map("approval_status")
-  approvalReviewedBy String?        @map("approval_reviewed_by") @db.Uuid
-  approvalReviewedAt DateTime?      @map("approval_reviewed_at")
-  rejectionReason    String?        @map("rejection_reason")
-  aiQualityScore     Int            @default(0) @map("ai_quality_score")
-  aiModerationFlags  Json           @default("[]") @map("ai_moderation_flags")
-  likeCount          Int            @default(0) @map("like_count")
-  commentCount       Int            @default(0) @map("comment_count")
-  shareCount         Int            @default(0) @map("share_count")
-  viewCount          Int            @default(0) @map("view_count")
-  isPinned           Boolean        @default(false) @map("is_pinned")
-  metadata           Json           @default("{}")
-  createdAt          DateTime       @default(now()) @map("created_at")
-  updatedAt          DateTime       @updatedAt @map("updated_at")
-  deletedAt          DateTime?      @map("deleted_at")
+  intent            ListingType    @default(rent)
+  budgetMin         Int?           @map("budget_min")
+  budgetMax         Int?           @map("budget_max")
+  areas             String[]
+  lookingFor        PropertyType[] @map("looking_for")
+  moveInBy          DateTime?      @map("move_in_by")
+  mustHaveAmenities String[]       @map("must_have_amenities")
+  nearMetro         Boolean        @default(false) @map("near_metro")
+  metroLines        String[]       @map("metro_lines")
+  maxWalkMinutes    Int?           @map("max_walk_minutes")
+  nearTransit       Boolean        @default(false) @map("near_transit")
+  furnishedPref     FurnishedPref? @map("furnished_pref")
+  housematesGender  GenderPref?    @map("housemates_gender")
+  occupation        Occupation?
+  smoker            Boolean?
+  bio               String?
 
-  // Relations
-  author    User     @relation("PostAuthor", fields: [authorId], references: [id])
-  approver  User?    @relation("PostApprover", fields: [approvalReviewedBy], references: [id])
-  listing   Listing? @relation(fields: [listingId], references: [id])
-  video     Video?   @relation(fields: [videoId], references: [id])
-  group     Group?   @relation(fields: [groupId], references: [id])
-  repostOf  Post?    @relation("Reposts", fields: [repostOfId], references: [id])
-  reposts   Post[]   @relation("Reposts")
-  comments  Comment[]
-  likes     Like[]   @relation("PostLikes")
-  shares    Share[]
-  pollVotes PollVote[]
-  reports   Report[] @relation("PostReports")
-
-  @@index([authorId])
-  @@index([groupId])
-  @@index([status])
-  @@index([createdAt])
-  @@index([postType])
-  @@index([hashtags], type: Gin)
-  @@map("posts")
-}
-
-// ─── COMMENTS ──────────────────────────────────────────
-
-model Comment {
-  id                String        @id @default(uuid()) @db.Uuid
-  postId            String        @map("post_id") @db.Uuid
-  authorId          String        @map("author_id") @db.Uuid
-  parentCommentId   String?       @map("parent_comment_id") @db.Uuid
-  content           String        @db.VarChar(500)
-  likeCount         Int           @default(0) @map("like_count")
-  isPinned          Boolean       @default(false) @map("is_pinned")
-  status            CommentStatus @default(visible)
-  aiModerationFlags Json          @default("[]") @map("ai_moderation_flags")
-  metadata          Json          @default("{}")
-  createdAt         DateTime      @default(now()) @map("created_at")
-  updatedAt         DateTime      @updatedAt @map("updated_at")
-  deletedAt         DateTime?     @map("deleted_at")
-
-  // Relations
-  post          Post      @relation(fields: [postId], references: [id])
-  author        User      @relation("CommentAuthor", fields: [authorId], references: [id])
-  parentComment Comment?  @relation("CommentReplies", fields: [parentCommentId], references: [id])
-  replies       Comment[] @relation("CommentReplies")
-  likes         Like[]    @relation("CommentLikes")
-  reports       Report[]  @relation("CommentReports")
-
-  @@index([postId])
-  @@index([authorId])
-  @@index([parentCommentId])
-  @@index([createdAt])
-  @@map("comments")
-}
-
-// ─── LIKES ─────────────────────────────────────────────
-
-model Like {
-  id         String         @id @default(uuid()) @db.Uuid
-  userId     String         @map("user_id") @db.Uuid
-  targetType LikeTargetType @map("target_type")
-  postId     String?        @map("post_id") @db.Uuid
-  commentId  String?        @map("comment_id") @db.Uuid
-  createdAt  DateTime       @default(now()) @map("created_at")
-
-  // Relations
-  user    User     @relation(fields: [userId], references: [id])
-  post    Post?    @relation("PostLikes", fields: [postId], references: [id])
-  comment Comment? @relation("CommentLikes", fields: [commentId], references: [id])
-
-  @@unique([userId, targetType, postId, commentId], name: "unique_like")
-  @@index([userId])
-  @@index([postId])
-  @@index([commentId])
-  @@map("likes")
-}
-
-// ─── FOLLOWS ───────────────────────────────────────────
-
-model Follow {
-  id          String   @id @default(uuid()) @db.Uuid
-  followerId  String   @map("follower_id") @db.Uuid
-  followingId String   @map("following_id") @db.Uuid
-  createdAt   DateTime @default(now()) @map("created_at")
-
-  // Relations
-  follower  User @relation("Follower", fields: [followerId], references: [id])
-  following User @relation("Following", fields: [followingId], references: [id])
-
-  @@unique([followerId, followingId])
-  @@index([followerId])
-  @@index([followingId])
-  @@map("follows")
-}
-
-// ─── BLOCKS ────────────────────────────────────────────
-
-model Block {
-  id        String   @id @default(uuid()) @db.Uuid
-  blockerId String   @map("blocker_id") @db.Uuid
-  blockedId String   @map("blocked_id") @db.Uuid
-  createdAt DateTime @default(now()) @map("created_at")
-
-  // Relations
-  blocker User @relation("Blocker", fields: [blockerId], references: [id])
-  blocked User @relation("Blocked", fields: [blockedId], references: [id])
-
-  @@unique([blockerId, blockedId])
-  @@index([blockerId])
-  @@index([blockedId])
-  @@map("blocks")
-}
-
-// ─── GROUPS ────────────────────────────────────────────
-
-model Group {
-  id            String       @id @default(uuid()) @db.Uuid
-  nameAr        String       @map("name_ar")
-  nameEn        String?      @map("name_en")
-  slug          String       @unique
-  descriptionAr String?      @map("description_ar")
-  descriptionEn String?      @map("description_en")
-  groupType     GroupType    @map("group_type")
-  coverPhotoUrl String?      @map("cover_photo_url")
-  avatarUrl     String?      @map("avatar_url")
-  privacy       GroupPrivacy @default(public)
-  postingRules  PostingRules @default(open) @map("posting_rules")
-  locationLat   Float?       @map("location_lat")
-  locationLng   Float?       @map("location_lng")
-  city          String?
-  district      String?
-  creatorId     String       @map("creator_id") @db.Uuid
-  memberCount   Int          @default(0) @map("member_count")
-  postCount     Int          @default(0) @map("post_count")
-  settings      Json         @default("{}")
-  createdAt     DateTime     @default(now()) @map("created_at")
-  updatedAt     DateTime     @updatedAt @map("updated_at")
-  deletedAt     DateTime?    @map("deleted_at")
-
-  // Relations
-  creator User          @relation("GroupCreator", fields: [creatorId], references: [id])
-  members GroupMember[]
-  posts   Post[]
-
-  @@index([slug])
-  @@index([groupType])
-  @@index([city])
-  @@index([createdAt])
-  @@map("groups")
-}
-
-model GroupMember {
-  id       String            @id @default(uuid()) @db.Uuid
-  groupId  String            @map("group_id") @db.Uuid
-  userId   String            @map("user_id") @db.Uuid
-  role     GroupMemberRole   @default(member)
-  joinedAt DateTime          @default(now()) @map("joined_at")
-  status   GroupMemberStatus @default(active)
-
-  // Relations
-  group Group @relation(fields: [groupId], references: [id])
-  user  User  @relation(fields: [userId], references: [id])
-
-  @@unique([groupId, userId])
-  @@index([groupId])
-  @@index([userId])
-  @@map("group_members")
-}
-
-// ─── SHARES ────────────────────────────────────────────
-
-model Share {
-  id        String    @id @default(uuid()) @db.Uuid
-  userId    String    @map("user_id") @db.Uuid
-  postId    String    @map("post_id") @db.Uuid
-  shareType ShareType @map("share_type")
-  metadata  Json      @default("{}")
-  createdAt DateTime  @default(now()) @map("created_at")
-
-  // Relations
-  user User @relation(fields: [userId], references: [id])
-  post Post @relation(fields: [postId], references: [id])
-
-  @@index([userId])
-  @@index([postId])
-  @@map("shares")
-}
-
-// ─── REPORTS ───────────────────────────────────────────
-
-model Report {
-  id              String       @id @default(uuid()) @db.Uuid
-  reporterId      String       @map("reporter_id") @db.Uuid
-  targetType      String       @map("target_type")
-  targetPostId    String?      @map("target_post_id") @db.Uuid
-  targetCommentId String?      @map("target_comment_id") @db.Uuid
-  targetUserId    String?      @map("target_user_id") @db.Uuid
-  targetListingId String?      @map("target_listing_id") @db.Uuid
-  reason          ReportReason
-  details         String?
-  status          ReportStatus @default(pending)
-  reviewedBy      String?      @map("reviewed_by") @db.Uuid
-  actionTaken     ReportAction @default(none) @map("action_taken")
-  aiSeverityScore Int          @default(0) @map("ai_severity_score")
-  createdAt       DateTime     @default(now()) @map("created_at")
-  reviewedAt      DateTime?    @map("reviewed_at")
-
-  // Relations
-  reporter      User     @relation("Reporter", fields: [reporterId], references: [id])
-  targetPost    Post?    @relation("PostReports", fields: [targetPostId], references: [id])
-  targetComment Comment? @relation("CommentReports", fields: [targetCommentId], references: [id])
-
-  @@index([reporterId])
-  @@index([status])
-  @@index([createdAt])
-  @@map("reports")
-}
-
-// ─── LISTINGS ──────────────────────────────────────────
-
-model Listing {
-  id            String        @id @default(uuid()) @db.Uuid
-  agentId       String        @map("agent_id") @db.Uuid
-  titleAr       String        @map("title_ar")
-  titleEn       String?       @map("title_en")
-  descriptionAr String?       @map("description_ar")
-  descriptionEn String?       @map("description_en")
-  listingType   ListingType   @map("listing_type")
-  propertyType  PropertyType  @map("property_type")
-  price         Decimal       @db.Decimal(12, 2)
-  currency      String        @default("EGP") @db.VarChar(3)
-  area          Float
-  bedrooms      Int?
-  bathrooms     Int?
-  floor         Int?
-  finishing     FinishingType?
-  amenities     String[]      @default([])
-  images        String[]      @default([])
-  locationLat   Float?        @map("location_lat")
-  locationLng   Float?        @map("location_lng")
-  address       String?
-  city          String?
-  district      String?
-  compound      String?
-  status        ListingStatus @default(active)
-  viewCount     Int           @default(0) @map("view_count")
-  saveCount     Int           @default(0) @map("save_count")
-  inquiryCount  Int           @default(0) @map("inquiry_count")
-  expiresAt     DateTime?     @map("expires_at")
-  createdAt     DateTime      @default(now()) @map("created_at")
-  updatedAt     DateTime      @updatedAt @map("updated_at")
-  deletedAt     DateTime?     @map("deleted_at")
-
-  // Relations
-  agent   User           @relation(fields: [agentId], references: [id])
-  posts   Post[]
-  videos  Video[]
-  savedBy SavedListing[]
-
-  @@index([agentId])
-  @@index([listingType])
-  @@index([propertyType])
-  @@index([price])
-  @@index([city])
-  @@index([status])
-  @@index([createdAt])
-  @@map("listings")
-}
-
-// ─── VIDEOS ────────────────────────────────────────────
-
-model Video {
-  id             String      @id @default(uuid()) @db.Uuid
-  uploaderId     String      @map("uploader_id") @db.Uuid
-  listingId      String?     @map("listing_id") @db.Uuid
-  muxAssetId     String?     @map("mux_asset_id")
-  muxPlaybackId  String?     @map("mux_playback_id")
-  muxUploadId    String?     @map("mux_upload_id")
-  status         VideoStatus @default(uploading)
-  playbackUrl    String?     @map("playback_url")
-  thumbnailUrl   String?     @map("thumbnail_url")
-  duration       Int?
-  aspectRatio    String?     @map("aspect_ratio") @db.VarChar(10)
-  watchCount     Int         @default(0) @map("watch_count")
-  totalWatchTime Int         @default(0) @map("total_watch_time")
-  metadata       Json        @default("{}")
-  createdAt      DateTime    @default(now()) @map("created_at")
-  updatedAt      DateTime    @updatedAt @map("updated_at")
-
-  // Relations
-  uploader User     @relation(fields: [uploaderId], references: [id])
-  listing  Listing? @relation(fields: [listingId], references: [id])
-  posts    Post[]
-
-  @@index([uploaderId])
-  @@index([listingId])
-  @@index([status])
-  @@map("videos")
-}
-
-// ─── CONVERSATIONS & MESSAGES ──────────────────────────
-
-model Conversation {
-  id            String    @id @default(uuid()) @db.Uuid
-  listingId     String?   @map("listing_id") @db.Uuid
-  lastMessageAt DateTime? @map("last_message_at")
-  createdAt     DateTime  @default(now()) @map("created_at")
-
-  // Relations
-  participants ConversationParticipant[]
-  messages     Message[]
-
-  @@index([lastMessageAt])
-  @@map("conversations")
-}
-
-model ConversationParticipant {
-  id             String    @id @default(uuid()) @db.Uuid
-  conversationId String    @map("conversation_id") @db.Uuid
-  userId         String    @map("user_id") @db.Uuid
-  lastReadAt     DateTime? @map("last_read_at")
-  joinedAt       DateTime  @default(now()) @map("joined_at")
-
-  // Relations
-  conversation Conversation @relation(fields: [conversationId], references: [id])
-  user         User         @relation(fields: [userId], references: [id])
-
-  @@unique([conversationId, userId])
-  @@index([userId])
-  @@map("conversation_participants")
-}
-
-model Message {
-  id             String    @id @default(uuid()) @db.Uuid
-  conversationId String    @map("conversation_id") @db.Uuid
-  senderId       String    @map("sender_id") @db.Uuid
-  content        String
-  messageType    String    @default("text") @map("message_type") @db.VarChar(20)
-  metadata       Json      @default("{}")
-  createdAt      DateTime  @default(now()) @map("created_at")
-  deletedAt      DateTime? @map("deleted_at")
-
-  // Relations
-  conversation Conversation @relation(fields: [conversationId], references: [id])
-  sender       User         @relation(fields: [senderId], references: [id])
-
-  @@index([conversationId])
-  @@index([senderId])
-  @@index([createdAt])
-  @@map("messages")
-}
-
-// ─── REVIEWS ───────────────────────────────────────────
-
-model Review {
-  id        String   @id @default(uuid()) @db.Uuid
-  authorId  String   @map("author_id") @db.Uuid
-  targetId  String   @map("target_id") @db.Uuid
-  rating    Int      @db.SmallInt
-  content   String?
-  createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  // Relations
-  author User @relation("ReviewAuthor", fields: [authorId], references: [id])
-  target User @relation("ReviewTarget", fields: [targetId], references: [id])
+  @@map("renter_profiles")
+}
 
-  @@unique([authorId, targetId])
-  @@index([targetId])
+model Property {
+  id      String @id @default(uuid())
+  ownerId String @map("owner_id")
+  owner   User   @relation("PropertyOwner", fields: [ownerId], references: [id])
+
+  title       String
+  description String @default("")
+  area        String
+  address     String @default("")
+  lat         Float?
+  lng         Float?
+
+  type        PropertyType
+  status      PropertyStatus @default(draft)
+  listingType ListingType    @default(rent) @map("listing_type")
+  rentalMode  RentalMode?    @map("rental_mode")
+
+  unitType  UnitType? @map("unit_type")
+  bedrooms  Int?
+  bathrooms Int?
+  floor     Int?
+  sizeM2    Int?      @map("size_m2")
+  furnished Boolean   @default(false)
+
+  price        Int
+  priceFrom    Int?        @map("price_from")
+  wholePrice   Int?        @map("whole_price")
+  wholeStatus  BedStatus?  @map("whole_status")
+  nightlyPrice Int?        @map("nightly_price")
+  salePrice    Int?        @map("sale_price")
+  saleStatus   SaleStatus? @map("sale_status")
+  negotiable   Boolean     @default(false)
+
+  rentToGender RentalGenderPolicy? @map("rent_to_gender")
+
+  images    String[]
+  amenities String[]
+  costs     Json     @default("[]")
+
+  trust          Float   @default(5.0)
+  trustBreakdown Json?   @map("trust_breakdown")
+  verified       Boolean @default(false)
+  quality        Json?
+  reviewsCount   Int     @default(0) @map("reviews_count")
+  residents      Int     @default(0)
+
+  rejectionReason String?   @map("rejection_reason")
+  moderatedAt     DateTime? @map("moderated_at")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  rooms         Room[]
+  wholeOccupant Occupant?      @relation("PropertyWholeOccupant")
+  nearby        NearbyPlace[]
+  customSpecs   CustomSpec[]
+  reviews       Review[]
+  questions     Question[]
+  threads       Thread[]
+  leads         Lead[]
+  tenancies     Tenancy[]
+  savedBy       SavedListing[]
+  renterReviews RenterReview[]
+
+  @@index([status])
+  @@index([ownerId])
+  @@index([type])
+  @@index([listingType])
+  @@index([area])
+  @@map("properties")
+}
+
+model Room {
+  id         String   @id @default(uuid())
+  propertyId String   @map("property_id")
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  name     String
+  features String[]
+  sizeM2   Int?       @map("size_m2")
+  price    Int?
+  status   BedStatus?
+
+  beds     Bed[]
+  occupant Occupant?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([propertyId])
+  @@map("rooms")
+}
+
+model Bed {
+  id     String @id @default(uuid())
+  roomId String @map("room_id")
+  room   Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  label    String
+  status   BedStatus @default(available)
+  price    Int
+  features String[]
+
+  occupant Occupant?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([roomId])
+  @@map("beds")
+}
+
+model Occupant {
+  id         String      @id @default(uuid())
+  name       String?
+  phone      String?
+  moveInDate DateTime?   @map("move_in_date")
+  notes      String?
+  userId     String?     @map("user_id")
+  user       User?       @relation(fields: [userId], references: [id])
+  linkStatus LinkStatus? @map("link_status")
+
+  bedId           String?   @unique @map("bed_id")
+  bed             Bed?      @relation(fields: [bedId], references: [id], onDelete: Cascade)
+  roomId          String?   @unique @map("room_id")
+  room            Room?     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  wholePropertyId String?   @unique @map("whole_property_id")
+  wholeProperty   Property? @relation("PropertyWholeOccupant", fields: [wholePropertyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("occupants")
+}
+
+model NearbyPlace {
+  id         String     @id @default(uuid())
+  propertyId String     @map("property_id")
+  property   Property   @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  type       NearbyType
+  name       String
+  line       String?
+  minutes    Int?
+
+  @@index([propertyId])
+  @@map("nearby_places")
+}
+
+model CustomSpec {
+  id         String   @id @default(uuid())
+  propertyId String   @map("property_id")
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  label      String
+  value      String
+
+  @@index([propertyId])
+  @@map("custom_specs")
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  propertyId String   @map("property_id")
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  authorId   String?  @map("author_id")
+  author     User?    @relation("ReviewAuthor", fields: [authorId], references: [id])
+
+  authorName  String @map("author_name")
+  initials    String @default("")
+  monthsLived Int    @map("months_lived")
+  rating      Float
+  body        String
+  scores      Json?
+  helpful     Int    @default(0)
+  ownerReply  Json?  @map("owner_reply")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  helpfulVotes ReviewHelpfulVote[]
+
+  @@index([propertyId])
   @@map("reviews")
 }
 
-// ─── SAVED LISTINGS ────────────────────────────────────
+model ReviewHelpfulVote {
+  id       String @id @default(uuid())
+  reviewId String @map("review_id")
+  review   Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  userId   String @map("user_id")
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-model SavedListing {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @map("user_id") @db.Uuid
-  listingId String   @map("listing_id") @db.Uuid
   createdAt DateTime @default(now()) @map("created_at")
 
-  // Relations
-  user    User    @relation(fields: [userId], references: [id])
-  listing Listing @relation(fields: [listingId], references: [id])
+  @@unique([reviewId, userId])
+  @@map("review_helpful_votes")
+}
 
-  @@unique([userId, listingId])
+model RenterReview {
+  id         String   @id @default(uuid())
+  tenancyId  String   @map("tenancy_id")
+  tenancy    Tenancy  @relation(fields: [tenancyId], references: [id], onDelete: Cascade)
+  renterId   String   @map("renter_id")
+  renter     User     @relation("RenterReviewSubject", fields: [renterId], references: [id])
+  ownerId    String   @map("owner_id")
+  owner      User     @relation("RenterReviewAuthor", fields: [ownerId], references: [id])
+  propertyId String   @map("property_id")
+  property   Property @relation(fields: [propertyId], references: [id])
+
+  rating Float
+  scores Json
+  body   String
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([tenancyId, ownerId])
+  @@index([renterId])
+  @@map("renter_reviews")
+}
+
+model ResponseEvent {
+  id                   String    @id @default(uuid())
+  ownerId              String    @map("owner_id")
+  owner                User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  threadId             String    @unique @map("thread_id")
+  thread               Thread    @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  firstRenterMessageAt DateTime  @map("first_renter_message_at")
+  firstOwnerReplyAt    DateTime? @map("first_owner_reply_at")
+
+  @@index([ownerId])
+  @@map("response_events")
+}
+
+model Question {
+  id         String   @id @default(uuid())
+  propertyId String   @map("property_id")
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  askerId    String?  @map("asker_id")
+  asker      User?    @relation("QuestionAsker", fields: [askerId], references: [id])
+  askerName  String   @map("asker_name")
+  body       String
+
+  answer       String?
+  answererId   String?   @map("answerer_id")
+  answerer     User?     @relation("QuestionAnswerer", fields: [answererId], references: [id])
+  answererName String?   @map("answerer_name")
+  answeredAt   DateTime? @map("answered_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([propertyId])
+  @@map("questions")
+}
+
+model Thread {
+  id         String   @id @default(uuid())
+  propertyId String   @map("property_id")
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  ownerId    String   @map("owner_id")
+  owner      User     @relation("ThreadOwner", fields: [ownerId], references: [id])
+  renterId   String   @map("renter_id")
+  renter     User     @relation("ThreadRenter", fields: [renterId], references: [id])
+
+  lastMessageAt DateTime @default(now()) @map("last_message_at")
+  unreadForId   String?  @map("unread_for_id")
+
+  messages      Message[]
+  responseEvent ResponseEvent?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([propertyId, renterId])
+  @@index([ownerId])
+  @@index([renterId])
+  @@map("threads")
+}
+
+model Message {
+  id       String      @id @default(uuid())
+  threadId String      @map("thread_id")
+  thread   Thread      @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  senderId String      @map("sender_id")
+  sender   User        @relation(fields: [senderId], references: [id])
+  body     String
+  type     MessageType @default(text)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([threadId])
+  @@map("messages")
+}
+
+model Lead {
+  id         String   @id @default(uuid())
+  propertyId String   @map("property_id")
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  renterId   String   @map("renter_id")
+  renter     User     @relation(fields: [renterId], references: [id])
+  renterName String   @map("renter_name")
+
+  status        LeadStatus  @default(pending)
+  intent        LeadIntent?
+  preferredDate DateTime?   @map("preferred_date")
+  note          String?
+
+  units LeadUnit[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([propertyId])
+  @@index([renterId])
+  @@map("leads")
+}
+
+model LeadUnit {
+  id       String       @id @default(uuid())
+  leadId   String       @map("lead_id")
+  lead     Lead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  label    String
+  kind     LeadUnitKind
+  roomId   String?      @map("room_id")
+  roomName String?      @map("room_name")
+  bedId    String?      @map("bed_id")
+  price    Int?
+
+  @@map("lead_units")
+}
+
+model Tenancy {
+  id          String    @id @default(uuid())
+  propertyId  String    @map("property_id")
+  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  userId      String    @map("user_id")
+  user        User      @relation(fields: [userId], references: [id])
+  moveInDate  DateTime  @map("move_in_date")
+  moveOutDate DateTime? @map("move_out_date")
+  monthsLived Int       @default(0) @map("months_lived")
+
+  renterReviews RenterReview[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([propertyId])
+  @@map("tenancies")
+}
+
+model SavedListing {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  propertyId String   @map("property_id")
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, propertyId])
   @@map("saved_listings")
 }
 
-// ─── SAVED SEARCHES ────────────────────────────────────
-
 model SavedSearch {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @map("user_id") @db.Uuid
-  name      String?
-  filters   Json
-  alertsOn  Boolean  @default(true) @map("alerts_on")
-  createdAt DateTime @default(now()) @map("created_at")
+  id     String @id @default(uuid())
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label  String
+  params Json
 
-  // Relations
-  user User @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@index([userId])
   @@map("saved_searches")
 }
 
-// ─── NOTIFICATIONS ─────────────────────────────────────
-
 model Notification {
-  id        String           @id @default(uuid()) @db.Uuid
-  userId    String           @map("user_id") @db.Uuid
-  type      NotificationType
-  title     String
-  body      String?
-  data      Json             @default("{}")
-  readAt    DateTime?        @map("read_at")
-  createdAt DateTime         @default(now()) @map("created_at")
+  id         String           @id @default(uuid())
+  userId     String           @map("user_id")
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type       NotificationType
+  title      String
+  body       String
+  propertyId String?          @map("property_id")
+  threadId   String?          @map("thread_id")
+  readAt     DateTime?        @map("read_at")
 
-  // Relations
-  user User @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@index([userId])
-  @@index([readAt])
-  @@index([createdAt])
   @@map("notifications")
 }
 
-// ─── POLL VOTES ────────────────────────────────────────
+model VerificationRequest {
+  id     String             @id @default(uuid())
+  userId String             @map("user_id")
+  user   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status VerificationStatus @default(pending)
 
-model PollVote {
-  id          String   @id @default(uuid()) @db.Uuid
-  postId      String   @map("post_id") @db.Uuid
-  userId      String   @map("user_id") @db.Uuid
-  optionIndex Int      @map("option_index")
-  createdAt   DateTime @default(now()) @map("created_at")
+  idDocUrl        String? @map("id_doc_url")
+  selfieUrl       String? @map("selfie_url")
+  ownershipDocUrl String? @map("ownership_doc_url")
+  rejectionReason String? @map("rejection_reason")
 
-  // Relations
-  post Post @relation(fields: [postId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  submittedAt DateTime  @default(now()) @map("submitted_at")
+  reviewedAt  DateTime? @map("reviewed_at")
 
-  @@unique([postId, userId])
-  @@index([postId])
-  @@map("poll_votes")
-}
-
-// ─── HASHTAGS ──────────────────────────────────────────
-
-model Hashtag {
-  id            String   @id @default(uuid()) @db.Uuid
-  tag           String   @unique
-  postCount     Int      @default(0) @map("post_count")
-  trendingScore Float    @default(0) @map("trending_score")
-  createdAt     DateTime @default(now()) @map("created_at")
-
-  @@index([tag])
-  @@index([trendingScore])
-  @@map("hashtags")
+  @@index([userId])
+  @@index([status])
+  @@map("verification_requests")
 }

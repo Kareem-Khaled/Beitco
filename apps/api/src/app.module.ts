@@ -4,67 +4,34 @@ import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { HealthController } from './health/health.controller';
 import { PrismaModule } from './prisma/prisma.module';
-import { AuthModule } from './auth/auth.module';
-import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
-import { TierGuard } from './auth/guards/tier.guard';
-import { UsersModule } from './users/users.module';
-import { ModerationModule } from './moderation/moderation.module';
-import { ListingsModule } from './listings/listings.module';
-import { SearchModule } from './search/search.module';
-import { ChatModule } from './chat/chat.module';
-import { NotificationsModule } from './notifications/notifications.module';
-import { PaymentsModule } from './payments/payments.module';
-import { AdminModule } from './admin/admin.module';
-import { AnalyticsModule } from './analytics/analytics.module';
+
+// B-0 minimal core. After the schema rewrite to the bed-level + trust model,
+// the legacy feature modules (auth, users, listings, chat, search, admin,
+// moderation, analytics, notifications, payments) target the OLD social schema
+// and do not compile. They are quarantined in src/_unported/ (excluded from the
+// TS build) and ported back onto the new schema one at a time per BACKEND_TASKS
+// (A-1 auth, B-1 listings, B-2 writes, MOD-1 moderation, ...). This keeps the
+// API booting on infra-only (config, rate limiting, Prisma, health).
 
 @Module({
   imports: [
-    // ─── Environment Variables ─────────────────────
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
     }),
-
-    // ─── Rate Limiting ─────────────────────────────
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
         limit: 120,
       },
     ]),
-
-    // ─── Database ──────────────────────────────────
     PrismaModule,
-
-    // ─── Feature Modules ───────────────────────────
-    AuthModule,
-    UsersModule,
-    ListingsModule,
-    ModerationModule,
-    SearchModule,
-    ChatModule,
-    NotificationsModule,
-    PaymentsModule,
-    AdminModule,
-    AnalyticsModule,
   ],
   controllers: [HealthController],
   providers: [
-    // ─── Global Guards (order matters!) ────────────
-    // 1. ThrottlerGuard — rate limiting first
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
-    },
-    // 2. JwtAuthGuard — authentication (skipped on @Public() routes)
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-    // 3. TierGuard — authorization (checks @RequireTier() after auth)
-    {
-      provide: APP_GUARD,
-      useClass: TierGuard,
     },
   ],
 })
