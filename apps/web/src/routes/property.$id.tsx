@@ -19,9 +19,9 @@ import { PropertyGallery } from "@/components/beitco/PropertyGallery";
 import { PageSkeleton } from "@/components/beitco/PageSkeleton";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { getProperty, createLead, findOrCreateThread, postMessage, canUserReview, postReview, postQuestion, answerQuestion, timeAgo, formatDate, toggleReviewHelpful, hasVotedHelpful, replyToReview } from "@/lib/beitco/store";
+import { getProperty, findOrCreateThread, postMessage, canUserReview, postReview, postQuestion, answerQuestion, timeAgo, formatDate, toggleReviewHelpful, hasVotedHelpful, replyToReview } from "@/lib/beitco/store";
 import { USE_API, apiGetProperty } from "@/lib/beitco/api";
-import { useSavedListings, toggleSavedListing } from "@/lib/beitco/queries";
+import { useSavedListings, toggleSavedListing, submitLead } from "@/lib/beitco/queries";
 import { useAuth } from "@/lib/beitco/auth";
 import { toast } from "sonner";
 import { ViewingRequestDialog } from "@/components/beitco/ViewingRequestDialog";
@@ -235,10 +235,10 @@ function PropertyDetail() {
     setViewingOpen(true);
   };
 
-  const onSubmitViewing = (data: { preferredDate?: string; note?: string }) => {
+  const onSubmitViewing = async (data: { preferredDate?: string; note?: string }) => {
     if (!user) return;
     const units = bookingUnits.length ? bookingUnits : undefined;
-    createLead({
+    await submitLead({
       propertyId: p.id,
       renterId: user.id,
       renterName: user.name,
@@ -247,6 +247,7 @@ function PropertyDetail() {
       preferredDate: data.preferredDate,
       note: data.note,
     });
+    qc.invalidateQueries({ queryKey: ["renterLeads", user.id] });
     const t = findOrCreateThread(p.id, user.id);
     const dateStr = data.preferredDate
       ? ` يوم ${new Date(data.preferredDate).toLocaleDateString("ar-EG-u-nu-latn")}`

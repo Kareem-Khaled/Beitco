@@ -2,11 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { Inbox, Calendar, MessageCircle, Search } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
-import {
-  getLeadsForRenter,
-  getProperty,
-  findOrCreateThread,
-} from "@/lib/beitco/store";
+import { findOrCreateThread } from "@/lib/beitco/store";
+import { useRenterLeads, usePropertyLookup } from "@/lib/beitco/queries";
 import type { Lead } from "@/lib/beitco/types";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/beitco/EmptyState";
@@ -19,12 +16,12 @@ export const Route = createFileRoute("/me/applications")({
 function MeApplications() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const leads = useMemo(() => {
-    if (!user) return [];
-    return getLeadsForRenter(user.id).sort(
-      (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt),
-    );
-  }, [user]);
+  const lookup = usePropertyLookup();
+  const { data: rawLeads = [] } = useRenterLeads(user?.id);
+  const leads = useMemo(
+    () => [...rawLeads].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)),
+    [rawLeads],
+  );
 
   if (!user) return null;
 
@@ -57,7 +54,7 @@ function MeApplications() {
       ) : (
         <ul className="grid gap-3">
           {leads.map((l) => {
-            const p = getProperty(l.propertyId);
+            const p = lookup(l.propertyId);
             return (
               <li key={l.id} className="rounded-2xl border border-border bg-card p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">

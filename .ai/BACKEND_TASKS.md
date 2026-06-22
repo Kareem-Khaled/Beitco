@@ -11,11 +11,18 @@
 
 ## 🟢 In Progress
 
-_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (slice 1) + saved-searches (slice 2) wired behind the flag. Next: leads, Q&A, reviews, create-listing, moderation queue on the FE.)_
+_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (slice 1) + saved-searches (slice 2) + renter-leads (slice 3) wired behind the flag. Next: Q&A, reviews, create-listing, then the owner dashboard — leads/properties/moderation — together.)_
 
 ---
 
 ## ✅ Done
+
+### FE-WIRE (slice 3) · Renter leads on the API ✅ (June 22)
+- `api.ts`: `apiCreateLead`/`apiListRenterLeads` (+ `apiListOwnerLeads`/`apiUpdateLeadStatus` ready for the owner slice).
+- `queries.ts`: `useRenterLeads(userId)` (flag-aware, zero-flash `initialData`) + `submitLead(input)` (same input shape as the mock `createLead`; API reads propertyId from the URL and takes renterId/name from the session) + `usePropertyLookup()` (flag-aware id→property resolver: mock uses the full store lookup, API resolves from the cached published set).
+- Wired the renter surfaces: property-detail "اطلب معاينة"/booking submit (`submitLead` + invalidate `["renterLeads"]`), `/me/applications` (list via `useRenterLeads`, property via `usePropertyLookup`), `/me` overview pending count.
+- **Scope note:** owner-side lead management (`/dashboard/leads`, `/dashboard` overview) is deferred to the owner-dashboard slice (slice 6) since it's entangled with owner properties (`/properties/mine`), renter-reputation badges, and owner→renter reviews. Chat thread/message side-effects stay on the mock (chat isn't ported yet).
+- **Verified:** `tsc` + 31 web tests green; flag-on web serves `/`, `/search`, `/property/1`, `/me/applications` all 200 (no SSR errors); full curl round-trip — verify OTP → `POST /properties/1/leads` (Arabic note + renterName round-trip) → `GET /me/leads` returns the `pending` viewing lead. Flag OFF unchanged.
 
 ### FE-WIRE (slice 2) · Saved searches on the API ✅ (June 22)
 - `lib/beitco/queries.ts`: `useSavedSearches(userId)` (flag-aware: mock returns `getSavedSearches` sync with zero-flash `initialData`; API hits `GET /me/searches`) + `createSavedSearch(userId, params)` (branches mock `saveSearch`/`apiCreateSavedSearch`, deriving the label via `describeSavedSearch`) + `removeSavedSearch` + `alreadySavedIn(list, params)` (dedup via the now-exported `sameSearch`).

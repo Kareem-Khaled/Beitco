@@ -208,3 +208,41 @@ export async function apiCreateSavedSearch(
 export async function apiDeleteSavedSearch(id: string): Promise<void> {
   await delJSON(`/me/searches/${encodeURIComponent(id)}`);
 }
+
+// ── Leads (FE-WIRE slice 3) ─────────────────────────────────────────────────
+export async function apiCreateLead(
+  propertyId: string,
+  payload: {
+    intent?: "viewing" | "booking";
+    units?: import("./types").LeadUnit[];
+    preferredDate?: string;
+    note?: string;
+  },
+): Promise<import("./types").Lead> {
+  const body = await postJSON<import("./types").Lead>(
+    `/properties/${encodeURIComponent(propertyId)}/leads`,
+    payload,
+  );
+  return body.data;
+}
+
+export async function apiListRenterLeads(): Promise<import("./types").Lead[]> {
+  const body = await getJSON<import("./types").Lead[]>("/me/leads");
+  return body.data;
+}
+
+export async function apiListOwnerLeads(): Promise<import("./types").Lead[]> {
+  const body = await getJSON<import("./types").Lead[]>("/me/owner-leads");
+  return body.data;
+}
+
+export async function apiUpdateLeadStatus(
+  id: string,
+  status: import("./types").Lead["status"],
+): Promise<import("./types").Lead> {
+  const body = await patchJSON<import("./types").Lead>(
+    `/leads/${encodeURIComponent(id)}/status`,
+    { status },
+  );
+  return body.data;
+}
