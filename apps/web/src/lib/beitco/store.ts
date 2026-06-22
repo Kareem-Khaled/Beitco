@@ -1679,6 +1679,14 @@ export function hasVotedHelpful(userId: string, reviewId: string): boolean {
   return raw ? (JSON.parse(raw) as string[]).includes(reviewId) : false;
 }
 
+// All review ids the user marked helpful (mirrors the API's review-meta
+// votedReviewIds so the flag-aware hook can use one shape in both modes).
+export function getVotedReviewIds(userId: string): string[] {
+  if (!isBrowser) return [];
+  const raw = localStorage.getItem(KEY_HELPFUL + userId);
+  return raw ? (JSON.parse(raw) as string[]) : [];
+}
+
 export function toggleReviewHelpful(userId: string, propertyId: string, reviewId: string): boolean {
   const all = getAllProperties();
   const idx = all.findIndex((p) => p.id === propertyId);

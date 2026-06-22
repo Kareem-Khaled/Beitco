@@ -11,11 +11,20 @@
 
 ## 🟢 In Progress
 
-_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (1) + saved-searches (2) + renter-leads (3) + Q&A (4) wired behind the flag. Next: reviews, create-listing, then the owner dashboard — leads/properties/moderation — together.)_
+_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (1) + saved-searches (2) + renter-leads (3) + Q&A (4) + reviews (5) wired behind the flag. Next: create-listing, then the owner dashboard — leads/properties/moderation — together. Then the matching-engine port.)_
+
+> **Known seed-fidelity note (not a wiring bug):** properties carry a hand-set display `reviewsCount` (e.g. 32) larger than their actual seeded review rows. The trust recompute counts real rows, so after the first real review the count snaps to the true value. Fix later by seeding more reviews or setting `reviewsCount = reviews.length` in the seed.
 
 ---
 
 ## ✅ Done
+
+### FE-WIRE (slice 5) · Reviews on the API ✅ (June 22)
+- **New backend read:** `GET /properties/:id/review-meta` (authenticated) → `{ canReview, votedReviewIds }` — `canReview` mirrors the mock's `canUserReview` (a 30+ day tenancy here); `votedReviewIds` = the reviews on this listing the user marked helpful. (Post/helpful/reply endpoints already existed in B-2b.)
+- `store.ts`: added `getVotedReviewIds(userId)` so the flag-aware hook returns one shape in both modes.
+- `api.ts`: `apiPostReview`/`apiToggleReviewHelpful`/`apiReplyToReview`/`apiGetReviewMeta`. `queries.ts`: `useReviewMeta(propertyId, userId)` (flag-aware, zero-flash) + `submitReview`/`toggleHelpful`/`replyReview`.
+- `property.$id.tsx`: eligibility + helpful-vote state now come from `useReviewMeta`; `ReviewCard` takes a `voted` prop (from `votedReviewIds`) instead of a direct store read; post/helpful/reply call the flag-aware helpers and run a shared `onReviewChange()` = `refreshDetail()` (loader re-run/store re-read) **+ invalidate `reviewMeta`** so the count, the helpful state, and eligibility all update.
+- **Verified (the wedge, end-to-end):** seeded a 60-day tenancy → `review-meta` `canReview:true` → posted a review that **moved trust 8.1 → 7.3** (real computed value) → review appears in the read list → renter toggled helpful (`voted:true`, count 1, `votedReviewIds` now lists it) → **owner (بيتكو كولايفنج) replied** and the reply shows on read-back → **stranger (no tenancy) `canReview:false`, post = 403**. Re-seeded to restore canonical state. `tsc` both apps + 31 web tests; flag-on `/property/1,2` + `/me/applications` render 200. Flag OFF unchanged.
 
 ### FE-WIRE (slice 4) · Q&A on the API ✅ (June 22)
 - **Read serializer fix:** `listings.serializer.ts` was hardcoding `qa: []` — now maps real `questions` (added `questions` to the read `detailInclude` + a `QuestionRow` type). Q&A `date` uses a new `arDate()` helper matching the mock's `toLocaleDateString("ar-EG-u-nu-latn")` format. So with the flag on, the property-detail loader returns the listing's real Q&A.

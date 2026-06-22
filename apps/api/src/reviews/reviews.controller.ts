@@ -33,6 +33,12 @@ export class ReviewsController {
     return this.reviews.reply(id, me.id, dto);
   }
 
+  @Get('properties/:id/review-meta')
+  @ApiOperation({ summary: 'My review eligibility + helpful-votes for this listing' })
+  reviewMeta(@CurrentUser() me: AuthUser, @Param('id') id: string) {
+    return this.reviews.reviewMeta(id, me.id);
+  }
+
   @Post('users/:renterId/reviews')
   @ApiOperation({ summary: 'Owner reviews a renter (two-sided trust). Moves reputation.' })
   reviewRenter(@CurrentUser() me: AuthUser, @Param('renterId') renterId: string, @Body() dto: CreateRenterReviewDto) {

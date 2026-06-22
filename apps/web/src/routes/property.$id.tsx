@@ -19,9 +19,9 @@ import { PropertyGallery } from "@/components/beitco/PropertyGallery";
 import { PageSkeleton } from "@/components/beitco/PageSkeleton";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { getProperty, findOrCreateThread, postMessage, canUserReview, postReview, timeAgo, formatDate, toggleReviewHelpful, hasVotedHelpful, replyToReview } from "@/lib/beitco/store";
+import { getProperty, findOrCreateThread, postMessage, timeAgo, formatDate } from "@/lib/beitco/store";
 import { USE_API, apiGetProperty } from "@/lib/beitco/api";
-import { useSavedListings, toggleSavedListing, submitLead, submitQuestion, submitAnswer } from "@/lib/beitco/queries";
+import { useSavedListings, toggleSavedListing, submitLead, submitQuestion, submitAnswer, useReviewMeta, submitReview, toggleHelpful, replyReview } from "@/lib/beitco/queries";
 import { useAuth } from "@/lib/beitco/auth";
 import { toast } from "sonner";
 import { ViewingRequestDialog } from "@/components/beitco/ViewingRequestDialog";
@@ -340,10 +340,20 @@ function PropertyDetail() {
   };
 
   const isOwner = user?.id === p.ownerId;
-  const eligibleToReview = user ? canUserReview(user.id, p.id) : false;
+  // Review context (eligibility + helpful-votes) — flag-aware, zero-flash mock.
+  const { data: reviewMeta } = useReviewMeta(p.id, user?.id);
+  const eligibleToReview = reviewMeta?.canReview ?? false;
+  const votedReviewIds = reviewMeta?.votedReviewIds ?? [];
   const alreadyReviewed = user
     ? p.reviews.some((r) => r.author === user.name)
     : false;
+
+  // After a review mutation: re-read the property (loader/store) and refresh the
+  // per-user review meta (helpful-vote state, eligibility).
+  const onReviewChange = async () => {
+    await refreshDetail();
+    qc.invalidateQueries({ queryKey: ["reviewMeta", p.id, user?.id] });
+  };
 
   const onOpenReview = () => {
     if (!user) {
@@ -354,14 +364,14 @@ function PropertyDetail() {
     setReviewOpen(true);
   };
 
-  const onSubmitReview = (data: ReviewSubmit) => {
+  const onSubmitReview = async (data: ReviewSubmit) => {
     if (!user) return;
     const initials = user.name
       .split(" ")
       .map((s) => s[0])
       .slice(0, 2)
       .join("");
-    postReview(p.id, {
+    await submitReview(p.id, {
       author: user.name,
       initials,
       monthsLived: 1,
@@ -370,7 +380,7 @@ function PropertyDetail() {
       scores: data.scores,
     });
     toast.success("اتنشر رأيك — شكراً! 🙏");
-    refresh();
+    await onReviewChange();
   };
 
   const onOpenQuestion = () => {
@@ -644,7 +654,8 @@ function PropertyDetail() {
                       propertyId={p.id}
                       isOwner={isOwner}
                       userId={user?.id}
-                      onChange={refresh}
+                      voted={votedReviewIds.includes(r.id)}
+                      onChange={onReviewChange}
                     />
                   ))}
               </div>
@@ -1322,34 +1333,35 @@ function ReviewCard({
   propertyId,
   isOwner,
   userId,
+  voted,
   onChange,
 }: {
   review: Property["reviews"][number];
   propertyId: string;
   isOwner: boolean;
   userId?: string;
-  onChange: () => void;
+  voted: boolean;
+  onChange: () => void | Promise<void>;
 }) {
   const [replying, setReplying] = useState(false);
   const [reply, setReply] = useState("");
-  const voted = userId ? hasVotedHelpful(userId, review.id) : false;
 
-  const onHelpful = () => {
+  const onHelpful = async () => {
     if (!userId) {
       toast.error("ادخل حسابك الأول");
       return;
     }
-    toggleReviewHelpful(userId, propertyId, review.id);
-    onChange();
+    await toggleHelpful(propertyId, review.id, userId);
+    await onChange();
   };
 
-  const submitReply = () => {
+  const submitReply = async () => {
     if (!reply.trim()) return;
-    replyToReview(propertyId, review.id, reply.trim());
+    await replyReview(propertyId, review.id, reply.trim());
     setReply("");
     setReplying(false);
     toast.success("اتنشر ردّك");
-    onChange();
+    await onChange();
   };
 
   return (

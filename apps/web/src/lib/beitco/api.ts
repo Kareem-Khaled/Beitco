@@ -255,3 +255,31 @@ export async function apiAskQuestion(propertyId: string, body: string): Promise<
 export async function apiAnswerQuestion(questionId: string, body: string): Promise<void> {
   await postJSON(`/questions/${encodeURIComponent(questionId)}/answer`, { body });
 }
+
+// ── Reviews (FE-WIRE slice 5) ───────────────────────────────────────────────
+export async function apiPostReview(
+  propertyId: string,
+  payload: { rating: number; body: string; scores?: Record<string, number> },
+): Promise<void> {
+  await postJSON(`/properties/${encodeURIComponent(propertyId)}/reviews`, payload);
+}
+
+export async function apiToggleReviewHelpful(reviewId: string): Promise<boolean> {
+  const body = await postJSON<{ voted: boolean; helpful: number }>(
+    `/reviews/${encodeURIComponent(reviewId)}/helpful`,
+  );
+  return body.data.voted;
+}
+
+export async function apiReplyToReview(reviewId: string, body: string): Promise<void> {
+  await postJSON(`/reviews/${encodeURIComponent(reviewId)}/reply`, { body });
+}
+
+export async function apiGetReviewMeta(
+  propertyId: string,
+): Promise<{ canReview: boolean; votedReviewIds: string[] }> {
+  const body = await getJSON<{ canReview: boolean; votedReviewIds: string[] }>(
+    `/properties/${encodeURIComponent(propertyId)}/review-meta`,
+  );
+  return body.data;
+}

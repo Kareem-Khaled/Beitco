@@ -157,6 +157,29 @@ export class ReviewsService {
     return { ok: true };
   }
 
+  // Per-user review context for a listing's detail page:
+  //  - canReview mirrors the mock's canUserReview (a 30+ day tenancy here);
+  //    the owner/already-reviewed cases are handled in the UI.
+  //  - votedReviewIds = the reviews on this property the user marked helpful.
+  async reviewMeta(
+    propertyId: string,
+    userId: string,
+  ): Promise<{ canReview: boolean; votedReviewIds: string[] }> {
+    const tenancy = await this.prisma.tenancy.findFirst({
+      where: { propertyId, userId },
+      orderBy: { moveInDate: 'asc' },
+    });
+    const canReview =
+      !!tenancy &&
+      (Date.now() - +new Date(tenancy.moveInDate)) / 86400000 >= REVIEW_GATE_DAYS;
+
+    const votes = await this.prisma.reviewHelpfulVote.findMany({
+      where: { userId, review: { propertyId } },
+      select: { reviewId: true },
+    });
+    return { canReview, votedReviewIds: votes.map((v) => v.reviewId) };
+  }
+
   private serializeReview(r: {
     id: string;
     propertyId: string;

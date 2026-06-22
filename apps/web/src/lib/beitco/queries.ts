@@ -21,6 +21,11 @@ import {
   createLead as storeCreateLead,
   postQuestion as storePostQuestion,
   answerQuestion as storeAnswerQuestion,
+  canUserReview,
+  getVotedReviewIds,
+  postReview as storePostReview,
+  toggleReviewHelpful as storeToggleHelpful,
+  replyToReview as storeReplyToReview,
 } from "./store";
 import {
   apiListProperties,
@@ -33,9 +38,13 @@ import {
   apiListRenterLeads,
   apiAskQuestion,
   apiAnswerQuestion,
+  apiPostReview,
+  apiToggleReviewHelpful,
+  apiReplyToReview,
+  apiGetReviewMeta,
   USE_API,
 } from "./api";
-import type { Property, PropertySummary, SavedSearch, SavedSearchParams, Lead } from "./types";
+import type { Property, PropertySummary, SavedSearch, SavedSearchParams, Lead, Review } from "./types";
 
 // Home + search consume the full published set (they filter/sort client-side).
 export function usePublishedProperties() {
@@ -185,6 +194,66 @@ export async function submitAnswer(
 ): Promise<void> {
   if (USE_API) return apiAnswerQuestion(questionId, answer);
   storeAnswerQuestion(propertyId, questionId, answererName, answer);
+}
+
+// ── Reviews (FE-WIRE slice 5) ───────────────────────────────────────────────
+// Per-user review context for a listing: eligibility (30-day tenancy) + which
+// reviews the user marked helpful. Flag-aware + zero-flash for the mock.
+export function useReviewMeta(propertyId: string, userId: string | undefined) {
+  return useQuery<{ canReview: boolean; votedReviewIds: string[] }>({
+    queryKey: ["reviewMeta", propertyId, userId, { source: USE_API ? "api" : "mock" }],
+    enabled: !!userId,
+    queryFn: async () => {
+      if (USE_API) return apiGetReviewMeta(propertyId);
+      if (!userId) return { canReview: false, votedReviewIds: [] };
+      return { canReview: canUserReview(userId, propertyId), votedReviewIds: getVotedReviewIds(userId) };
+    },
+    initialData:
+      USE_API || !userId
+        ? undefined
+        : () => ({
+            canReview: canUserReview(userId, propertyId),
+            votedReviewIds: getVotedReviewIds(userId),
+          }),
+    staleTime: USE_API ? 15_000 : Infinity,
+  });
+}
+
+// Post a resident review. Same input shape as the mock store's postReview; the
+// API takes only { rating, body, scores } (author/months derived server-side)
+// and recomputes trust. Callers re-read via refreshDetail() + invalidate meta.
+export async function submitReview(
+  propertyId: string,
+  review: Omit<Review, "id" | "propertyId" | "date">,
+): Promise<void> {
+  if (USE_API) {
+    return apiPostReview(propertyId, {
+      rating: review.rating,
+      body: review.body,
+      scores: review.scores,
+    });
+  }
+  storePostReview(propertyId, review);
+}
+
+// Toggle a helpful vote. Returns the new voted state.
+export async function toggleHelpful(
+  propertyId: string,
+  reviewId: string,
+  userId: string,
+): Promise<boolean> {
+  if (USE_API) return apiToggleReviewHelpful(reviewId);
+  return storeToggleHelpful(userId, propertyId, reviewId);
+}
+
+// Owner replies to a review.
+export async function replyReview(
+  propertyId: string,
+  reviewId: string,
+  body: string,
+): Promise<void> {
+  if (USE_API) return apiReplyToReview(reviewId, body);
+  storeReplyToReview(propertyId, reviewId, body);
 }
 
 
