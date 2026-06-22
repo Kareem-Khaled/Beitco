@@ -6,8 +6,8 @@
 //   - flag ON: data is fetched from the NestJS API.
 
 import { useQuery } from "@tanstack/react-query";
-import { getPublishedProperties } from "./store";
-import { apiListProperties, USE_API } from "./api";
+import { getPublishedProperties, getSavedForUser, getProperty, toggleSaved } from "./store";
+import { apiListProperties, apiGetSaved, apiToggleSaved, USE_API } from "./api";
 import type { Property, PropertySummary } from "./types";
 
 // Home + search consume the full published set (they filter/sort client-side).
@@ -26,3 +26,34 @@ export function usePublishedProperties() {
     staleTime: USE_API ? 30_000 : Infinity,
   });
 }
+
+// Saved listings for /me/saved. Mock resolves ids -> properties synchronously;
+// API returns summaries directly from GET /me/saved.
+export function useSavedListings(userId: string | undefined) {
+  return useQuery<(Property | PropertySummary)[]>({
+    queryKey: ["saved", userId, { source: USE_API ? "api" : "mock" }],
+    enabled: !!userId,
+    queryFn: async () => {
+      if (USE_API) return apiGetSaved();
+      if (!userId) return [];
+      return getSavedForUser(userId)
+        .map((id) => getProperty(id))
+        .filter((p): p is Property => !!p);
+    },
+    initialData:
+      USE_API || !userId
+        ? undefined
+        : () =>
+            getSavedForUser(userId)
+              .map((id) => getProperty(id))
+              .filter((p): p is Property => !!p),
+    staleTime: USE_API ? 15_000 : Infinity,
+  });
+}
+
+// Toggle save state. Returns the new state (true = saved). Branches on the flag.
+export async function toggleSavedListing(userId: string, propertyId: string): Promise<boolean> {
+  if (USE_API) return apiToggleSaved(propertyId);
+  return toggleSaved(userId, propertyId);
+}
+

@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   MapPin, ShieldCheck, Star, Users, Wifi, Snowflake, WashingMachine,
   Microwave, Refrigerator, ArrowUpDown, Car, Lock, Sofa, Coffee,
@@ -18,8 +19,9 @@ import { PropertyGallery } from "@/components/beitco/PropertyGallery";
 import { PageSkeleton } from "@/components/beitco/PageSkeleton";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { getProperty, createLead, findOrCreateThread, postMessage, toggleSaved, getSavedForUser, canUserReview, postReview, postQuestion, answerQuestion, timeAgo, formatDate, toggleReviewHelpful, hasVotedHelpful, replyToReview } from "@/lib/beitco/store";
+import { getProperty, createLead, findOrCreateThread, postMessage, canUserReview, postReview, postQuestion, answerQuestion, timeAgo, formatDate, toggleReviewHelpful, hasVotedHelpful, replyToReview } from "@/lib/beitco/store";
 import { USE_API, apiGetProperty } from "@/lib/beitco/api";
+import { useSavedListings, toggleSavedListing } from "@/lib/beitco/queries";
 import { useAuth } from "@/lib/beitco/auth";
 import { toast } from "sonner";
 import { ViewingRequestDialog } from "@/components/beitco/ViewingRequestDialog";
@@ -196,9 +198,11 @@ function PropertyDetail() {
   const [viewingOpen, setViewingOpen] = useState(false);
   // The specific bed(s)/room(s) the renter is booking (empty = generic viewing).
   const [bookingUnits, setBookingUnits] = useState<LeadUnit[]>([]);
-  const [saved, setSaved] = useState(() =>
-    user ? getSavedForUser(user.id).includes(id) : false,
-  );
+  const qc = useQueryClient();
+  const { data: savedList = [] } = useSavedListings(user?.id);
+  // Optimistic override so the heart flips instantly; falls back to the cache.
+  const [savedOverride, setSavedOverride] = useState<boolean | null>(null);
+  const saved = savedOverride ?? savedList.some((s) => s.id === id);
   const totalCost = p.costs.reduce((s, c) => s + c.amount, 0);
   const avgQuality =
     Object.values(p.quality).reduce((s, v) => s + v, 0) / Object.values(p.quality).length;
@@ -288,10 +292,11 @@ function PropertyDetail() {
     navigate({ to: "/messages/$threadId", params: { threadId: t.id } });
   };
 
-  const onSave = () => {
+  const onSave = async () => {
     if (!requireAuth() || !user) return;
-    const isSaved = toggleSaved(user.id, p.id);
-    setSaved(isSaved);
+    const isSaved = await toggleSavedListing(user.id, p.id);
+    setSavedOverride(isSaved);
+    qc.invalidateQueries({ queryKey: ["saved", user.id] });
     toast.success(isSaved ? "اتحفظت في المحفوظات" : "اتشالت من المحفوظات");
   };
 

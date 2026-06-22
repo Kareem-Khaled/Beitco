@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
 import { Heart, Search } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/beitco/auth";
-import { getSavedForUser, getProperty, toggleSaved } from "@/lib/beitco/store";
+import { useSavedListings, toggleSavedListing } from "@/lib/beitco/queries";
 import { BeitcoListingCard } from "@/components/beitco/BeitcoListingCard";
 import { EmptyState } from "@/components/beitco/EmptyState";
 import { Button } from "@/components/ui/button";
@@ -13,17 +13,14 @@ export const Route = createFileRoute("/me/saved")({
 
 function MeSaved() {
   const { user } = useAuth();
-  const [, force] = useState(0);
+  const qc = useQueryClient();
+  const { data: properties = [] } = useSavedListings(user?.id);
 
   if (!user) return null;
-  const ids = getSavedForUser(user.id);
-  const properties = ids
-    .map((id) => getProperty(id))
-    .filter((p): p is NonNullable<typeof p> => !!p);
 
-  const unsave = (id: string) => {
-    toggleSaved(user.id, id);
-    force((x) => x + 1);
+  const unsave = async (id: string) => {
+    await toggleSavedListing(user.id, id);
+    qc.invalidateQueries({ queryKey: ["saved", user.id] });
   };
 
   return (

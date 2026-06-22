@@ -3,7 +3,6 @@ import { useMemo, useState, useEffect } from "react";
 import { Heart, Inbox, KeyRound, Search, Sparkles, SlidersHorizontal, LayoutDashboard, Home, Bookmark, Trash2, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
 import {
-  getSavedForUser,
   getLeadsForRenter,
   getTenanciesForUser,
   getMatchesForUser,
@@ -13,6 +12,7 @@ import {
   deleteSavedSearch,
   getRenterReputation,
 } from "@/lib/beitco/store";
+import { useSavedListings } from "@/lib/beitco/queries";
 import type { SavedSearch } from "@/lib/beitco/types";
 import { MatchBadge } from "@/components/beitco/MatchBadge";
 import { Button } from "@/components/ui/button";
@@ -24,12 +24,13 @@ export const Route = createFileRoute("/me/")({
 function MeOverview() {
   const { user } = useAuth();
   const isOwner = user?.role === "owner" || user?.role === "both";
+  const { data: savedList = [] } = useSavedListings(user?.id);
   const data = useMemo(() => {
     if (!user)
       return { saved: 0, pending: 0, tenancies: 0, completeness: 0, topMatch: 0, matchCount: 0, listings: 0, reputation: undefined as { score: number; count: number } | undefined };
     const matches = getMatchesForUser(user.id);
     return {
-      saved: getSavedForUser(user.id).length,
+      saved: savedList.length,
       pending: getLeadsForRenter(user.id).filter((l) => l.status === "pending").length,
       tenancies: getTenanciesForUser(user.id).length,
       completeness: profileCompleteness(user.profile),
@@ -38,7 +39,7 @@ function MeOverview() {
       listings: getPropertiesByOwner(user.id).length,
       reputation: getRenterReputation(user.id),
     };
-  }, [user]);
+  }, [user, savedList.length]);
 
   // Saved searches (FE-6) — local list so deletes re-render immediately.
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);

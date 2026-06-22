@@ -11,11 +11,16 @@
 
 ## 🟢 In Progress
 
-_(B-0 → B-1, A-1, B-2 writes, T-PORT/B-2b reviews, B-2c create-listing + MOD-1 moderation done. Next: FE wiring pass; matching-engine port; chat/search/payments.)_
+_(Backend B-0→MOD-1 done. **FE wiring pass started:** reads (B-1) + saved-listings wired behind the flag. Next: saved-searches, leads, Q&A, reviews, create-listing, moderation queue on the FE.)_
 
 ---
 
 ## ✅ Done
+
+### FE-WIRE (slice 1) · Saved listings on the API ✅ (June 22)
+- `lib/beitco/queries.ts`: `useSavedListings(userId)` (TanStack Query, flag-aware: mock resolves ids→properties sync with zero-flash `initialData`; API hits `GET /me/saved`) + `toggleSavedListing(userId, propertyId)` (branches mock/`apiToggleSaved`).
+- Wired all three surfaces to the shared query cache: `/me/saved` (list + unsave), property-detail save button (optimistic heart via cache + invalidate), `/me` overview saved count.
+- **Verified:** `tsc` + 31 tests green; flag-on web serves `/`, `/search`, `/me/saved`, `/property/1` all 200 against the live API, no client errors. Flag OFF unchanged.
 
 ### B-2c + MOD-1 · Create/edit listings + admin moderation ✅ (June 22)
 - **Listings write** (`apps/api/src/listings/listings.write.service.ts`): `POST /properties` (create — nested rooms→beds, server-derived `type`/`priceFrom`, **moderation-gated status** via `getInitialListingStatus`: admin/verified → `published`, else `pending_approval`; recomputes trust), `PATCH /properties/:id` (edit own — re-runs the gate for draft/rejected, keeps live ones live), `GET /properties/mine` (owner, all statuses), `DELETE /properties/:id` (soft). Ownership enforced (403).
