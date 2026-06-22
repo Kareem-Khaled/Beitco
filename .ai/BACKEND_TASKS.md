@@ -11,11 +11,19 @@
 
 ## 🟢 In Progress
 
-_(B-0, B-0.1, B-0.2, B-1, A-1 done — next up: B-2 persist core writes)_
+_(B-0 → B-1, A-1 done; B-2 write API done + `updateUser` wired. Next: wire saved/leads/Q&A on the FE, then B-2b reviews + create-listing.)_
 
 ---
 
 ## ✅ Done
+
+### B-2 (slice) · Persist core writes — API + profile wiring ✅ (June 22)
+- **API** (auth-protected, ownership-checked):
+  - `users` module: `PATCH /users/me` (name/role/avatar/notificationPrefs).
+  - `engagement` module: saved listings (`GET /me/saved`, `POST /properties/:id/save` toggle), saved searches (`GET/POST /me/searches`, `DELETE /me/searches/:id`), leads (`POST /properties/:id/leads`, `GET /me/leads`, `GET /me/owner-leads`, `PATCH /leads/:id/status`), Q&A (`POST /properties/:id/questions`, `POST /questions/:id/answer`). Completing a lead creates a confirmed tenancy (idempotent). Owner-only actions enforce ownership (403 otherwise).
+- **Frontend:** `lib/beitco/api.ts` write calls; `auth.tsx` `updateUser` now persists settings to `PATCH /users/me` in API mode (completes the A-1 gap, optimistic).
+- **Verified (curl, authenticated):** save toggle + list, saved search create/list/delete, profile update, lead create → owner approve → complete → **tenancy created**, Q&A ask → owner answer; cross-user approve → **403**. Test data cleaned. `tsc` green both apps; 31 web tests pass.
+- **Remaining (B-2 cont.):** wire saved-listings/saved-searches/leads/Q&A **on the frontend** behind the flag (sync→async call-site refactor). Reviews + helpful + owner-reply and **create/edit listing** are **B-2b** (pair with **T-PORT** trust recompute). Renter-preferences (`profile`) persistence pairs with the matching-engine port.
 
 ### A-1 · Real phone OTP + JWT ✅ (June 22)
 - **API** (`apps/api/src/auth/`, rebuilt on the new schema — `_unported/auth` retired): `POST /auth/otp/send` (6-digit OTP in Redis, 5-min TTL, 60s cooldown; dev returns a fixed `123456` + logs it, prod stub for an SMS gateway), `POST /auth/otp/verify` (find-or-create user by phone → issues access+refresh JWTs as **httpOnly cookies** + returns `{ user, isNewUser }`), `POST /auth/complete-profile` (name/role/gender for new users), `GET /auth/me`, `POST /auth/refresh`, `POST /auth/logout` (revoke via Redis blacklist). JWT strategy reads the cookie or Bearer; `serializeUser` → frontend `User` shape (no tiers — `isAdmin` + verification replace the old 5-tier model). `cookie-parser` added; CORS allows credentialed requests from the web origin.

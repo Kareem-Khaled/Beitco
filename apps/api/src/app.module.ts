@@ -7,12 +7,15 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { ListingsModule } from './listings/listings.module';
+import { UsersModule } from './users/users.module';
+import { EngagementModule } from './engagement/engagement.module';
 
 // Post-pivot core. After the schema rewrite to the bed-level + trust model, the
-// remaining legacy modules (users, chat, search, admin, moderation, analytics,
+// remaining legacy modules (chat, search, admin, moderation, analytics,
 // notifications, payments) target the OLD social schema and live in
 // src/_unported/ (excluded from the TS build), ported back one at a time per
-// BACKEND_TASKS. Rebuilt so far: ListingsModule (B-1), AuthModule (A-1).
+// BACKEND_TASKS. Rebuilt so far: ListingsModule (B-1), AuthModule (A-1),
+// UsersModule + EngagementModule (B-2 writes).
 
 @Module({
   imports: [
@@ -29,6 +32,8 @@ import { ListingsModule } from './listings/listings.module';
     PrismaModule,
     AuthModule,
     ListingsModule,
+    UsersModule,
+    EngagementModule,
   ],
   controllers: [HealthController],
   providers: [

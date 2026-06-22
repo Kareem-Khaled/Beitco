@@ -144,3 +144,67 @@ export async function apiLogout(): Promise<void> {
     // ignore — clearing local state is enough
   }
 }
+
+// ── Writes (B-2) ──────────────────────────────────────────────────────────
+async function patchJSON<T>(path: string, payload: unknown): Promise<Envelope<T>> {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+  const body = (await res.json()) as Envelope<T>;
+  if (!res.ok || !body.success) throw new Error(body.error?.message ?? `Request failed (${res.status})`);
+  return body;
+}
+
+async function delJSON<T>(path: string): Promise<Envelope<T>> {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: "DELETE",
+    headers: { Accept: "application/json" },
+    credentials: "include",
+  });
+  const body = (await res.json()) as Envelope<T>;
+  if (!res.ok || !body.success) throw new Error(body.error?.message ?? `Request failed (${res.status})`);
+  return body;
+}
+
+export async function apiUpdateMe(
+  patch: Partial<import("./types").User>,
+): Promise<import("./types").User> {
+  // Only the fields the /users/me endpoint accepts.
+  const payload: Record<string, unknown> = {};
+  if (patch.name !== undefined) payload.name = patch.name;
+  if (patch.role !== undefined) payload.role = patch.role;
+  if (patch.avatar !== undefined) payload.avatar = patch.avatar;
+  if (patch.notifications !== undefined) payload.notifications = patch.notifications;
+  const body = await patchJSON<import("./types").User>("/users/me", payload);
+  return body.data;
+}
+
+export async function apiToggleSaved(propertyId: string): Promise<boolean> {
+  const body = await postJSON<{ saved: boolean }>(`/properties/${encodeURIComponent(propertyId)}/save`);
+  return body.data.saved;
+}
+
+export async function apiGetSaved(): Promise<import("./types").PropertySummary[]> {
+  const body = await getJSON<import("./types").PropertySummary[]>("/me/saved");
+  return body.data;
+}
+
+export async function apiListSavedSearches(): Promise<import("./types").SavedSearch[]> {
+  const body = await getJSON<import("./types").SavedSearch[]>("/me/searches");
+  return body.data;
+}
+
+export async function apiCreateSavedSearch(
+  label: string,
+  params: import("./types").SavedSearchParams,
+): Promise<import("./types").SavedSearch> {
+  const body = await postJSON<import("./types").SavedSearch>("/me/searches", { label, params });
+  return body.data;
+}
+
+export async function apiDeleteSavedSearch(id: string): Promise<void> {
+  await delJSON(`/me/searches/${encodeURIComponent(id)}`);
+}

@@ -12,6 +12,7 @@ import {
   apiCompleteProfile,
   apiMe,
   apiLogout,
+  apiUpdateMe,
 } from "./api";
 
 const KEY_CURRENT_USER = "beitco:currentUser";
@@ -153,14 +154,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
-  // Patch the logged-in user (e.g. save renter preferences) and persist.
+  // Patch the logged-in user (e.g. settings) and persist.
   const updateUser = (patch: Partial<User>) => {
     setUser((cur) => {
       if (!cur) return cur;
       const next = { ...cur, ...patch };
-      // API mode: local optimistic update only for now; the user-update endpoint
-      // lands with B-2 (persist writes). Mock mode persists to localStorage.
-      if (!USE_API) {
+      if (USE_API) {
+        // Optimistic local update; persist the supported fields to the API.
+        // (Renter `profile` preferences persist with the matching-engine port.)
+        if (patch.name !== undefined || patch.role !== undefined || patch.notifications !== undefined) {
+          apiUpdateMe(patch).catch(() => {/* keep optimistic state */});
+        }
+      } else {
         saveUser(next);
         if (isBrowser) localStorage.setItem(KEY_CURRENT_USER, JSON.stringify(next));
       }
