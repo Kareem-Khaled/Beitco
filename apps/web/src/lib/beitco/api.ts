@@ -87,3 +87,60 @@ export async function apiGetProperty(id: string): Promise<Property | undefined> 
     return undefined;
   }
 }
+
+// ── Auth ──────────────────────────────────────────────────────────────────
+async function postJSON<T>(path: string, payload?: unknown): Promise<Envelope<T>> {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    credentials: "include",
+    body: payload ? JSON.stringify(payload) : undefined,
+  });
+  const body = (await res.json()) as Envelope<T>;
+  if (!res.ok || !body.success) {
+    throw new Error(body.error?.message ?? `Request failed (${res.status})`);
+  }
+  return body;
+}
+
+export async function apiRequestOtp(phone: string): Promise<{ devCode?: string }> {
+  const body = await postJSON<{ expiresIn: number; devCode?: string }>("/auth/otp/send", { phone });
+  return { devCode: body.data.devCode };
+}
+
+export async function apiVerifyOtp(
+  phone: string,
+  code: string,
+): Promise<{ user: import("./types").User; isNewUser: boolean }> {
+  const body = await postJSON<{ user: import("./types").User; isNewUser: boolean }>(
+    "/auth/otp/verify",
+    { phone, code },
+  );
+  return { user: body.data.user, isNewUser: body.data.isNewUser };
+}
+
+export async function apiCompleteProfile(payload: {
+  name: string;
+  role: "renter" | "owner" | "both";
+  gender: "male" | "female";
+}): Promise<import("./types").User> {
+  const body = await postJSON<import("./types").User>("/auth/complete-profile", payload);
+  return body.data;
+}
+
+export async function apiMe(): Promise<import("./types").User | null> {
+  try {
+    const body = await getJSON<import("./types").User>("/auth/me");
+    return body.data;
+  } catch {
+    return null;
+  }
+}
+
+export async function apiLogout(): Promise<void> {
+  try {
+    await postJSON("/auth/logout");
+  } catch {
+    // ignore — clearing local state is enough
+  }
+}

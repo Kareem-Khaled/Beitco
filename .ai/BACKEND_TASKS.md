@@ -11,11 +11,17 @@
 
 ## 🟢 In Progress
 
-_(B-0, B-0.1, B-0.2, B-1 done — next up: A-1 real phone OTP + JWT)_
+_(B-0, B-0.1, B-0.2, B-1, A-1 done — next up: B-2 persist core writes)_
 
 ---
 
 ## ✅ Done
+
+### A-1 · Real phone OTP + JWT ✅ (June 22)
+- **API** (`apps/api/src/auth/`, rebuilt on the new schema — `_unported/auth` retired): `POST /auth/otp/send` (6-digit OTP in Redis, 5-min TTL, 60s cooldown; dev returns a fixed `123456` + logs it, prod stub for an SMS gateway), `POST /auth/otp/verify` (find-or-create user by phone → issues access+refresh JWTs as **httpOnly cookies** + returns `{ user, isNewUser }`), `POST /auth/complete-profile` (name/role/gender for new users), `GET /auth/me`, `POST /auth/refresh`, `POST /auth/logout` (revoke via Redis blacklist). JWT strategy reads the cookie or Bearer; `serializeUser` → frontend `User` shape (no tiers — `isAdmin` + verification replace the old 5-tier model). `cookie-parser` added; CORS allows credentialed requests from the web origin.
+- **Guard:** global `JwtAuthGuard` restored (skips `@Public()`); health + listings marked `@Public()` so browsing stays open.
+- **Frontend** (behind `VITE_USE_API`): `lib/beitco/auth.tsx` branches each method on the flag — same `useAuth` surface. API mode: `apiMe()` hydrates the session from the cookie, `requestOtp`/`verifyOtp`/`completeProfile`/`logout` hit the API (gender mapped Arabic ↔ male/female; `credentials: include`). Mock mode unchanged (default). `updateUser` stays local in API mode until the user-update endpoint (B-2).
+- **Verified:** dev OTP → verify (existing user مصطفى + new-user stub) → `beitco_at` cookie set → `GET /me` returns the user; protected routes 401 without auth; listings stay public; CORS allows creds from `localhost:8080`. Flag-on web serves login+home 200. `tsc` green both apps; 31 web tests pass.
 
 ### B-1 · Listings read API + wire the frontend ✅ (June 22)
 - **API** (`apps/api/src/listings/`, rebuilt on the new schema): `GET /api/v1/properties` (cursor-paginated; filters `type`/`purpose`/`gender`/`area`/`minPrice`/`maxPrice`/`verifiedOnly`/`nightly`/`freeOnly`/`sort`) returns `PropertySummary`-shaped rows; `GET /api/v1/properties/:id` returns the full `Property` shape (rooms → beds, nearby, landlord, reviews, computed `beds` counts). A serializer maps Prisma rows → the frontend's Arabic-enum shape (`type`/`unitType`/`nearby.type` mapped back to Arabic; bed summary mirrors `summarizeListing`). Public (no auth yet). Wired into `app.module.ts`.
@@ -39,19 +45,10 @@ _(B-0, B-0.1, B-0.2, B-1 done — next up: A-1 real phone OTP + JWT)_
 
 ---
 
-##  Phase 1 — Read path
-
-### A-1 · Real phone OTP + JWT ⭐ **NEXT**
-- `auth` module (in `src/_unported/`) already has OTP/JWT scaffolding — port onto the new schema: Egyptian numbers + the housing user model. `POST /auth/otp/send`, `POST /auth/otp/verify` (real SMS gateway, dev bypass code), JWT in httpOnly cookie + refresh. Restore the global `JwtAuthGuard` + `@Public()` once back.
-- Frontend: replace mock OTP in `lib/beitco/auth.tsx`; keep the same `useAuth` surface.
-- **DoD:** real login issues a session; protected routes enforce it server-side.
-
----
-
 ## 🟠 Phase 2 — Write path (persist everything)
 
-### B-2 · Persist core writes
-- Endpoints + services for: create/edit listing (moderation-gated by verification — port `getInitialListingStatus`), reviews, Q&A (ask/answer), leads (viewing + bed-level booking), tenancies, saved listings, saved searches, occupant consent-linking.
+### B-2 · Persist core writes ⭐ **NEXT**
+- Endpoints + services for: create/edit listing (moderation-gated by verification — port `getInitialListingStatus`), reviews, Q&A (ask/answer), leads (viewing + bed-level booking), tenancies, saved listings, saved searches, occupant consent-linking, **user profile update** (settings/preferences — also completes A-1's `updateUser` in API mode).
 - Frontend: swap each `store.ts` mutation for a mutation hook; optimistic where it makes sense.
 - **DoD:** a full owner+renter journey persists across sessions/devices.
 

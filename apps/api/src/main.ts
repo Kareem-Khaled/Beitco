@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { ResponseEnvelopeInterceptor } from './common/interceptors/response-envelope.interceptor';
@@ -8,9 +9,12 @@ import { ResponseEnvelopeInterceptor } from './common/interceptors/response-enve
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // ─── Cookies (auth tokens) ─────────────────────────
+  app.use(cookieParser());
+
   // ─── CORS ──────────────────────────────────────────
   app.enableCors({
-    origin: process.env.CORS_ORIGINS?.split(',') ?? ['http://localhost:3000'],
+    origin: process.env.CORS_ORIGINS?.split(',') ?? ['http://localhost:8080', 'http://localhost:3000'],
     credentials: true,
   });
 
