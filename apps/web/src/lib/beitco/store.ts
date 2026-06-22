@@ -326,6 +326,7 @@ export function getPropertySummaries(): PropertySummary[] {
     id: p.id,
     title: p.title,
     area: p.area,
+    address: p.address,
     type: p.type,
     price: p.price,
     trust: p.trust,
@@ -344,6 +345,7 @@ export function getPropertySummaries(): PropertySummary[] {
     nightlyPrice: p.nightlyPrice,
     spec: p.spec,
     priceFrom: p.priceFrom,
+    createdAt: p.createdAt,
   }));
 }
 

@@ -277,6 +277,7 @@ export type PropertySummary = Pick<
   | "id"
   | "title"
   | "area"
+  | "address"
   | "type"
   | "price"
   | "trust"
@@ -295,6 +296,7 @@ export type PropertySummary = Pick<
   | "nightlyPrice"
   | "spec"
   | "priceFrom"
+  | "createdAt"
 >;
 
 // Messaging

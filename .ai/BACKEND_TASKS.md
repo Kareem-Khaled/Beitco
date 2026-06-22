@@ -11,11 +11,19 @@
 
 ## 🟢 In Progress
 
-_(B-0 + B-0.1 done — next up: B-1 listings read + wire the frontend)_
+_(B-0, B-0.1, B-0.2, B-1 done — next up: A-1 real phone OTP + JWT)_
 
 ---
 
 ## ✅ Done
+
+### B-1 · Listings read API + wire the frontend ✅ (June 22)
+- **API** (`apps/api/src/listings/`, rebuilt on the new schema): `GET /api/v1/properties` (cursor-paginated; filters `type`/`purpose`/`gender`/`area`/`minPrice`/`maxPrice`/`verifiedOnly`/`nightly`/`freeOnly`/`sort`) returns `PropertySummary`-shaped rows; `GET /api/v1/properties/:id` returns the full `Property` shape (rooms → beds, nearby, landlord, reviews, computed `beds` counts). A serializer maps Prisma rows → the frontend's Arabic-enum shape (`type`/`unitType`/`nearby.type` mapped back to Arabic; bed summary mirrors `summarizeListing`). Public (no auth yet). Wired into `app.module.ts`.
+- **Frontend** (behind `VITE_USE_API`, default OFF → mock): `lib/beitco/api.ts` (typed client) + `lib/beitco/queries.ts` (`usePublishedProperties` with `initialData` so the mock path is zero-flash/byte-identical). Home + search use the hook; property detail's loader is API-aware (keeps `head()`/SEO working). `PropertySummary` gained `address` + `createdAt` (search filters/sort need them) across types + mock + API serializer.
+- **Verified:** API returns correct data (sale→#7, nightly→#4, bed+freeOnly→#3/5/2; detail #2 has 3 rooms/8 beds/landlord/review, bed counts match `summarizeListing`). With `VITE_USE_API=true` the property-detail SSR loader fetches the API and renders the correct dynamic Arabic title; home/search/property all 200. Flag OFF (default) unchanged. `tsc` green both apps; 31 web tests pass.
+
+### B-0.2 · Response envelope + conventions ✅ (June 22)
+- `ResponseEnvelopeInterceptor` (global) wraps success responses in `{ success: true, data, meta? }` (lifts `{ data, meta }` from paginated handlers; passes through handlers that already envelope). The existing `AllExceptionsFilter` emits `{ success: false, error: { code, message } }`. Wired in `main.ts`. Cursor-pagination DTO already in `common/`.
 
 ### B-0.1 · Seed parity ✅ (June 17)
 - First migration applied: `prisma/migrations/20260621160438_init_bed_level_trust` (26 tables incl. PostGIS) against Postgres.
@@ -31,22 +39,10 @@ _(B-0 + B-0.1 done — next up: B-1 listings read + wire the frontend)_
 
 ---
 
-## 🔥 Phase 0 — Foundation (do first, unblocks everything)
+##  Phase 1 — Read path
 
-### B-0.2 · API response envelope + conventions
-- Enforce `{ success, data, meta?: { cursor, hasMore }, error?: { code, message } }` globally (interceptor + exception filter). Cursor pagination only. `camelCase` JSON.
-
----
-
-## 🔵 Phase 1 — Read path (frontend renders from the API)
-
-### B-1 · Listings read API + wire the frontend
-- Rework `listings` module to the new schema: `GET /properties` (cursor-paginated, filters mirroring search.tsx: type, purpose, gender, area, price, freeOnly, verifiedOnly, nightly), `GET /properties/:id`, `GET /properties/:id/similar`.
-- Frontend: introduce a typed API client + TanStack Query; replace `getPublishedProperties`/`getProperty` reads. **UI must not change** — seed parity makes this invisible.
-- **DoD:** home, search, and property detail render from Postgres; localStorage reads for listings removed.
-
-### A-1 · Real phone OTP + JWT
-- `auth` module already has OTP/JWT scaffolding — align to Egyptian numbers + the housing user/tier model. `POST /auth/otp/send`, `POST /auth/otp/verify` (real SMS gateway, dev bypass code), JWT in httpOnly cookie + refresh.
+### A-1 · Real phone OTP + JWT ⭐ **NEXT**
+- `auth` module (in `src/_unported/`) already has OTP/JWT scaffolding — port onto the new schema: Egyptian numbers + the housing user model. `POST /auth/otp/send`, `POST /auth/otp/verify` (real SMS gateway, dev bypass code), JWT in httpOnly cookie + refresh. Restore the global `JwtAuthGuard` + `@Public()` once back.
 - Frontend: replace mock OTP in `lib/beitco/auth.tsx`; keep the same `useAuth` surface.
 - **DoD:** real login issues a session; protected routes enforce it server-side.
 

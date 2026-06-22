@@ -6,7 +6,8 @@ import { SiteHeader } from "@/components/beitco/SiteHeader";
 import { SiteFooter } from "@/components/beitco/SiteFooter";
 import { BeitcoListingCard } from "@/components/beitco/BeitcoListingCard";
 import { EmptyState } from "@/components/beitco/EmptyState";
-import { getPublishedProperties, EGYPT_AREAS, saveSearch, hasSavedSearch } from "@/lib/beitco/store";
+import { EGYPT_AREAS, saveSearch, hasSavedSearch } from "@/lib/beitco/store";
+import { usePublishedProperties } from "@/lib/beitco/queries";
 import { useAuth } from "@/lib/beitco/auth";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -63,7 +64,7 @@ function SearchPage() {
     navigate({ search: (prev) => ({ ...prev, ...next }) });
   };
 
-  const all = useMemo(() => getPublishedProperties(), []);
+  const { data: all = [] } = usePublishedProperties();
 
   const filtered = useMemo(() => {
     let list = [...all];

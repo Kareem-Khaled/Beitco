@@ -19,6 +19,7 @@ import { PageSkeleton } from "@/components/beitco/PageSkeleton";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { getProperty, createLead, findOrCreateThread, postMessage, toggleSaved, getSavedForUser, canUserReview, postReview, postQuestion, answerQuestion, timeAgo, formatDate, toggleReviewHelpful, hasVotedHelpful, replyToReview } from "@/lib/beitco/store";
+import { USE_API, apiGetProperty } from "@/lib/beitco/api";
 import { useAuth } from "@/lib/beitco/auth";
 import { toast } from "sonner";
 import { ViewingRequestDialog } from "@/components/beitco/ViewingRequestDialog";
@@ -27,7 +28,14 @@ import { QuestionDialog } from "@/components/beitco/QuestionDialog";
 import type { Property, Room, BedStatus, NearbyType, LeadUnit } from "@/lib/beitco/types";
 
 export const Route = createFileRoute("/property/$id")({
-  loader: ({ params }) => {
+  loader: async ({ params }) => {
+    // API-aware (B-1): with the flag on, fetch from the backend; otherwise read
+    // the localStorage mock synchronously. Feeds both head() (SEO) and the page.
+    if (USE_API) {
+      const fromApi = await apiGetProperty(params.id);
+      if (!fromApi) throw notFound();
+      return fromApi;
+    }
     const property = getProperty(params.id);
     if (!property) throw notFound();
     return property;
@@ -91,7 +99,9 @@ function iconFor(name: string) {
 function PropertyPage() {
   const { id } = Route.useParams();
   const { user, isLoading } = useAuth();
-  const p = getProperty(id)!;
+  const loaderData = Route.useLoaderData() as Property;
+  // Mock path re-reads the store for live updates; API path uses loader data.
+  const p = USE_API ? loaderData : getProperty(id)!;
 
   // Avoid flashing the gate before auth hydrates.
   if (isLoading) return <PageSkeleton variant="detail" />;
@@ -180,7 +190,8 @@ function PropertyDetail() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const p = getProperty(id)!;
+  const loaderData = Route.useLoaderData() as Property;
+  const p = USE_API ? loaderData : getProperty(id)!;
   const isSale = p.listingType === "sale";
   const [viewingOpen, setViewingOpen] = useState(false);
   // The specific bed(s)/room(s) the renter is booking (empty = generic viewing).

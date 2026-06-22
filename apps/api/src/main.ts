@@ -3,6 +3,7 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { ResponseEnvelopeInterceptor } from './common/interceptors/response-envelope.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -23,6 +24,9 @@ async function bootstrap() {
   // ─── Global Exception Filter ──────────────────────
   app.useGlobalFilters(new AllExceptionsFilter());
 
+  // ─── Global Response Envelope ─────────────────────
+  app.useGlobalInterceptors(new ResponseEnvelopeInterceptor());
+
   // ─── Global Validation Pipe ────────────────────────
   app.useGlobalPipes(
     new ValidationPipe({
@@ -38,7 +42,7 @@ async function bootstrap() {
   // ─── Swagger Docs ─────────────────────────────────
   const config = new DocumentBuilder()
     .setTitle('Beitco API')
-    .setDescription('Egypt\'s first social network for real estate')
+    .setDescription('Trust-first bed-level housing marketplace for Egypt')
     .setVersion('1.0')
     .addBearerAuth()
     .build();

@@ -1,12 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Search, SlidersHorizontal, BedDouble, ShieldCheck, Home } from "lucide-react";
 import { SiteHeader } from "@/components/beitco/SiteHeader";
 import { SiteFooter } from "@/components/beitco/SiteFooter";
 import { BeitcoListingCard } from "@/components/beitco/BeitcoListingCard";
 import { EmptyState } from "@/components/beitco/EmptyState";
 import { Button } from "@/components/ui/button";
-import { getPublishedProperties } from "@/lib/beitco/store";
+import { usePublishedProperties } from "@/lib/beitco/queries";
+import type { Property, PropertySummary } from "@/lib/beitco/types";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,7 +26,7 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
-  const properties = useMemo(() => getPublishedProperties(), []);
+  const { data: properties = [] } = usePublishedProperties();
 
   const onSearch = (overrides?: Record<string, unknown>) => {
     navigate({
@@ -118,7 +119,7 @@ function HomePage() {
           />
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {properties.slice(0, 9).map((p) => (
+            {properties.slice(0, 9).map((p: Property | PropertySummary) => (
               <BeitcoListingCard key={p.id} p={p} />
             ))}
           </div>
