@@ -353,6 +353,9 @@ export type Lead = {
   preferredDate?: string;
   note?: string;
   createdAt: string;
+  // Owner-context enrichment (only present on the owner-leads API response):
+  renterReputation?: { score: number; count: number } | null; // T-4 badge
+  canReview?: boolean; // owner may still review this renter (confirmed tenancy, not yet reviewed)
 };
 
 // Tenancy = user lived at a property (gates review eligibility)

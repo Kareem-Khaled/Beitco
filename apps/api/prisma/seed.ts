@@ -318,7 +318,22 @@ const properties: SeedProp[] = [
 async function main() {
   console.log('Seeding Beitco demo data...');
 
-  // Idempotent: clear demo tables (FK-safe order via cascading deletes).
+  // Idempotent: clear demo tables, children first. Most FKs cascade from
+  // Property/User, but a few are RESTRICT (e.g. renter_reviews.property_id),
+  // so we delete the engagement/review tables explicitly before the parents.
+  await prisma.reviewHelpfulVote.deleteMany();
+  await prisma.renterReview.deleteMany();
+  await prisma.responseEvent.deleteMany();
+  await prisma.message.deleteMany();
+  await prisma.thread.deleteMany();
+  await prisma.leadUnit.deleteMany();
+  await prisma.lead.deleteMany();
+  await prisma.tenancy.deleteMany();
+  await prisma.question.deleteMany();
+  await prisma.savedListing.deleteMany();
+  await prisma.savedSearch.deleteMany();
+  await prisma.notification.deleteMany();
+  await prisma.verificationRequest.deleteMany();
   await prisma.occupant.deleteMany();
   await prisma.review.deleteMany();
   await prisma.nearbyPlace.deleteMany();

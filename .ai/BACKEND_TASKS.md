@@ -11,13 +11,20 @@
 
 ## 🟢 In Progress
 
-_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (1) + saved-searches (2) + renter-leads (3) + Q&A (4) + reviews (5) + create/edit listing (6a) wired behind the flag. Next: owner dashboard — owner-leads + listings management (6b), moderation queue (6c), owner→renter reviews (6d). Then the matching-engine port.)_
+_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (1) + saved-searches (2) + renter-leads (3) + Q&A (4) + reviews (5) + create/edit listing (6a) + owner-leads & renter-reviews (6b) wired behind the flag. Next: dashboard management/overview (6c), moderation queue (6d). Then the matching-engine port.)_
 
 > **Known seed-fidelity note (not a wiring bug):** properties carry a hand-set display `reviewsCount` (e.g. 32) larger than their actual seeded review rows. The trust recompute counts real rows, so after the first real review the count snaps to the true value. Fix later by seeding more reviews or setting `reviewsCount = reviews.length` in the seed.
 
 ---
 
 ## ✅ Done
+
+### FE-WIRE (slice 6b) · Owner leads + owner→renter reviews on the API ✅ (June 22)
+- **Backend enrichment:** `listOwnerLeads` now attaches, per lead, the renter's `renterReputation` ({score,count}|null) and `canReview` (a confirmed owner↔renter tenancy not yet reviewed — mirrors the mock's `canOwnerReviewRenter`), batched (no N+1). So the owner leads page needs no extra per-renter calls.
+- **Seed fix (real bug):** the reset only deleted a handful of tables and relied on cascades, but `renter_reviews.property_id` is `ON DELETE RESTRICT` — so once any renter-review existed, `npm run db:seed` failed at `property.deleteMany()`. Reset is now comprehensive (all engagement/review/thread tables, children-first) and re-runnable.
+- `api.ts`: `apiReviewRenter(renterId, dto)`. `queries.ts`: `useOwnerLeads(userId)` (flag-aware) + `setLeadStatus(id, status)` + `submitRenterReview(ownerId, renterId, input)` + pure flag-aware helpers `renterReputationOf(lead)` / `ownerCanReview(ownerId, lead)` (API reads the enriched lead; mock reads the store). Lead type gained optional `renterReputation`/`canReview`.
+- `dashboard/leads.tsx`: list via `useOwnerLeads`, property titles via `useOwnerProperties`, approve/decline/complete via `setLeadStatus` + invalidate `ownerLeads`, renter-review dialog via `submitRenterReview`; the reputation badge + "قيّم الساكن" gate use the flag-aware helpers.
+- **Verified (the full owner loop, curl):** renter creates a lead → owner sees it (reputation null, canReview false) → approve → **complete creates a tenancy** → `canReview` flips **true** → owner reviews the renter → reputation **{score 7.8, count 1}**, `canReview` back to **false**; cross-owner status PATCH → **403**. Re-seeded cleanly (seed fix). `tsc` both apps + 31 web tests; flag-on `/dashboard/leads`, `/dashboard`, `/me` render 200. Flag OFF unchanged.
 
 ### FE-WIRE (slice 6a) · Create/edit listing on the API ✅ (June 22)
 - `api.ts`: `apiCreateProperty`/`apiUpdateProperty`/`apiDeleteProperty`/`apiListMine` + a `propertyToListingPayload(p)` mapper that sends only the `CreateListingDto` input subset (Arabic `spec.unitType`/`nearby.type` pass through; `type`/`priceFrom`/bed-counts/`trust`/`status` are all derived server-side).

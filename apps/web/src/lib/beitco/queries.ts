@@ -29,6 +29,11 @@ import {
   getPropertiesByOwner,
   saveProperty as storeSaveProperty,
   deleteProperty as storeDeleteProperty,
+  getLeadsForOwner,
+  updateLeadStatus as storeUpdateLeadStatus,
+  getRenterReputation,
+  canOwnerReviewRenter,
+  postRenterReview as storePostRenterReview,
 } from "./store";
 import {
   apiListProperties,
@@ -49,6 +54,9 @@ import {
   apiUpdateProperty,
   apiDeleteProperty,
   apiListMine,
+  apiListOwnerLeads,
+  apiUpdateLeadStatus,
+  apiReviewRenter,
   USE_API,
 } from "./api";
 import type { Property, PropertySummary, SavedSearch, SavedSearchParams, Lead, Review } from "./types";
@@ -300,6 +308,61 @@ export async function saveListing(
 export async function deleteListing(id: string): Promise<void> {
   if (USE_API) return apiDeleteProperty(id);
   storeDeleteProperty(id);
+}
+
+// ── Owner leads + owner→renter reviews (FE-WIRE slice 6b) ───────────────────
+// Incoming requests on the owner's listings. In API mode each lead is enriched
+// with the renter's reputation + review eligibility (so the page needs no extra
+// per-renter calls); in mock mode those come from the local store helpers below.
+export function useOwnerLeads(userId: string | undefined) {
+  return useQuery<Lead[]>({
+    queryKey: ["ownerLeads", userId, { source: USE_API ? "api" : "mock" }],
+    enabled: !!userId,
+    queryFn: async () => {
+      if (USE_API) return apiListOwnerLeads();
+      if (!userId) return [];
+      return getLeadsForOwner(userId);
+    },
+    initialData:
+      USE_API || !userId ? undefined : () => getLeadsForOwner(userId),
+    staleTime: USE_API ? 15_000 : Infinity,
+  });
+}
+
+export async function setLeadStatus(id: string, status: Lead["status"]): Promise<void> {
+  if (USE_API) {
+    await apiUpdateLeadStatus(id, status);
+    return;
+  }
+  storeUpdateLeadStatus(id, status);
+}
+
+export async function submitRenterReview(
+  ownerId: string,
+  renterId: string,
+  input: {
+    rating: number;
+    body: string;
+    scores: { reliability: number; cleanliness: number; communication: number };
+  },
+): Promise<void> {
+  if (USE_API) {
+    await apiReviewRenter(renterId, { rating: input.rating, body: input.body, scores: input.scores });
+    return;
+  }
+  storePostRenterReview(ownerId, renterId, input);
+}
+
+// The reputation badge + "review this renter" gate: API leads carry the values;
+// mock reads the local store. Pure helpers (flag-aware), used per-lead.
+export function renterReputationOf(lead: Lead): { score: number; count: number } | null {
+  if (USE_API) return lead.renterReputation ?? null;
+  return getRenterReputation(lead.renterId) ?? null;
+}
+
+export function ownerCanReview(ownerId: string, lead: Lead): boolean {
+  if (USE_API) return !!lead.canReview;
+  return canOwnerReviewRenter(ownerId, lead.renterId);
 }
 
 

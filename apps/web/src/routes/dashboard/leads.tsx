@@ -1,15 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Check, X, Calendar, BedDouble, DoorOpen, Star, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
 import {
-  getLeadsForOwner,
-  getPropertiesByOwner,
-  updateLeadStatus,
-  getRenterReputation,
-  canOwnerReviewRenter,
-  postRenterReview,
-} from "@/lib/beitco/store";
+  useOwnerLeads,
+  useOwnerProperties,
+  setLeadStatus,
+  submitRenterReview,
+  renterReputationOf,
+  ownerCanReview,
+} from "@/lib/beitco/queries";
 import type { Lead } from "@/lib/beitco/types";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -21,16 +22,18 @@ export const Route = createFileRoute("/dashboard/leads")({
 
 function DashboardLeads() {
   const { user } = useAuth();
-  const [, force] = useState(0);
-  const refresh = () => force((x) => x + 1);
+  const qc = useQueryClient();
   const [tab, setTab] = useState<Lead["status"] | "all">("pending");
   const [reviewing, setReviewing] = useState<{ renterId: string; renterName: string } | null>(null);
+  const { data: rawLeads = [] } = useOwnerLeads(user?.id);
+  const { data: properties = [] } = useOwnerProperties(user?.id);
+
+  const allLeads = useMemo(
+    () => [...rawLeads].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)),
+    [rawLeads],
+  );
 
   if (!user) return null;
-  const properties = getPropertiesByOwner(user.id);
-  const allLeads = getLeadsForOwner(user.id).sort(
-    (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt),
-  );
   const leads = tab === "all" ? allLeads : allLeads.filter((l) => l.status === tab);
 
   const tabs: { id: Lead["status"] | "all"; label: string }[] = [
@@ -49,25 +52,30 @@ function DashboardLeads() {
     all: allLeads.length,
   };
 
-  const act = (id: string, status: Lead["status"]) => {
-    updateLeadStatus(id, status);
+  const refreshLeads = () => qc.invalidateQueries({ queryKey: ["ownerLeads", user.id] });
+
+  const act = async (id: string, status: Lead["status"]) => {
+    await setLeadStatus(id, status);
     const msg =
       status === "approved" ? "قبلت الطلب" : status === "declined" ? "رفضت الطلب" : "خلص الطلب";
     toast.success(msg);
-    refresh();
+    refreshLeads();
   };
 
-  const submitRenterReview = (data: {
+  const onSubmitRenterReview = async (data: {
     rating: number;
     body: string;
     scores: { reliability: number; cleanliness: number; communication: number };
   }) => {
     if (!reviewing) return;
-    const ok = postRenterReview(user.id, reviewing.renterId, data);
-    if (ok) toast.success("اتنشر تقييمك للساكن");
-    else toast.error("مش قادرين نسجّل التقييم دلوقتي");
+    try {
+      await submitRenterReview(user.id, reviewing.renterId, data);
+      toast.success("اتنشر تقييمك للساكن");
+    } catch {
+      toast.error("مش قادرين نسجّل التقييم دلوقتي");
+    }
     setReviewing(null);
-    refresh();
+    refreshLeads();
   };
 
   return (
@@ -109,7 +117,7 @@ function DashboardLeads() {
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="font-display text-base font-semibold">{l.renterName}</p>
-                      <RenterReputation renterId={l.renterId} />
+                      <RenterReputation lead={l} />
                       <StatusPill status={l.status} />
                       {l.intent === "booking" ? (
                         <span className="rounded-full bg-trust px-2 py-0.5 text-[11px] font-medium text-trust-foreground">
@@ -187,7 +195,7 @@ function DashboardLeads() {
                         خلصت
                       </Button>
                     ) : null}
-                    {l.status === "completed" && canOwnerReviewRenter(user.id, l.renterId) ? (
+                    {l.status === "completed" && ownerCanReview(user.id, l) ? (
                       <Button
                         size="sm"
                         variant="outline"
@@ -212,7 +220,7 @@ function DashboardLeads() {
         open={reviewing !== null}
         onOpenChange={(v) => !v && setReviewing(null)}
         renterName={reviewing?.renterName ?? ""}
-        onSubmit={submitRenterReview}
+        onSubmit={onSubmitRenterReview}
       />
     </div>
   );
@@ -220,8 +228,8 @@ function DashboardLeads() {
 
 // Privacy-safe reputation badge: shows the renter's aggregate score + review
 // count to the owner, never the underlying review text (TRUST_SPEC §6).
-function RenterReputation({ renterId }: { renterId: string }) {
-  const rep = getRenterReputation(renterId);
+function RenterReputation({ lead }: { lead: Lead }) {
+  const rep = renterReputationOf(lead);
   if (!rep) {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">

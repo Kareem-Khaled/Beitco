@@ -165,7 +165,43 @@ export class EngagementService {
       orderBy: { createdAt: 'desc' },
       include: { units: true },
     });
-    return rows.map((r) => serializeLead(r as unknown as LeadRow));
+    const renterIds = [...new Set(rows.map((r) => r.renterId))];
+    if (renterIds.length === 0) return [];
+
+    // Renter reputations (T-4) for the privacy-safe badge (score + count only).
+    const renters = await this.prisma.user.findMany({
+      where: { id: { in: renterIds } },
+      select: { id: true, renterReputation: true, renterReviewsCount: true },
+    });
+    const repMap = new Map(renters.map((u) => [u.id, u]));
+
+    // Which renters this owner can still review: a confirmed owner<->renter
+    // tenancy not yet reviewed (mirrors the mock's canOwnerReviewRenter).
+    const tenancies = await this.prisma.tenancy.findMany({
+      where: { userId: { in: renterIds }, property: { ownerId } },
+      select: { id: true, userId: true },
+    });
+    const reviewed = await this.prisma.renterReview.findMany({
+      where: { ownerId, tenancyId: { in: tenancies.map((t) => t.id) } },
+      select: { tenancyId: true },
+    });
+    const reviewedTenancies = new Set(reviewed.map((r) => r.tenancyId));
+    const reviewableRenters = new Set<string>();
+    for (const t of tenancies) {
+      if (!reviewedTenancies.has(t.id)) reviewableRenters.add(t.userId);
+    }
+
+    return rows.map((r) => {
+      const rep = repMap.get(r.renterId);
+      return {
+        ...serializeLead(r as unknown as LeadRow),
+        renterReputation:
+          rep?.renterReputation != null
+            ? { score: rep.renterReputation, count: rep.renterReviewsCount }
+            : null,
+        canReview: reviewableRenters.has(r.renterId),
+      };
+    });
   }
 
   // Owner-only. Completing a lead creates a confirmed tenancy (idempotent).

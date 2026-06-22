@@ -247,6 +247,14 @@ export async function apiUpdateLeadStatus(
   return body.data;
 }
 
+// Owner reviews a renter (two-sided trust, T-4). Moves the renter's reputation.
+export async function apiReviewRenter(
+  renterId: string,
+  payload: { rating: number; body: string; scores: Record<string, number> },
+): Promise<void> {
+  await postJSON(`/users/${encodeURIComponent(renterId)}/reviews`, payload);
+}
+
 // ── Q&A (FE-WIRE slice 4) ───────────────────────────────────────────────────
 export async function apiAskQuestion(propertyId: string, body: string): Promise<void> {
   await postJSON(`/properties/${encodeURIComponent(propertyId)}/questions`, { body });
