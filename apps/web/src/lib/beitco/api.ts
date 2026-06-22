@@ -283,3 +283,99 @@ export async function apiGetReviewMeta(
   );
   return body.data;
 }
+
+// ── Listings write (FE-WIRE slice 6a) ───────────────────────────────────────
+// The create/edit DTO is a subset of Property: `type`, `priceFrom`, bed counts,
+// `trust`, and `status` are all DERIVED server-side, so we only send inputs.
+type ListingPayload = {
+  title: string;
+  area: string;
+  address?: string;
+  lat?: number;
+  lng?: number;
+  listingType?: "rent" | "sale";
+  rentalMode?: "whole" | "by_room" | "by_bed";
+  description?: string;
+  spec?: { unitType: string; bedrooms: number; bathrooms: number; floor?: number; sizeM2?: number; furnished: boolean };
+  wholePrice?: number;
+  wholeStatus?: string;
+  nightlyPrice?: number;
+  salePrice?: number;
+  saleStatus?: string;
+  negotiable?: boolean;
+  rentToGender?: "male_only" | "female_only";
+  images?: string[];
+  amenities?: string[];
+  costs?: { label: string; amount: number }[];
+  rooms?: { name: string; features: string[]; sizeM2?: number; price?: number; status?: string; beds?: { label: string; status: string; price: number; features?: string[] }[] }[];
+  nearby?: { type: string; name: string; line?: string; minutes?: number }[];
+  customSpecs?: { label: string; value: string }[];
+};
+
+function propertyToListingPayload(p: Property): ListingPayload {
+  return {
+    title: p.title,
+    area: p.area,
+    address: p.address || undefined,
+    lat: p.lat ?? undefined,
+    lng: p.lng ?? undefined,
+    listingType: p.listingType ?? "rent",
+    rentalMode: p.rentalMode ?? undefined,
+    description: p.description || undefined,
+    spec: p.spec
+      ? {
+          unitType: p.spec.unitType,
+          bedrooms: p.spec.bedrooms,
+          bathrooms: p.spec.bathrooms,
+          floor: p.spec.floor,
+          sizeM2: p.spec.sizeM2,
+          furnished: p.spec.furnished,
+        }
+      : undefined,
+    wholePrice: p.wholePrice ?? undefined,
+    wholeStatus: p.wholeStatus ?? undefined,
+    nightlyPrice: p.nightlyPrice ?? undefined,
+    salePrice: p.salePrice ?? undefined,
+    saleStatus: p.saleStatus ?? undefined,
+    negotiable: p.negotiable ?? undefined,
+    rentToGender: p.rentToGender ?? undefined,
+    images: p.images ?? undefined,
+    amenities: p.amenities ?? undefined,
+    costs: p.costs?.map((c) => ({ label: c.label, amount: c.amount })),
+    rooms: p.rooms?.map((r) => ({
+      name: r.name,
+      features: r.features ?? [],
+      sizeM2: r.sizeM2,
+      price: r.price,
+      status: r.status,
+      beds: r.beds?.map((b) => ({ label: b.label, status: b.status, price: b.price, features: b.features })),
+    })),
+    nearby: p.nearby?.map((n) => ({ type: n.type, name: n.name, line: n.line, minutes: n.minutes })),
+    customSpecs: p.customSpecs?.map((c) => ({ label: c.label, value: c.value })),
+  };
+}
+
+export async function apiCreateProperty(p: Property): Promise<Property> {
+  const body = await postJSON<Property>("/properties", propertyToListingPayload(p));
+  return body.data;
+}
+
+export async function apiUpdateProperty(id: string, p: Property): Promise<Property> {
+  const body = await patchJSON<Property>(
+    `/properties/${encodeURIComponent(id)}`,
+    propertyToListingPayload(p),
+  );
+  return body.data;
+}
+
+export async function apiDeleteProperty(id: string): Promise<void> {
+  await delJSON(`/properties/${encodeURIComponent(id)}`);
+}
+
+// Owner's own listings (all statuses). Summaries + status (+ rejectionReason).
+export async function apiListMine(): Promise<(import("./types").PropertySummary & { status: string })[]> {
+  const body = await getJSON<(import("./types").PropertySummary & { status: string })[]>(
+    "/properties/mine",
+  );
+  return body.data;
+}

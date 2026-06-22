@@ -5,13 +5,12 @@ import { useAuth } from "@/lib/beitco/auth";
 import {
   getTenanciesForUser,
   getMatchesForUser,
-  getPropertiesByOwner,
   profileCompleteness,
   getSavedSearches,
   deleteSavedSearch,
   getRenterReputation,
 } from "@/lib/beitco/store";
-import { useSavedListings, useRenterLeads } from "@/lib/beitco/queries";
+import { useSavedListings, useRenterLeads, useOwnerProperties } from "@/lib/beitco/queries";
 import type { SavedSearch } from "@/lib/beitco/types";
 import { MatchBadge } from "@/components/beitco/MatchBadge";
 import { Button } from "@/components/ui/button";
@@ -25,6 +24,7 @@ function MeOverview() {
   const isOwner = user?.role === "owner" || user?.role === "both";
   const { data: savedList = [] } = useSavedListings(user?.id);
   const { data: renterLeads = [] } = useRenterLeads(user?.id);
+  const { data: ownerProps = [] } = useOwnerProperties(user?.id);
   const data = useMemo(() => {
     if (!user)
       return { saved: 0, pending: 0, tenancies: 0, completeness: 0, topMatch: 0, matchCount: 0, listings: 0, reputation: undefined as { score: number; count: number } | undefined };
@@ -36,10 +36,10 @@ function MeOverview() {
       completeness: profileCompleteness(user.profile),
       topMatch: matches[0]?.match.score ?? 0,
       matchCount: matches.length,
-      listings: getPropertiesByOwner(user.id).length,
+      listings: ownerProps.length,
       reputation: getRenterReputation(user.id),
     };
-  }, [user, savedList.length, renterLeads]);
+  }, [user, savedList.length, renterLeads, ownerProps.length]);
 
   // Saved searches (FE-6) — local list so deletes re-render immediately.
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);

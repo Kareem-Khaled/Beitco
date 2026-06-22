@@ -26,6 +26,9 @@ import {
   postReview as storePostReview,
   toggleReviewHelpful as storeToggleHelpful,
   replyToReview as storeReplyToReview,
+  getPropertiesByOwner,
+  saveProperty as storeSaveProperty,
+  deleteProperty as storeDeleteProperty,
 } from "./store";
 import {
   apiListProperties,
@@ -42,6 +45,10 @@ import {
   apiToggleReviewHelpful,
   apiReplyToReview,
   apiGetReviewMeta,
+  apiCreateProperty,
+  apiUpdateProperty,
+  apiDeleteProperty,
+  apiListMine,
   USE_API,
 } from "./api";
 import type { Property, PropertySummary, SavedSearch, SavedSearchParams, Lead, Review } from "./types";
@@ -254,6 +261,45 @@ export async function replyReview(
 ): Promise<void> {
   if (USE_API) return apiReplyToReview(reviewId, body);
   storeReplyToReview(propertyId, reviewId, body);
+}
+
+// ── Listings write (FE-WIRE slice 6a) ───────────────────────────────────────
+// Owner's own listings (all statuses) for the dashboard/count. Mock returns
+// full Property objects; API returns summaries + status from GET /properties/mine.
+export function useOwnerProperties(userId: string | undefined) {
+  return useQuery<(Property | PropertySummary)[]>({
+    queryKey: ["ownerProperties", userId, { source: USE_API ? "api" : "mock" }],
+    enabled: !!userId,
+    queryFn: async () => {
+      if (USE_API) return apiListMine();
+      if (!userId) return [];
+      return getPropertiesByOwner(userId);
+    },
+    initialData:
+      USE_API || !userId ? undefined : () => getPropertiesByOwner(userId),
+    staleTime: USE_API ? 15_000 : Infinity,
+  });
+}
+
+// Create or edit a listing. The mock upserts the full Property locally; the API
+// sends only the input subset (status/type/price derived server-side) and
+// returns the authoritative saved Property (with the server-decided status).
+export async function saveListing(
+  property: Property,
+  opts: { isEdit: boolean; editId?: string },
+): Promise<Property> {
+  if (USE_API) {
+    return opts.isEdit && opts.editId
+      ? apiUpdateProperty(opts.editId, property)
+      : apiCreateProperty(property);
+  }
+  storeSaveProperty(property);
+  return property;
+}
+
+export async function deleteListing(id: string): Promise<void> {
+  if (USE_API) return apiDeleteProperty(id);
+  storeDeleteProperty(id);
 }
 
 

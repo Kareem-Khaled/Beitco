@@ -55,7 +55,6 @@ import {
   type StepId,
 } from "@/lib/beitco/listing-draft";
 import {
-  saveProperty,
   getProperty,
   getInitialListingStatus,
   summarizeListing,
@@ -70,6 +69,8 @@ import {
   NEARBY_TYPES,
   CAIRO_METRO_LINES,
 } from "@/lib/beitco/store";
+import { USE_API, apiGetProperty } from "@/lib/beitco/api";
+import { saveListing } from "@/lib/beitco/queries";
 import type {
   Property,
   RentalMode,
@@ -101,23 +102,35 @@ function ListNewPage() {
   const [draft, setDraft] = useState<ListingDraft>({});
   const [hydrated, setHydrated] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  // The existing listing when editing — fetched once (flag-aware) and reused by
+  // the ownership guard + publish (instead of re-reading the store each time).
+  const [existingProp, setExistingProp] = useState<Property | undefined>(undefined);
+  const [publishing, setPublishing] = useState(false);
 
   // Hydrate: edit mode prefills from the existing property; create mode loads the saved draft.
   useEffect(() => {
-    if (isEdit && editId) {
-      const existing = getProperty(editId);
-      if (existing) {
-        setDraft(propertyToDraft(existing));
+    let cancelled = false;
+    void (async () => {
+      if (isEdit && editId) {
+        const existing = USE_API ? await apiGetProperty(editId) : getProperty(editId);
+        if (cancelled) return;
+        if (existing) {
+          setExistingProp(existing);
+          setDraft(propertyToDraft(existing));
+        } else {
+          setNotFound(true);
+        }
       } else {
-        setNotFound(true);
+        // Seed sensible defaults so the values shown in the wizard are the ones
+        // actually stored (a saved draft overrides them). Without this, the
+        // displayed "2 أوض / 1 حمام" wasn't a real value and blocked step 2.
+        setDraft({ listingType: "rent", bedrooms: 2, bathrooms: 1, ...loadDraft() });
       }
-    } else {
-      // Seed sensible defaults so the values shown in the wizard are the ones
-      // actually stored (a saved draft overrides them). Without this, the
-      // displayed "2 أوض / 1 حمام" wasn't a real value and blocked step 2.
-      setDraft({ listingType: "rent", bedrooms: 2, bathrooms: 1, ...loadDraft() });
-    }
-    setHydrated(true);
+      if (!cancelled) setHydrated(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [isEdit, editId]);
 
   // Only persist the new-listing draft; don't clobber it while editing.
@@ -131,12 +144,11 @@ function ListNewPage() {
 
   // Ownership guard for edit mode.
   useEffect(() => {
-    if (!hydrated || !isEdit || !editId || !user) return;
-    const existing = getProperty(editId);
-    if (existing && existing.ownerId !== user.id) {
+    if (!hydrated || !isEdit || !user) return;
+    if (existingProp && existingProp.ownerId !== user.id) {
       navigate({ to: "/dashboard/listings" });
     }
-  }, [hydrated, isEdit, editId, user, navigate]);
+  }, [hydrated, isEdit, existingProp, user, navigate]);
 
   const update = (patch: Partial<ListingDraft>) => setDraft((d) => ({ ...d, ...patch }));
 
@@ -145,22 +157,33 @@ function ListNewPage() {
   const next = () => setStep((s) => Math.min(LAST_STEP, s + 1) as StepId);
   const back = () => setStep((s) => Math.max(1, s - 1) as StepId);
 
-  const handlePublish = () => {
-    if (!user) return;
-    const existing = isEdit && editId ? getProperty(editId) : undefined;
+  const handlePublish = async () => {
+    if (!user || publishing) return;
+    const existing = existingProp;
     const property = draftToProperty(draft, user.id, user.name, existing);
 
     // Moderation gate (MOD-1): verified owners auto-publish; unverified owners'
     // listings enter the review queue. Editing a live listing keeps it live;
-    // (re)publishing a new/draft/rejected one runs through the gate.
+    // (re)publishing a new/draft/rejected one runs through the gate. In API mode
+    // the server is authoritative (returns the decided status); the mock sets it
+    // here so the localStorage path behaves identically.
     const wasLive = existing?.status === "published" || existing?.status === "paused";
     if (!wasLive) {
       property.status = getInitialListingStatus(user);
     }
-    saveProperty(property);
+
+    setPublishing(true);
+    let saved: Property;
+    try {
+      saved = await saveListing(property, { isEdit, editId });
+    } catch (err) {
+      setPublishing(false);
+      toast.error(err instanceof Error ? err.message : "مقدرناش نحفظ الإعلان دلوقتي");
+      return;
+    }
     if (!isEdit) clearDraft();
 
-    const pending = property.status === "pending_approval";
+    const pending = saved.status === "pending_approval";
     toast.success(
       isEdit
         ? "اتحفظت التعديلات"
@@ -173,7 +196,7 @@ function ListNewPage() {
     if (pending) {
       navigate({ to: "/dashboard/listings", replace: true });
     } else {
-      navigate({ to: "/property/$id", params: { id: property.id }, replace: true });
+      navigate({ to: "/property/$id", params: { id: saved.id }, replace: true });
     }
   };
 
@@ -240,8 +263,8 @@ function ListNewPage() {
               <ArrowLeft className="h-4 w-4" />
             </Button>
           ) : (
-            <Button onClick={handlePublish} size="lg" className="rounded-xl">
-              {isEdit ? "احفظ التعديلات" : "انشر الإعلان"}
+            <Button onClick={handlePublish} disabled={publishing} size="lg" className="rounded-xl">
+              {publishing ? "بنحفظ…" : isEdit ? "احفظ التعديلات" : "انشر الإعلان"}
             </Button>
           )}
         </div>

@@ -11,13 +11,20 @@
 
 ## 🟢 In Progress
 
-_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (1) + saved-searches (2) + renter-leads (3) + Q&A (4) + reviews (5) wired behind the flag. Next: create-listing, then the owner dashboard — leads/properties/moderation — together. Then the matching-engine port.)_
+_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (1) + saved-searches (2) + renter-leads (3) + Q&A (4) + reviews (5) + create/edit listing (6a) wired behind the flag. Next: owner dashboard — owner-leads + listings management (6b), moderation queue (6c), owner→renter reviews (6d). Then the matching-engine port.)_
 
 > **Known seed-fidelity note (not a wiring bug):** properties carry a hand-set display `reviewsCount` (e.g. 32) larger than their actual seeded review rows. The trust recompute counts real rows, so after the first real review the count snaps to the true value. Fix later by seeding more reviews or setting `reviewsCount = reviews.length` in the seed.
 
 ---
 
 ## ✅ Done
+
+### FE-WIRE (slice 6a) · Create/edit listing on the API ✅ (June 22)
+- `api.ts`: `apiCreateProperty`/`apiUpdateProperty`/`apiDeleteProperty`/`apiListMine` + a `propertyToListingPayload(p)` mapper that sends only the `CreateListingDto` input subset (Arabic `spec.unitType`/`nearby.type` pass through; `type`/`priceFrom`/bed-counts/`trust`/`status` are all derived server-side).
+- `queries.ts`: `useOwnerProperties(userId)` (flag-aware: mock full Property[], API summaries+status from `GET /properties/mine`) + `saveListing(property, {isEdit, editId})` (POST create / PATCH edit; returns the authoritative saved Property) + `deleteListing(id)`.
+- `list/new.tsx` (the "حط شقتك" wizard): edit hydration is now **flag-aware async** (`apiGetProperty` in API mode, fetched once into `existingProp` and reused by the ownership guard + publish); publish calls `saveListing` and uses the **server-decided status** for the toast/redirect; added a `publishing` guard (disables the button, error toast on failure) to prevent double-submit on the API round-trip. `me/index.tsx` listings count → `useOwnerProperties`.
+- **Scope:** the dashboard **management** grid (`/dashboard/listings` pause/unit-status partial updates, `/dashboard` analytics, `/dashboard/reviews`, `/dashboard/leads`) is **slice 6b** — it needs full owner properties + a few status mutations the create DTO doesn't carry.
+- **Verified (curl):** verified owner (مصطفى) create → **published** (type `شقة`, `priceFrom` derived) → shows in `/properties/mine` → edit title → **stays published**; unverified owner (أحمد عبده) create → **pending_approval**; cross-owner edit → **403**; delete own → 200 then public GET **404**. Re-seeded to canonical. `tsc` both apps + 31 web tests; flag-on `/list/new` + `/me` render 200 (edit URL 307→login when logged-out, expected). Flag OFF unchanged.
 
 ### FE-WIRE (slice 5) · Reviews on the API ✅ (June 22)
 - **New backend read:** `GET /properties/:id/review-meta` (authenticated) → `{ canReview, votedReviewIds }` — `canReview` mirrors the mock's `canUserReview` (a 30+ day tenancy here); `votedReviewIds` = the reviews on this listing the user marked helpful. (Post/helpful/reply endpoints already existed in B-2b.)
