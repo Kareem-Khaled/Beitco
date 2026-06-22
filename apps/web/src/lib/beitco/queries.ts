@@ -6,9 +6,27 @@
 //   - flag ON: data is fetched from the NestJS API.
 
 import { useQuery } from "@tanstack/react-query";
-import { getPublishedProperties, getSavedForUser, getProperty, toggleSaved } from "./store";
-import { apiListProperties, apiGetSaved, apiToggleSaved, USE_API } from "./api";
-import type { Property, PropertySummary } from "./types";
+import {
+  getPublishedProperties,
+  getSavedForUser,
+  getProperty,
+  toggleSaved,
+  getSavedSearches,
+  saveSearch,
+  deleteSavedSearch,
+  describeSavedSearch,
+  sameSearch,
+} from "./store";
+import {
+  apiListProperties,
+  apiGetSaved,
+  apiToggleSaved,
+  apiListSavedSearches,
+  apiCreateSavedSearch,
+  apiDeleteSavedSearch,
+  USE_API,
+} from "./api";
+import type { Property, PropertySummary, SavedSearch, SavedSearchParams } from "./types";
 
 // Home + search consume the full published set (they filter/sort client-side).
 export function usePublishedProperties() {
@@ -56,4 +74,39 @@ export async function toggleSavedListing(userId: string, propertyId: string): Pr
   if (USE_API) return apiToggleSaved(propertyId);
   return toggleSaved(userId, propertyId);
 }
+
+// ── Saved searches ──────────────────────────────────────────────────────────
+export function useSavedSearches(userId: string | undefined) {
+  return useQuery<SavedSearch[]>({
+    queryKey: ["savedSearches", userId, { source: USE_API ? "api" : "mock" }],
+    enabled: !!userId,
+    queryFn: async () => {
+      if (USE_API) return apiListSavedSearches();
+      if (!userId) return [];
+      return getSavedSearches(userId);
+    },
+    initialData:
+      USE_API || !userId ? undefined : () => getSavedSearches(userId),
+    staleTime: USE_API ? 15_000 : Infinity,
+  });
+}
+
+export async function createSavedSearch(
+  userId: string,
+  params: SavedSearchParams,
+): Promise<SavedSearch> {
+  if (USE_API) return apiCreateSavedSearch(describeSavedSearch(params), params);
+  return saveSearch(userId, params);
+}
+
+export async function removeSavedSearch(userId: string, id: string): Promise<void> {
+  if (USE_API) return apiDeleteSavedSearch(id);
+  return deleteSavedSearch(userId, id);
+}
+
+// Whether a saved search equivalent to `params` exists in `list` (flag-agnostic).
+export function alreadySavedIn(list: SavedSearch[], params: SavedSearchParams): boolean {
+  return list.some((s) => sameSearch(s.params, params));
+}
+
 

@@ -11,11 +11,17 @@
 
 ## 🟢 In Progress
 
-_(Backend B-0→MOD-1 done. **FE wiring pass started:** reads (B-1) + saved-listings wired behind the flag. Next: saved-searches, leads, Q&A, reviews, create-listing, moderation queue on the FE.)_
+_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (slice 1) + saved-searches (slice 2) wired behind the flag. Next: leads, Q&A, reviews, create-listing, moderation queue on the FE.)_
 
 ---
 
 ## ✅ Done
+
+### FE-WIRE (slice 2) · Saved searches on the API ✅ (June 22)
+- `lib/beitco/queries.ts`: `useSavedSearches(userId)` (flag-aware: mock returns `getSavedSearches` sync with zero-flash `initialData`; API hits `GET /me/searches`) + `createSavedSearch(userId, params)` (branches mock `saveSearch`/`apiCreateSavedSearch`, deriving the label via `describeSavedSearch`) + `removeSavedSearch` + `alreadySavedIn(list, params)` (dedup via the now-exported `sameSearch`).
+- `store.ts`: `sameSearch` promoted to an export (shared dedup helper).
+- `routes/search.tsx`: the "save this search" banner now reads `useSavedSearches(user?.id)` for its saved/not-saved state and calls `createSavedSearch` + invalidates `["savedSearches", user.id]` on save (replaces the direct `hasSavedSearch`/`saveSearch` store calls + the old `savedTick` re-render hack).
+- **Verified:** `tsc` + 31 web tests green; full curl round-trip against the live API — send/verify OTP → `POST /me/searches` (Arabic label **and** `params.area` round-trip through the Prisma JSON column) → `GET /me/searches` → `DELETE` → list-after-delete correct; ownership scoped to `userId`. Flag OFF unchanged.
 
 ### FE-WIRE (slice 1) · Saved listings on the API ✅ (June 22)
 - `lib/beitco/queries.ts`: `useSavedListings(userId)` (TanStack Query, flag-aware: mock resolves ids→properties sync with zero-flash `initialData`; API hits `GET /me/saved`) + `toggleSavedListing(userId, propertyId)` (branches mock/`apiToggleSaved`).

@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState, useEffect } from "react";
 import { Search, X, BedDouble, ShieldCheck, SlidersHorizontal, BookmarkPlus, BookmarkCheck, SearchX, Moon } from "lucide-react";
 import { z } from "zod";
@@ -6,8 +7,8 @@ import { SiteHeader } from "@/components/beitco/SiteHeader";
 import { SiteFooter } from "@/components/beitco/SiteFooter";
 import { BeitcoListingCard } from "@/components/beitco/BeitcoListingCard";
 import { EmptyState } from "@/components/beitco/EmptyState";
-import { EGYPT_AREAS, saveSearch, hasSavedSearch } from "@/lib/beitco/store";
-import { usePublishedProperties } from "@/lib/beitco/queries";
+import { EGYPT_AREAS } from "@/lib/beitco/store";
+import { usePublishedProperties, useSavedSearches, createSavedSearch, alreadySavedIn } from "@/lib/beitco/queries";
 import { useAuth } from "@/lib/beitco/auth";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,7 @@ function SearchPage() {
   const params = Route.useSearch();
   const navigate = useNavigate({ from: "/search" });
   const { user } = useAuth();
+  const qc = useQueryClient();
 
   const [q, setQ] = useState(params.q ?? "");
   useEffect(() => setQ(params.q ?? ""), [params.q]);
@@ -110,14 +112,14 @@ function SearchPage() {
     params.minPrice != null ||
     params.maxPrice != null;
 
-  // Saved-search state (FE-6). `savedTick` forces a re-check after saving.
-  const [savedTick, setSavedTick] = useState(0);
+  // Saved-search state (FE-6), flag-aware via the shared query cache.
+  const { data: savedSearches = [] } = useSavedSearches(user?.id);
   const alreadySaved = useMemo(
-    () => (user ? hasSavedSearch(user.id, params) : false),
-    [user, params, savedTick],
+    () => (user ? alreadySavedIn(savedSearches, params) : false),
+    [user, params, savedSearches],
   );
 
-  const onSaveSearch = () => {
+  const onSaveSearch = async () => {
     if (!user) {
       toast.error("ادخل حسابك الأول عشان تحفظ بحثك");
       navigate({ to: "/auth/login" });
@@ -127,8 +129,8 @@ function SearchPage() {
       toast.info("بحثك ده محفوظ عندك بالفعل");
       return;
     }
-    saveSearch(user.id, params);
-    setSavedTick((t) => t + 1);
+    await createSavedSearch(user.id, params);
+    qc.invalidateQueries({ queryKey: ["savedSearches", user.id] });
     toast.success("اتحفظ — هنبلّغك أول ما ينزل مكان يطابقه");
   };
 

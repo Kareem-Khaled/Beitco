@@ -1236,7 +1236,7 @@ function normalizeSearchParams(p: SavedSearchParams): SavedSearchParams {
   return out;
 }
 
-function sameSearch(a: SavedSearchParams, b: SavedSearchParams): boolean {
+export function sameSearch(a: SavedSearchParams, b: SavedSearchParams): boolean {
   const ka = normalizeSearchParams(a);
   const kb = normalizeSearchParams(b);
   // Sort is a view preference, not part of the search identity.
