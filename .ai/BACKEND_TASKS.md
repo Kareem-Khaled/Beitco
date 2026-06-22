@@ -11,11 +11,16 @@
 
 ## 🟢 In Progress
 
-_(B-0 → B-1, A-1, B-2 (writes), T-PORT + B-2b (reviews + trust) done. Next: FE wiring of saved/leads/Q&A/reviews; MOD-1 moderation; matching-engine port.)_
+_(B-0 → B-1, A-1, B-2 writes, T-PORT/B-2b reviews, B-2c create-listing + MOD-1 moderation done. Next: FE wiring pass; matching-engine port; chat/search/payments.)_
 
 ---
 
 ## ✅ Done
+
+### B-2c + MOD-1 · Create/edit listings + admin moderation ✅ (June 22)
+- **Listings write** (`apps/api/src/listings/listings.write.service.ts`): `POST /properties` (create — nested rooms→beds, server-derived `type`/`priceFrom`, **moderation-gated status** via `getInitialListingStatus`: admin/verified → `published`, else `pending_approval`; recomputes trust), `PATCH /properties/:id` (edit own — re-runs the gate for draft/rejected, keeps live ones live), `GET /properties/mine` (owner, all statuses), `DELETE /properties/:id` (soft). Ownership enforced (403).
+- **MOD-1 admin** (`apps/api/src/admin/`, `AdminGuard` = `isAdmin`): `GET /admin/moderation` (pending queue, oldest first), `GET /admin/moderation/count` (nav badge), `POST /admin/moderation/:id/approve` (→ published + recompute), `POST /admin/moderation/:id/reject` (reason).
+- **Verified (curl):** verified owner create → **published**; unverified → **pending_approval** (correct type/priceFrom derivation); non-admin queue → **403**; admin sees queue, approve → published + **publicly visible (200)** + count decrements; reject-with-reason persists (owner sees it on `/properties/mine`); cross-owner edit → **403**. Seed data intact after cleanup. `tsc` green both apps; 17 Jest + 31 web tests pass.
 
 ### T-PORT + B-2b · Trust engine port + reviews that move the score ✅ (June 22)
 - **Trust engine** ported to `apps/api/src/trust/trust.engine.ts` (pure, framework-free — mirrors `apps/web/src/lib/beitco/trust.ts`): `bayesianMean`, `computeQualityFromReviews`, `computeListingTrust`, `computeOwnerTrust`, `computeRenterReputation`, `computeResponseRate`. **17 Jest tests pass** (mirror the frontend Vitest cases: smoothing, verification cap, DoD, response rate, reputation).
@@ -66,9 +71,6 @@ _(B-0 → B-1, A-1, B-2 (writes), T-PORT + B-2b (reviews + trust) done. Next: FE
 - Endpoints + services for: create/edit listing (moderation-gated by verification — port `getInitialListingStatus`), reviews, Q&A (ask/answer), leads (viewing + bed-level booking), tenancies, saved listings, saved searches, occupant consent-linking, **user profile update** (settings/preferences — also completes A-1's `updateUser` in API mode).
 - Frontend: swap each `store.ts` mutation for a mutation hook; optimistic where it makes sense.
 - **DoD:** a full owner+renter journey persists across sessions/devices.
-
-### MOD-1 · Moderation queue (server-side)
-- Port the frontend's MOD-1: unverified owners' listings → `pending_approval`; admin queue endpoints (`GET /admin/moderation`, approve, reject-with-reason); only `published` appears in public reads. `moderation`/`admin` modules already have most of this — align to listing approval.
 
 ### T-PORT · Port the trust + matching engines to services
 - Move `trust.ts` (T-1→T-5) and `matching.ts` into NestJS services (they're already pure — near-direct port). Recompute on review/reply/verification/booking; persist `trustBreakdown`. Expose `GET /properties/:id/trust`.

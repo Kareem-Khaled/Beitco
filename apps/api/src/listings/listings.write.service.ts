@@ -1,0 +1,258 @@
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { TrustService } from '../trust/trust.service';
+import { serializeProperty, serializeSummary, type PropertyRow } from './listings.serializer';
+import { CreateListingDto } from './dto/create-listing.dto';
+
+const UNIT_LATIN: Record<string, 'apartment' | 'studio' | 'duplex' | 'roof' | 'villa'> = {
+  شقة: 'apartment',
+  استوديو: 'studio',
+  دوبلكس: 'duplex',
+  روف: 'roof',
+  فيلا: 'villa',
+};
+const NEARBY_LATIN: Record<string, 'metro' | 'university' | 'transit' | 'mall' | 'hospital' | 'supermarket' | 'other'> = {
+  مترو: 'metro',
+  جامعة: 'university',
+  مواصلات: 'transit',
+  مول: 'mall',
+  مستشفى: 'hospital',
+  'سوبر ماركت': 'supermarket',
+  'حاجة تانية': 'other',
+};
+
+const detailInclude = {
+  owner: true,
+  rooms: { include: { beds: true }, orderBy: { createdAt: 'asc' as const } },
+  nearby: true,
+  customSpecs: true,
+  reviews: { orderBy: { createdAt: 'desc' as const } },
+};
+
+@Injectable()
+export class ListingsWriteService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly trust: TrustService,
+  ) {}
+
+  // Owner's own listings (all statuses) for the dashboard.
+  async listMine(ownerId: string): Promise<Record<string, unknown>[]> {
+    const rows = (await this.prisma.property.findMany({
+      where: { ownerId, deletedAt: null },
+      orderBy: { createdAt: 'desc' },
+      include: { rooms: { include: { beds: true } } },
+    })) as unknown as PropertyRow[];
+    // Summaries but keep status (owner needs to see draft/pending/rejected).
+    return rows.map((p) => ({ ...serializeSummary(p), status: p.status, rejectionReason: undefined }));
+  }
+
+  async create(ownerId: string, dto: CreateListingDto): Promise<Record<string, unknown>> {
+    const owner = await this.prisma.user.findUnique({
+      where: { id: ownerId },
+      select: { isAdmin: true, verified: true, verificationStatus: true },
+    });
+    if (!owner) throw new NotFoundException({ code: 'USER_NOT_FOUND', message: 'الحساب مش موجود.' });
+
+    const status = this.initialStatus(owner);
+    const derived = this.derive(dto);
+
+    const created = await this.prisma.property.create({
+      data: {
+        ownerId,
+        title: dto.title,
+        description: dto.description ?? '',
+        area: dto.area,
+        address: dto.address ?? '',
+        lat: dto.lat ?? null,
+        lng: dto.lng ?? null,
+        type: derived.type,
+        status,
+        listingType: dto.listingType ?? 'rent',
+        rentalMode: dto.listingType === 'sale' ? null : (dto.rentalMode ?? null),
+        unitType: dto.spec ? UNIT_LATIN[dto.spec.unitType] : null,
+        bedrooms: dto.spec?.bedrooms ?? null,
+        bathrooms: dto.spec?.bathrooms ?? null,
+        floor: dto.spec?.floor ?? null,
+        sizeM2: dto.spec?.sizeM2 ?? null,
+        furnished: dto.spec?.furnished ?? false,
+        price: derived.priceFrom,
+        priceFrom: derived.priceFrom,
+        wholePrice: dto.wholePrice ?? null,
+        wholeStatus: (dto.wholeStatus as never) ?? null,
+        nightlyPrice: dto.nightlyPrice ?? null,
+        salePrice: dto.salePrice ?? null,
+        saleStatus: (dto.saleStatus as never) ?? null,
+        negotiable: dto.negotiable ?? false,
+        rentToGender: dto.rentToGender ?? null,
+        images: dto.images ?? [],
+        amenities: dto.amenities ?? [],
+        costs: (dto.costs ?? []) as object,
+        ...this.nestedCreate(dto),
+      },
+      include: detailInclude,
+    });
+
+    // Fresh listing: compute its real trust from (zero) reviews + owner signal.
+    await this.trust.recomputeListing(created.id);
+    const fresh = await this.findRow(created.id);
+    return { ...serializeProperty(fresh!), status };
+  }
+
+  async update(ownerId: string, id: string, dto: CreateListingDto): Promise<Record<string, unknown>> {
+    const existing = await this.prisma.property.findFirst({
+      where: { id, deletedAt: null },
+      select: { ownerId: true, status: true },
+    });
+    if (!existing) throw new NotFoundException({ code: 'PROPERTY_NOT_FOUND', message: 'الإعلان مش موجود.' });
+    if (existing.ownerId !== ownerId) {
+      throw new ForbiddenException({ code: 'NOT_OWNER', message: 'مش من حقك تعدّل الإعلان ده.' });
+    }
+
+    const owner = await this.prisma.user.findUnique({
+      where: { id: ownerId },
+      select: { isAdmin: true, verified: true, verificationStatus: true },
+    });
+    const derived = this.derive(dto);
+
+    // Editing a live listing keeps it live; (re)publishing a draft/rejected one
+    // re-runs the moderation gate.
+    const wasLive = existing.status === 'published' || existing.status === 'paused';
+    const status = wasLive ? existing.status : this.initialStatus(owner!);
+
+    // Replace nested children (simplest correct path for an edit).
+    await this.prisma.room.deleteMany({ where: { propertyId: id } });
+    await this.prisma.nearbyPlace.deleteMany({ where: { propertyId: id } });
+    await this.prisma.customSpec.deleteMany({ where: { propertyId: id } });
+
+    await this.prisma.property.update({
+      where: { id },
+      data: {
+        title: dto.title,
+        description: dto.description ?? '',
+        area: dto.area,
+        address: dto.address ?? '',
+        lat: dto.lat ?? null,
+        lng: dto.lng ?? null,
+        type: derived.type,
+        status,
+        listingType: dto.listingType ?? 'rent',
+        rentalMode: dto.listingType === 'sale' ? null : (dto.rentalMode ?? null),
+        unitType: dto.spec ? UNIT_LATIN[dto.spec.unitType] : null,
+        bedrooms: dto.spec?.bedrooms ?? null,
+        bathrooms: dto.spec?.bathrooms ?? null,
+        floor: dto.spec?.floor ?? null,
+        sizeM2: dto.spec?.sizeM2 ?? null,
+        furnished: dto.spec?.furnished ?? false,
+        price: derived.priceFrom,
+        priceFrom: derived.priceFrom,
+        wholePrice: dto.wholePrice ?? null,
+        wholeStatus: (dto.wholeStatus as never) ?? null,
+        nightlyPrice: dto.nightlyPrice ?? null,
+        salePrice: dto.salePrice ?? null,
+        saleStatus: (dto.saleStatus as never) ?? null,
+        negotiable: dto.negotiable ?? false,
+        rentToGender: dto.rentToGender ?? null,
+        images: dto.images ?? [],
+        amenities: dto.amenities ?? [],
+        costs: (dto.costs ?? []) as object,
+        rejectionReason: null,
+        ...this.nestedCreate(dto),
+      },
+    });
+
+    await this.trust.recomputeListing(id);
+    const fresh = await this.findRow(id);
+    return { ...serializeProperty(fresh!), status };
+  }
+
+  async remove(ownerId: string, id: string): Promise<{ ok: true }> {
+    const existing = await this.prisma.property.findFirst({
+      where: { id, deletedAt: null },
+      select: { ownerId: true },
+    });
+    if (!existing) throw new NotFoundException({ code: 'PROPERTY_NOT_FOUND', message: 'الإعلان مش موجود.' });
+    if (existing.ownerId !== ownerId) {
+      throw new ForbiddenException({ code: 'NOT_OWNER', message: 'مش من حقك تمسح الإعلان ده.' });
+    }
+    await this.prisma.property.update({ where: { id }, data: { deletedAt: new Date(), status: 'paused' } });
+    return { ok: true };
+  }
+
+  // ─── helpers ──────────────────────────────────────────
+  private initialStatus(owner: { isAdmin: boolean; verified: boolean; verificationStatus: string }):
+    'published' | 'pending_approval' {
+    if (owner.isAdmin) return 'published';
+    const verified = owner.verificationStatus === 'verified' || owner.verified;
+    return verified ? 'published' : 'pending_approval';
+  }
+
+  private nestedCreate(dto: CreateListingDto) {
+    return {
+      rooms:
+        dto.listingType === 'sale' || !dto.rooms?.length
+          ? undefined
+          : {
+              create: dto.rooms.map((r) => ({
+                name: r.name,
+                features: r.features ?? [],
+                sizeM2: r.sizeM2 ?? null,
+                price: r.price ?? null,
+                status: (r.status as never) ?? null,
+                beds: r.beds?.length
+                  ? {
+                      create: r.beds.map((b) => ({
+                        label: b.label,
+                        status: b.status as never,
+                        price: b.price,
+                        features: b.features ?? [],
+                      })),
+                    }
+                  : undefined,
+              })),
+            },
+      nearby: dto.nearby?.length
+        ? {
+            create: dto.nearby
+              .map((n) => ({ type: NEARBY_LATIN[n.type], name: n.name, line: n.line ?? null, minutes: n.minutes ?? null }))
+              .filter((n): n is { type: NonNullable<typeof n.type>; name: string; line: string | null; minutes: number | null } => !!n.type),
+          }
+        : undefined,
+      customSpecs: dto.customSpecs?.length
+        ? { create: dto.customSpecs.map((c) => ({ label: c.label, value: c.value })) }
+        : undefined,
+    };
+  }
+
+  // Derive the card-facing type + entry price from the structured model.
+  private derive(dto: CreateListingDto): { type: 'apartment' | 'room' | 'bed'; priceFrom: number } {
+    if (dto.listingType === 'sale') {
+      return { type: 'apartment', priceFrom: dto.salePrice ?? 0 };
+    }
+    if (dto.rentalMode === 'by_room') {
+      const rooms = dto.rooms ?? [];
+      const avail = rooms.filter((r) => (r.status ?? 'available') === 'available');
+      const prices = (avail.length ? avail : rooms).map((r) => r.price ?? 0).filter((n) => n > 0);
+      return { type: 'room', priceFrom: prices.length ? Math.min(...prices) : 0 };
+    }
+    if (dto.rentalMode === 'by_bed') {
+      const beds = (dto.rooms ?? []).flatMap((r) => r.beds ?? []);
+      const avail = beds.filter((b) => b.status === 'available');
+      const prices = (avail.length ? avail : beds).map((b) => b.price).filter((n) => n > 0);
+      return { type: 'bed', priceFrom: prices.length ? Math.min(...prices) : 0 };
+    }
+    // whole
+    return { type: 'apartment', priceFrom: dto.wholePrice ?? 0 };
+  }
+
+  private async findRow(id: string): Promise<PropertyRow | null> {
+    return (await this.prisma.property.findUnique({
+      where: { id },
+      include: detailInclude,
+    })) as unknown as PropertyRow | null;
+  }
+}

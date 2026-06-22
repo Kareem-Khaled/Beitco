@@ -11,6 +11,7 @@ import { UsersModule } from './users/users.module';
 import { EngagementModule } from './engagement/engagement.module';
 import { TrustModule } from './trust/trust.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { AdminModule } from './admin/admin.module';
 
 // Post-pivot core. After the schema rewrite to the bed-level + trust model, the
 // remaining legacy modules (chat, search, admin, moderation, analytics,
@@ -38,6 +39,7 @@ import { ReviewsModule } from './reviews/reviews.module';
     UsersModule,
     EngagementModule,
     ReviewsModule,
+    AdminModule,
   ],
   controllers: [HealthController],
   providers: [
