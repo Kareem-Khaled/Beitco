@@ -19,6 +19,8 @@ import {
   sameSearch,
   getLeadsForRenter,
   createLead as storeCreateLead,
+  postQuestion as storePostQuestion,
+  answerQuestion as storeAnswerQuestion,
 } from "./store";
 import {
   apiListProperties,
@@ -29,6 +31,8 @@ import {
   apiDeleteSavedSearch,
   apiCreateLead,
   apiListRenterLeads,
+  apiAskQuestion,
+  apiAnswerQuestion,
   USE_API,
 } from "./api";
 import type { Property, PropertySummary, SavedSearch, SavedSearchParams, Lead } from "./types";
@@ -159,6 +163,28 @@ export function usePropertyLookup() {
     return (id: string): Property | PropertySummary | undefined =>
       USE_API ? map.get(id) : getProperty(id);
   }, [published]);
+}
+
+// ── Q&A (FE-WIRE slice 4) ───────────────────────────────────────────────────
+// Both mutate a property's Q&A; callers re-read via router.invalidate() (API)
+// or a local refresh() (mock) afterwards, so these return void.
+export async function submitQuestion(
+  propertyId: string,
+  askerName: string,
+  question: string,
+): Promise<void> {
+  if (USE_API) return apiAskQuestion(propertyId, question);
+  storePostQuestion(propertyId, askerName, question);
+}
+
+export async function submitAnswer(
+  propertyId: string,
+  questionId: string,
+  answererName: string,
+  answer: string,
+): Promise<void> {
+  if (USE_API) return apiAnswerQuestion(questionId, answer);
+  storeAnswerQuestion(propertyId, questionId, answererName, answer);
 }
 
 

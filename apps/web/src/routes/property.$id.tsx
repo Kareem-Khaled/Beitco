@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -19,9 +19,9 @@ import { PropertyGallery } from "@/components/beitco/PropertyGallery";
 import { PageSkeleton } from "@/components/beitco/PageSkeleton";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { getProperty, findOrCreateThread, postMessage, canUserReview, postReview, postQuestion, answerQuestion, timeAgo, formatDate, toggleReviewHelpful, hasVotedHelpful, replyToReview } from "@/lib/beitco/store";
+import { getProperty, findOrCreateThread, postMessage, canUserReview, postReview, timeAgo, formatDate, toggleReviewHelpful, hasVotedHelpful, replyToReview } from "@/lib/beitco/store";
 import { USE_API, apiGetProperty } from "@/lib/beitco/api";
-import { useSavedListings, toggleSavedListing, submitLead } from "@/lib/beitco/queries";
+import { useSavedListings, toggleSavedListing, submitLead, submitQuestion, submitAnswer } from "@/lib/beitco/queries";
 import { useAuth } from "@/lib/beitco/auth";
 import { toast } from "sonner";
 import { ViewingRequestDialog } from "@/components/beitco/ViewingRequestDialog";
@@ -191,6 +191,7 @@ function PropertyGate({ p }: { p: Property }) {
 function PropertyDetail() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const router = useRouter();
   const { user } = useAuth();
   const loaderData = Route.useLoaderData() as Property;
   const p = USE_API ? loaderData : getProperty(id)!;
@@ -331,6 +332,12 @@ function PropertyDetail() {
   const [reviewSort, setReviewSort] = useState<"newest" | "highest" | "lowest" | "helpful">("newest");
   const [, force] = useState(0);
   const refresh = () => force((x) => x + 1);
+  // After a Q&A/review mutation: mock re-reads the store via a local re-render;
+  // API re-runs the route loader so the fresh property is shown.
+  const refreshDetail = async () => {
+    if (USE_API) await router.invalidate();
+    else refresh();
+  };
 
   const isOwner = user?.id === p.ownerId;
   const eligibleToReview = user ? canUserReview(user.id, p.id) : false;
@@ -374,11 +381,11 @@ function PropertyDetail() {
     setQuestionOpen(true);
   };
 
-  const onSubmitQuestion = (question: string) => {
+  const onSubmitQuestion = async (question: string) => {
     if (!user) return;
-    postQuestion(p.id, user.name, question);
+    await submitQuestion(p.id, user.name, question);
     toast.success("اتبعت سؤالك لصاحب البيت");
-    refresh();
+    await refreshDetail();
   };
 
   return (
@@ -668,10 +675,10 @@ function PropertyDetail() {
                       </div>
                     ) : isOwner ? (
                       <AnswerForm
-                        onAnswer={(text) => {
+                        onAnswer={async (text) => {
                           if (!user) return;
-                          answerQuestion(p.id, q.id, user.name, text);
-                          refresh();
+                          await submitAnswer(p.id, q.id, user.name, text);
+                          await refreshDetail();
                         }}
                       />
                     ) : (

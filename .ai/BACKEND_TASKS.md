@@ -11,11 +11,17 @@
 
 ## 🟢 In Progress
 
-_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (slice 1) + saved-searches (slice 2) + renter-leads (slice 3) wired behind the flag. Next: Q&A, reviews, create-listing, then the owner dashboard — leads/properties/moderation — together.)_
+_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (1) + saved-searches (2) + renter-leads (3) + Q&A (4) wired behind the flag. Next: reviews, create-listing, then the owner dashboard — leads/properties/moderation — together.)_
 
 ---
 
 ## ✅ Done
+
+### FE-WIRE (slice 4) · Q&A on the API ✅ (June 22)
+- **Read serializer fix:** `listings.serializer.ts` was hardcoding `qa: []` — now maps real `questions` (added `questions` to the read `detailInclude` + a `QuestionRow` type). Q&A `date` uses a new `arDate()` helper matching the mock's `toLocaleDateString("ar-EG-u-nu-latn")` format. So with the flag on, the property-detail loader returns the listing's real Q&A.
+- `api.ts`: `apiAskQuestion(propertyId, body)` / `apiAnswerQuestion(questionId, body)`. `queries.ts`: `submitQuestion`/`submitAnswer` (flag-aware; return void — callers re-read).
+- `property.$id.tsx`: ask + owner-answer now call the flag-aware helpers; added a shared `refreshDetail()` that **re-runs the route loader via `router.invalidate()` in API mode** (so new Q&A shows) and falls back to the local `refresh()` in mock mode. (This loader-invalidate pattern is what slice 5 reviews will reuse.)
+- **Verified:** `tsc` (both apps) + 31 web tests; flag-on `/property/1` & `/property/2` render 200 with real Q&A; full curl flow — renter asks → read-back shows the unanswered Q → **owner (مصطفى حسن) answers** → read-back shows q+a+answerer (Arabic date `22‏/6‏/2026`) → **non-owner answer = 403**. Flag OFF unchanged.
 
 ### FE-WIRE (slice 3) · Renter leads on the API ✅ (June 22)
 - `api.ts`: `apiCreateLead`/`apiListRenterLeads` (+ `apiListOwnerLeads`/`apiUpdateLeadStatus` ready for the owner slice).

@@ -22,6 +22,7 @@ const detailInclude = {
   nearby: true,
   customSpecs: true,
   reviews: { orderBy: { createdAt: 'desc' as const } },
+  questions: { orderBy: { createdAt: 'desc' as const } },
 };
 
 @Injectable()

@@ -38,6 +38,12 @@ function arMonthYear(d: Date): string {
   return `${AR_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
 }
 
+// Day/month/year in Egyptian Arabic with Latin numerals — matches the mock
+// store's Q&A date format (toLocaleDateString("ar-EG-u-nu-latn")).
+function arDate(d: Date): string {
+  return d.toLocaleDateString('ar-EG-u-nu-latn');
+}
+
 function initialsOf(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return '؟';
@@ -94,6 +100,15 @@ interface OwnerRow {
   responseRate: number | null;
   verified: boolean;
 }
+interface QuestionRow {
+  id: string;
+  askerName: string;
+  body: string;
+  answer: string | null;
+  answererName: string | null;
+  createdAt: Date;
+  answeredAt: Date | null;
+}
 export interface PropertyRow {
   id: string;
   ownerId: string;
@@ -137,6 +152,7 @@ export interface PropertyRow {
   nearby?: NearbyRow[];
   customSpecs?: CustomSpecRow[];
   reviews?: ReviewRow[];
+  questions?: QuestionRow[];
 }
 
 // Compute the card-facing { total, available, occupied } the way the frontend's
@@ -279,7 +295,15 @@ export function serializeProperty(p: PropertyRow): Record<string, unknown> {
       ownerReply: r.ownerReply ?? undefined,
       scores: r.scores ?? undefined,
     })),
-    qa: [],
+    qa: (p.questions ?? []).map((q) => ({
+      id: q.id,
+      propertyId: p.id,
+      asker: q.askerName,
+      q: q.body,
+      a: q.answer ?? undefined,
+      answerer: q.answererName ?? undefined,
+      date: arDate(q.createdAt),
+    })),
     createdAt: p.createdAt.toISOString(),
   };
 }

@@ -246,3 +246,12 @@ export async function apiUpdateLeadStatus(
   );
   return body.data;
 }
+
+// ── Q&A (FE-WIRE slice 4) ───────────────────────────────────────────────────
+export async function apiAskQuestion(propertyId: string, body: string): Promise<void> {
+  await postJSON(`/properties/${encodeURIComponent(propertyId)}/questions`, { body });
+}
+
+export async function apiAnswerQuestion(questionId: string, body: string): Promise<void> {
+  await postJSON(`/questions/${encodeURIComponent(questionId)}/answer`, { body });
+}
