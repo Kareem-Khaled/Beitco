@@ -11,11 +11,18 @@
 
 ## 🟢 In Progress
 
-_(B-0 → B-1, A-1 done; B-2 write API done + `updateUser` wired. Next: wire saved/leads/Q&A on the FE, then B-2b reviews + create-listing.)_
+_(B-0 → B-1, A-1, B-2 (writes), T-PORT + B-2b (reviews + trust) done. Next: FE wiring of saved/leads/Q&A/reviews; MOD-1 moderation; matching-engine port.)_
 
 ---
 
 ## ✅ Done
+
+### T-PORT + B-2b · Trust engine port + reviews that move the score ✅ (June 22)
+- **Trust engine** ported to `apps/api/src/trust/trust.engine.ts` (pure, framework-free — mirrors `apps/web/src/lib/beitco/trust.ts`): `bayesianMean`, `computeQualityFromReviews`, `computeListingTrust`, `computeOwnerTrust`, `computeRenterReputation`, `computeResponseRate`. **17 Jest tests pass** (mirror the frontend Vitest cases: smoothing, verification cap, DoD, response rate, reputation).
+- **`TrustService`** (global module): recomputes + persists from Prisma — owner response rate from `ResponseEvent`s (T-3), listing quality+trust (T-1/T-2), owner trust, renter reputation (T-4). `GET /properties/:id/trust` exposes the live breakdown.
+- **`reviews` module** (B-2b): `POST /properties/:id/reviews` (gated by a 30-day tenancy; **triggers a trust recompute**), `POST /reviews/:id/helpful` (toggle, dedup vote), `POST /reviews/:id/reply` (owner), `POST /users/:renterId/reviews` (owner→renter, T-4; **recomputes reputation**).
+- **Verified (curl):** posting a review **moved a listing's trust 8.3 → 5.2** (real computed value vs the hand-set seed); breakdown endpoint returns components; helpful toggle (1 vote); owner reply persists; 30-day gate rejects non-residents (**403**); owner→renter review set reputation to **7.8** (Bayesian-smoothed). Test data cleaned. `tsc` green; 17 Jest + 31 web tests pass.
+- **Deferred:** the **matching engine** port (pairs with renter-preferences persistence — it's heavy on Arabic string literals, its own task). Frontend wiring of review actions behind the flag (with the saved/leads/Q&A wiring).
 
 ### B-2 (slice) · Persist core writes — API + profile wiring ✅ (June 22)
 - **API** (auth-protected, ownership-checked):
