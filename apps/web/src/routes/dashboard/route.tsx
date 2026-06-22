@@ -2,7 +2,8 @@ import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tansta
 import { useEffect } from "react";
 import { Home, ListChecks, Inbox, Star, Plus, ShieldCheck, ShieldAlert } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
-import { getVerificationStatus, isPlatformAdmin, getPendingListingsCount } from "@/lib/beitco/store";
+import { getVerificationStatus, isPlatformAdmin } from "@/lib/beitco/store";
+import { useModerationCount } from "@/lib/beitco/queries";
 import { SiteHeader } from "@/components/beitco/SiteHeader";
 import { SiteFooter } from "@/components/beitco/SiteFooter";
 import { Button } from "@/components/ui/button";
@@ -109,7 +110,7 @@ function DashboardLayout() {
 function ModerationNavLink() {
   const location = useLocation();
   const active = location.pathname.startsWith("/dashboard/moderation");
-  const pending = getPendingListingsCount();
+  const { data: pending = 0 } = useModerationCount();
   return (
     <Link
       to="/dashboard/moderation"

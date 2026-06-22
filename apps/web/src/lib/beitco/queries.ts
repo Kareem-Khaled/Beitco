@@ -34,6 +34,10 @@ import {
   getRenterReputation,
   canOwnerReviewRenter,
   postRenterReview as storePostRenterReview,
+  getPendingListings,
+  getPendingListingsCount,
+  approveListing as storeApproveListing,
+  rejectListing as storeRejectListing,
 } from "./store";
 import {
   apiListProperties,
@@ -57,6 +61,10 @@ import {
   apiListOwnerLeads,
   apiUpdateLeadStatus,
   apiReviewRenter,
+  apiListPendingListings,
+  apiModerationCount,
+  apiApproveListing,
+  apiRejectListing,
   USE_API,
 } from "./api";
 import type { Property, PropertySummary, SavedSearch, SavedSearchParams, Lead, Review } from "./types";
@@ -363,6 +371,41 @@ export function renterReputationOf(lead: Lead): { score: number; count: number }
 export function ownerCanReview(ownerId: string, lead: Lead): boolean {
   if (USE_API) return !!lead.canReview;
   return canOwnerReviewRenter(ownerId, lead.renterId);
+}
+
+// ── Admin moderation (FE-WIRE slice 6c) ─────────────────────────────────────
+// The review queue: listings awaiting approval. Admin-only (the page/badge gate
+// on isPlatformAdmin); in API mode the endpoint is AdminGuard-protected too.
+// Both modes return FULL Property objects (the card needs landlord/address/etc.).
+export function usePendingListings() {
+  return useQuery<Property[]>({
+    queryKey: ["pendingListings", { source: USE_API ? "api" : "mock" }],
+    queryFn: async () => {
+      if (USE_API) return apiListPendingListings();
+      return getPendingListings();
+    },
+    initialData: USE_API ? undefined : () => getPendingListings(),
+    staleTime: USE_API ? 15_000 : Infinity,
+  });
+}
+
+export function useModerationCount() {
+  return useQuery<number>({
+    queryKey: ["moderationCount", { source: USE_API ? "api" : "mock" }],
+    queryFn: async () => (USE_API ? apiModerationCount() : getPendingListingsCount()),
+    initialData: USE_API ? undefined : () => getPendingListingsCount(),
+    staleTime: USE_API ? 30_000 : Infinity,
+  });
+}
+
+export async function approveListing(id: string): Promise<void> {
+  if (USE_API) return apiApproveListing(id);
+  storeApproveListing(id);
+}
+
+export async function rejectListing(id: string, reason: string): Promise<void> {
+  if (USE_API) return apiRejectListing(id, reason);
+  storeRejectListing(id, reason);
 }
 
 

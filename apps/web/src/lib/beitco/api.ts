@@ -387,3 +387,22 @@ export async function apiListMine(): Promise<(import("./types").PropertySummary 
   );
   return body.data;
 }
+
+// ── Admin moderation (FE-WIRE slice 6c) ─────────────────────────────────────
+export async function apiListPendingListings(): Promise<Property[]> {
+  const body = await getJSON<Property[]>("/admin/moderation");
+  return body.data;
+}
+
+export async function apiModerationCount(): Promise<number> {
+  const body = await getJSON<{ count: number }>("/admin/moderation/count");
+  return body.data.count;
+}
+
+export async function apiApproveListing(id: string): Promise<void> {
+  await postJSON(`/admin/moderation/${encodeURIComponent(id)}/approve`);
+}
+
+export async function apiRejectListing(id: string, reason: string): Promise<void> {
+  await postJSON(`/admin/moderation/${encodeURIComponent(id)}/reject`, { reason });
+}

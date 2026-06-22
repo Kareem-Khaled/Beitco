@@ -1,14 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { ShieldCheck, Check, X, MapPin, ExternalLink, BedDouble } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
-import {
-  getPendingListings,
-  approveListing,
-  rejectListing,
-  isPlatformAdmin,
-  formatDate,
-} from "@/lib/beitco/store";
+import { isPlatformAdmin, formatDate } from "@/lib/beitco/store";
+import { usePendingListings, approveListing, rejectListing } from "@/lib/beitco/queries";
 import type { Property } from "@/lib/beitco/types";
 import { EmptyState } from "@/components/beitco/EmptyState";
 import { Button } from "@/components/ui/button";
@@ -39,10 +35,10 @@ const QUICK_REASONS = [
 function ModerationQueue() {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
-  const [, force] = useState(0);
-  const refresh = () => force((x) => x + 1);
+  const qc = useQueryClient();
   const [rejecting, setRejecting] = useState<Property | null>(null);
   const [reason, setReason] = useState("");
+  const { data: pending = [] } = usePendingListings();
 
   // Admin-only: bounce everyone else.
   useEffect(() => {
@@ -54,12 +50,15 @@ function ModerationQueue() {
   if (isLoading || !user) return null;
   if (!isPlatformAdmin(user)) return null;
 
-  const pending = getPendingListings();
+  const refreshQueue = () => {
+    qc.invalidateQueries({ queryKey: ["pendingListings"] });
+    qc.invalidateQueries({ queryKey: ["moderationCount"] });
+  };
 
-  const onApprove = (p: Property) => {
-    approveListing(p.id);
+  const onApprove = async (p: Property) => {
+    await approveListing(p.id);
     toast.success(`وافقنا على «${p.title}» — بقت شغّالة`);
-    refresh();
+    refreshQueue();
   };
 
   const openReject = (p: Property) => {
@@ -67,13 +66,13 @@ function ModerationQueue() {
     setRejecting(p);
   };
 
-  const confirmReject = () => {
+  const confirmReject = async () => {
     if (!rejecting) return;
-    rejectListing(rejecting.id, reason);
+    await rejectListing(rejecting.id, reason);
     toast.success(`رفضنا «${rejecting.title}»`);
     setRejecting(null);
     setReason("");
-    refresh();
+    refreshQueue();
   };
 
   return (

@@ -47,8 +47,14 @@ export class ListingsWriteService {
       orderBy: { createdAt: 'desc' },
       include: { rooms: { include: { beds: true } } },
     })) as unknown as PropertyRow[];
-    // Summaries but keep status (owner needs to see draft/pending/rejected).
-    return rows.map((p) => ({ ...serializeSummary(p), status: p.status, rejectionReason: undefined }));
+    // Summaries but keep status (owner needs to see draft/pending/rejected)
+    // and the rejection reason (so they can fix and resubmit).
+    return rows.map((p) => ({
+      ...serializeSummary(p),
+      status: p.status,
+      rejectionReason:
+        (p as unknown as { rejectionReason: string | null }).rejectionReason ?? undefined,
+    }));
   }
 
   async create(ownerId: string, dto: CreateListingDto): Promise<Record<string, unknown>> {

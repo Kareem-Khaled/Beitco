@@ -11,13 +11,19 @@
 
 ## 🟢 In Progress
 
-_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (1) + saved-searches (2) + renter-leads (3) + Q&A (4) + reviews (5) + create/edit listing (6a) + owner-leads & renter-reviews (6b) wired behind the flag. Next: dashboard management/overview (6c), moderation queue (6d). Then the matching-engine port.)_
+_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (1) + saved-searches (2) + renter-leads (3) + Q&A (4) + reviews (5) + create/edit listing (6a) + owner-leads & renter-reviews (6b) + admin moderation queue (6c) wired behind the flag. Next: dashboard management/overview (6d — listings pause/unit-status + analytics, needs new mutation endpoints). Then the matching-engine port.)_
 
 > **Known seed-fidelity note (not a wiring bug):** properties carry a hand-set display `reviewsCount` (e.g. 32) larger than their actual seeded review rows. The trust recompute counts real rows, so after the first real review the count snaps to the true value. Fix later by seeding more reviews or setting `reviewsCount = reviews.length` in the seed.
 
 ---
 
 ## ✅ Done
+
+### FE-WIRE (slice 6c) · Admin moderation queue on the API ✅ (June 22)
+- `api.ts`: `apiListPendingListings`/`apiModerationCount`/`apiApproveListing`/`apiRejectListing` (hit the AdminGuard-protected `/admin/moderation*`). `queries.ts`: `usePendingListings()` (returns full `Property[]` — the card needs landlord/address/description), `useModerationCount()` (nav badge), `approveListing(id)`/`rejectListing(id, reason)` (flag-aware; aliased over the store fns).
+- `dashboard/moderation.tsx`: queue via `usePendingListings` (hook moved above the admin gate), approve/reject call the flag-aware helpers + invalidate `pendingListings`/`moderationCount`. `dashboard/route.tsx`: the admin nav badge uses `useModerationCount`. `isPlatformAdmin(user)` works in both modes (pure on the user object; API `apiMe` carries `isAdmin`).
+- **Backend fix:** `listMine` was hardcoding `rejectionReason: undefined` — the owner couldn't see why a listing was rejected. Now it returns the real `rejectionReason` (the dashboard listings card shows it).
+- **Verified (curl):** unverified owner creates 2 pending → **non-admin queue = 403** → admin sees queue (size 2, full landlord data) + `count=2` → **approve → published + public 200 + leaves queue** → **reject(reason) → public 404** → owner sees `status=rejected, reason="الصور مش واضحة"` on `/properties/mine` → queue `count=0`. Re-seeded. `tsc` both apps + 31 web tests; flag-on `/dashboard/moderation`, `/dashboard`, `/dashboard/leads` render 200. Flag OFF unchanged.
 
 ### FE-WIRE (slice 6b) · Owner leads + owner→renter reviews on the API ✅ (June 22)
 - **Backend enrichment:** `listOwnerLeads` now attaches, per lead, the renter's `renterReputation` ({score,count}|null) and `canReview` (a confirmed owner↔renter tenancy not yet reviewed — mirrors the mock's `canOwnerReviewRenter`), batched (no N+1). So the owner leads page needs no extra per-renter calls.
