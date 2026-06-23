@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { TrustService } from '../trust/trust.service';
+import { ChatGateway } from './chat.gateway';
 import { serializeThread, serializeMessage } from './chat.serializer';
 import { CreateThreadDto, SendMessageDto } from './dto/chat.dto';
 
@@ -24,6 +25,7 @@ export class ChatService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly trust: TrustService,
+    private readonly gateway: ChatGateway,
   ) {}
 
   // A user's threads (as owner or renter), newest activity first. No message
@@ -123,7 +125,11 @@ export class ChatService {
     });
 
     await this.maintainResponseEvent(thread, userId, now);
-    return serializeMessage(message as never);
+    const serialized = serializeMessage(message as never);
+    // Live delivery (CHAT-3): push to both participants' rooms so their open
+    // thread + messages list refetch in real time.
+    this.gateway.notifyNewMessage([thread.ownerId, thread.renterId], threadId, serialized);
+    return serialized;
   }
 
   // T-3 bookkeeping: open on the renter's first message, close on the owner's

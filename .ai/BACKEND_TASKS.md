@@ -11,13 +11,19 @@
 
 ## 🟢 In Progress
 
-_(Backend B-0→MOD-1 done. **Flag-on app fully interactive** (FE wiring slices 1–6d + T-MATCH). `_unported/` cleaned (CLEANUP-1). **Chat shipped** (CHAT-1/2), **notifications shipped** (NOTIF-1), and **saved-search alerts shipped** (NOTIF-2) — the "هنبلّغك أول ما ينزل مكان يطابقه" promise is now real. The flag-on app covers every core surface against the backend. Only optional infra remains: a Socket.io gateway for live chat delivery (CHAT-3) and moving the saved-search match-on-publish to a BullMQ worker for scale.)_
+_(Backend B-0→MOD-1 done. **Flag-on app fully interactive** (FE wiring slices 1–6d + T-MATCH). `_unported/` cleaned (CLEANUP-1). **Chat shipped** (CHAT-1/2 + live delivery CHAT-3), **notifications shipped** (NOTIF-1 + saved-search alerts NOTIF-2). **Every planned surface — core and optional infra — now runs against the backend.** The only remaining notes are nice-to-haves: a BullMQ worker for saved-search matching at scale, and the occupant-link consent flow.)_
 
 > **Known seed-fidelity note (not a wiring bug):** properties carry a hand-set display `reviewsCount` (e.g. 32) larger than their actual seeded review rows. The trust recompute counts real rows, so after the first real review the count snaps to the true value. Fix later by seeding more reviews or setting `reviewsCount = reviews.length` in the seed.
 
 ---
 
 ## ✅ Done
+
+### CHAT-3 · Live chat delivery (Socket.io) ✅ (June 23)
+- **Gateway** (`chat.gateway.ts`, namespace `/ws/chat`): authenticates the socket via the **same httpOnly `beitco_at` JWT cookie** the REST API uses (parses the handshake cookie, verifies with `JwtService` + `JWT_SECRET`; invalid/missing → `disconnect`). Each client joins a per-user room `user:<id>`. CORS mirrors the REST origins with credentials. `JwtModule` is registered locally in `ChatModule` (auth's isn't exported).
+- **Emit:** `ChatService.sendMessage` calls `gateway.notifyNewMessage([ownerId, renterId], threadId, message)` after persisting → `message:new { threadId, message }` to both participants' rooms (service→gateway only; no DI cycle).
+- **Client:** added `socket.io-client`. `socket.ts` (a single shared connection, `withCredentials` so the browser sends the cookie) + `useChatSocket()` (connects while authed in **API mode only**; on `message:new` invalidates `["thread", id]`, `["threads", userId]`, `["notificationsUnread", userId]` — Query stays the source of truth, the socket just triggers refetches). Mounted once via a `<ChatSocketBridge/>` inside the root's Auth+Query providers. SSR-safe (the `io()` call is inside a client-only effect).
+- **Verified (Node socket.io-client e2e):** owner socket connects → renter sends a REST message → **owner's socket receives `message:new`** with the matching threadId + Arabic body, in real time; an **unauthenticated socket is disconnected** by the gateway (not connected after 2s). `tsc`+`nest build`+41 Jest + 31 web; flag-on `/`,`/messages`,`/search`,`/property/1` render 200 (socket import is SSR-safe). Flag OFF unchanged (no socket in mock mode).
 
 ### NOTIF-2 · Saved-search alerts ("هنبلّغك") ✅ (June 23)
 - **Migration:** added `saved_search` to the `NotificationType` enum (`20260623105042_add_saved_search_notification`).

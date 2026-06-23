@@ -13,6 +13,9 @@ const API_BASE =
   (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_API_URL ??
   "http://localhost:3001/api/v1";
 
+// The API origin (no /api/v1 path) — used by the chat WebSocket (CHAT-3).
+export const API_ORIGIN = API_BASE.replace(/\/api\/v1\/?$/, "");
+
 type Envelope<T> = {
   success: boolean;
   data: T;

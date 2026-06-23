@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/lib/beitco/auth";
+import { useChatSocket } from "@/lib/beitco/useChatSocket";
 import { initTheme, themeInitScript } from "@/lib/beitco/theme";
 import { Toaster } from "@/components/ui/sonner";
 import { BottomNav } from "@/components/beitco/BottomNav";
@@ -144,6 +145,13 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+// Lives inside AuthProvider + QueryClientProvider: opens the chat socket while
+// authenticated (API mode) and invalidates chat queries on live messages.
+function ChatSocketBridge() {
+  useChatSocket();
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -163,6 +171,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <ChatSocketBridge />
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:start-3 focus:top-3 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
