@@ -11,13 +11,19 @@
 
 ## 🟢 In Progress
 
-_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (1) + saved-searches (2) + renter-leads (3) + Q&A (4) + reviews (5) + create/edit listing (6a) + owner-leads & renter-reviews (6b) + admin moderation (6c) + dashboard management/overview (6d) + **matching engine + renter preferences (T-MATCH)** wired behind the flag. **The whole flag-on app is now interactive against the backend.** `_unported/` cleaned up (CLEANUP-1): 5 dead pre-pivot modules retired, only `chat` + `notifications` remain as scaffolding for dedicated future ports. **Next real features:** chat ("كلّم صاحب الشقة") then notifications (saved-search alerts) — both ported from the frontend mock against the new schema.)_
+_(Backend B-0→MOD-1 done. **Flag-on app fully interactive** (FE wiring slices 1–6d + T-MATCH). `_unported/` cleaned (CLEANUP-1). **CHAT-1 (backend REST) done** — wiring the FE `/messages` next (CHAT-2). Then notifications (NOTIF-1).)_
 
 > **Known seed-fidelity note (not a wiring bug):** properties carry a hand-set display `reviewsCount` (e.g. 32) larger than their actual seeded review rows. The trust recompute counts real rows, so after the first real review the count snaps to the true value. Fix later by seeding more reviews or setting `reviewsCount = reviews.length` in the seed.
 
 ---
 
 ## ✅ Done
+
+### CHAT-1 · Chat backend REST ("كلّم صاحب الشقة") ✅ (June 23)
+- New `src/chat` module (ported from the web mock `store.ts` against the existing `Thread`/`Message`/`ResponseEvent` schema): `GET /me/threads` (my conversations, newest first, each with an embedded property summary {title,image,area,landlord} so the FE needs no extra fetches + the last message), `GET /threads/:id` (full history; **participant-only**; **marks read** for the viewer), `POST /threads` ({propertyId} → **idempotent** find-or-create on the unique (propertyId,renterId); renter can't message their own listing), `POST /threads/:id/messages` ({body, type?}).
+- **T-3 wired through chat:** sending maintains the `ResponseEvent` — the renter's first message opens it, the owner's first reply closes it and calls `TrustService.recomputeOwner` (response-rate-backed trust). Unread flag flips to the non-sender.
+- **Verified (curl):** find-or-create + idempotent (same id); renter msg → owner reads (unread cleared) → owner reply; thread list shows unread + last-message preview; `viewing_request` type round-trips; **owner reply moved listing trust 8.1 → 8.6** (responsiveness 1.12 → 1.6 — the wedge); stranger read/post → **403**, owner-own-listing → **403**. Re-seeded. `tsc` + `nest build` + 31 Jest pass.
+- **Deferred:** a Socket.io gateway for live delivery (CHAT-2 can add it); FE polls/refetches for now.
 
 ### CLEANUP-1 · Retire dead pre-pivot modules ✅ (June 23)
 - Audited `src/_unported/` (nothing in the active build imports it; excluded from both tsconfigs). Decided per-module: **retired** `moderation` (old post-flagging — listing moderation shipped as MOD-1/admin), `analytics` (old social — dashboard analytics now via `ownerAnalyticsFromData`), `payments` (34-loc stub), `search` (old social Meilisearch — listings search is client-side via B-1), `users` (superseded by the wired `src/users`).
