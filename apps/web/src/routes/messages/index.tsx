@@ -1,8 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { MessageCircle } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
-import { getThreadsForUser, getProperty } from "@/lib/beitco/store";
+import { useThreads, threadPropertyOf } from "@/lib/beitco/queries";
 import { SiteHeader } from "@/components/beitco/SiteHeader";
 import { SiteFooter } from "@/components/beitco/SiteFooter";
 
@@ -13,17 +13,11 @@ export const Route = createFileRoute("/messages/")({
 function MessagesIndex() {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
+  const { data: threads = [] } = useThreads(user?.id);
 
   useEffect(() => {
     if (!isLoading && !user) navigate({ to: "/auth/login" });
   }, [user, isLoading, navigate]);
-
-  const threads = useMemo(() => {
-    if (!user) return [];
-    return getThreadsForUser(user.id).sort(
-      (a, b) => +new Date(b.lastMessageAt) - +new Date(a.lastMessageAt),
-    );
-  }, [user]);
 
   if (!user) return null;
 
@@ -52,7 +46,7 @@ function MessagesIndex() {
         ) : (
           <ul className="grid gap-2">
             {threads.map((t) => {
-              const p = getProperty(t.propertyId);
+              const p = threadPropertyOf(t);
               const last = t.messages[t.messages.length - 1];
               const otherIsOwner = user.id !== t.ownerId;
               const otherName = otherIsOwner

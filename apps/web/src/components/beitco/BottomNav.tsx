@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Search, Plus, MessageCircle, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
-import { getThreadsForUser } from "@/lib/beitco/store";
+import { useThreads } from "@/lib/beitco/queries";
 
 // Mobile-only bottom tab bar — the expected navigation pattern for a phone-first
 // Egyptian marketplace (and for the Capacitor shell later). Hidden on md+, where
@@ -10,9 +10,10 @@ import { getThreadsForUser } from "@/lib/beitco/store";
 export function BottomNav() {
   const { user } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { data: threads = [] } = useThreads(user?.id);
 
   const unread = user
-    ? getThreadsForUser(user.id).filter((t) => t.unreadFor === user.id).length
+    ? threads.filter((t) => t.unreadFor === user.id).length
     : 0;
 
   const isActive = (to: string) =>

@@ -1,18 +1,14 @@
-import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, Send, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
-import { getThread, getProperty, postMessage } from "@/lib/beitco/store";
+import { useThread, threadPropertyOf, sendChatMessage } from "@/lib/beitco/queries";
 import { SiteHeader } from "@/components/beitco/SiteHeader";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/messages/$threadId")({
-  loader: ({ params }) => {
-    const t = getThread(params.threadId);
-    if (!t) throw notFound();
-    return t;
-  },
   component: ThreadPage,
 });
 
@@ -20,8 +16,9 @@ function ThreadPage() {
   const { threadId } = Route.useParams();
   const navigate = useNavigate();
   const { user, isLoading } = useAuth();
-  const [, force] = useState(0);
-  const refresh = () => force((x) => x + 1);
+  const qc = useQueryClient();
+  const { data: thread, isLoading: threadLoading } = useThread(threadId, user?.id);
+  const [body, setBody] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,22 +30,32 @@ function ThreadPage() {
   });
 
   if (!user) return null;
-  const thread = getThread(threadId);
-  if (!thread) return null;
+  if (!thread) {
+    return (
+      <div dir="rtl" className="flex min-h-screen flex-col bg-background text-foreground">
+        <SiteHeader />
+        <div className="mx-auto flex w-full max-w-3xl flex-1 items-center justify-center px-4 py-10 text-center">
+          <p className="text-sm text-muted-foreground">
+            {threadLoading ? "بنحمّل المحادثة…" : "المحادثة دي مش موجودة."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
-  const property = getProperty(thread.propertyId);
+  const property = threadPropertyOf(thread);
   const isOwner = user.id === thread.ownerId;
   const otherName = isOwner ? "المستأجر" : property?.landlord.name ?? "صاحب الشقة";
   const otherVerified = !isOwner && (property?.landlord.verified ?? false);
 
-  const [body, setBody] = useState("");
-
-  const send = (e: React.FormEvent) => {
+  const send = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!body.trim()) return;
-    postMessage(thread.id, user.id, body.trim());
+    const text = body.trim();
     setBody("");
-    refresh();
+    await sendChatMessage(thread.id, user.id, text);
+    qc.invalidateQueries({ queryKey: ["thread", threadId] });
+    qc.invalidateQueries({ queryKey: ["threads", user.id] });
   };
 
   return (

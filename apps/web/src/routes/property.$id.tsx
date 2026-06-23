@@ -19,9 +19,9 @@ import { PropertyGallery } from "@/components/beitco/PropertyGallery";
 import { PageSkeleton } from "@/components/beitco/PageSkeleton";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { getProperty, findOrCreateThread, postMessage, timeAgo, formatDate } from "@/lib/beitco/store";
+import { getProperty, timeAgo, formatDate } from "@/lib/beitco/store";
 import { USE_API, apiGetProperty } from "@/lib/beitco/api";
-import { useSavedListings, toggleSavedListing, submitLead, submitQuestion, submitAnswer, useReviewMeta, submitReview, toggleHelpful, replyReview } from "@/lib/beitco/queries";
+import { useSavedListings, toggleSavedListing, submitLead, submitQuestion, submitAnswer, useReviewMeta, submitReview, toggleHelpful, replyReview, startThread, sendChatMessage } from "@/lib/beitco/queries";
 import { useAuth } from "@/lib/beitco/auth";
 import { toast } from "sonner";
 import { ViewingRequestDialog } from "@/components/beitco/ViewingRequestDialog";
@@ -220,11 +220,11 @@ function PropertyDetail() {
     return true;
   };
 
-  const onMessageOwner = () => {
+  const onMessageOwner = async () => {
     if (!requireAuth() || !user) return;
-    const t = findOrCreateThread(p.id, user.id);
+    const t = await startThread(p.id, user.id);
     if (t.messages.length === 0) {
-      postMessage(t.id, user.id, `أهلاً، أنا مهتم بـ "${p.title}". ممكن أعرف تفاصيل أكتر؟`);
+      await sendChatMessage(t.id, user.id, `أهلاً، أنا مهتم بـ "${p.title}". ممكن أعرف تفاصيل أكتر؟`);
     }
     navigate({ to: "/messages/$threadId", params: { threadId: t.id } });
   };
@@ -249,7 +249,7 @@ function PropertyDetail() {
       note: data.note,
     });
     qc.invalidateQueries({ queryKey: ["renterLeads", user.id] });
-    const t = findOrCreateThread(p.id, user.id);
+    const t = await startThread(p.id, user.id);
     const dateStr = data.preferredDate
       ? ` يوم ${new Date(data.preferredDate).toLocaleDateString("ar-EG-u-nu-latn")}`
       : "";
@@ -289,7 +289,7 @@ function PropertyDetail() {
     } else {
       body = `طلبت معاينة${dateStr}.${data.note ? `\n${data.note}` : ""}`;
     }
-    postMessage(t.id, user.id, body, "viewing_request");
+    await sendChatMessage(t.id, user.id, body, "viewing_request");
     setBookingUnits([]);
     navigate({ to: "/messages/$threadId", params: { threadId: t.id } });
   };

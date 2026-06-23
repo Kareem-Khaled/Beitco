@@ -317,6 +317,15 @@ export type Thread = {
   lastMessageAt: string;
   unreadFor?: string; // user id who has unread messages
   messages: Message[];
+  // Embedded property summary — present on API responses so the messages pages
+  // need no extra property fetch. In mock mode it's derived via getProperty.
+  property?: {
+    id: string;
+    title: string;
+    image: string;
+    area: string;
+    landlord: { name: string; initials: string; verified: boolean };
+  };
 };
 
 // Tracks how fast an owner replies to a renter's first message in a thread (T-3).

@@ -432,3 +432,35 @@ export async function apiGetMatches(): Promise<
   >("/me/matches");
   return body.data;
 }
+
+// ── Chat (CHAT-2) ───────────────────────────────────────────────────────────
+export async function apiListThreads(): Promise<import("./types").Thread[]> {
+  const body = await getJSON<import("./types").Thread[]>("/me/threads");
+  return body.data;
+}
+
+export async function apiGetThread(id: string): Promise<import("./types").Thread | undefined> {
+  try {
+    const body = await getJSON<import("./types").Thread>(`/threads/${encodeURIComponent(id)}`);
+    return body.data;
+  } catch {
+    return undefined;
+  }
+}
+
+export async function apiFindOrCreateThread(propertyId: string): Promise<import("./types").Thread> {
+  const body = await postJSON<import("./types").Thread>("/threads", { propertyId });
+  return body.data;
+}
+
+export async function apiSendMessage(
+  threadId: string,
+  messageBody: string,
+  type: import("./types").Message["type"] = "text",
+): Promise<import("./types").Message> {
+  const body = await postJSON<import("./types").Message>(
+    `/threads/${encodeURIComponent(threadId)}/messages`,
+    { body: messageBody, type },
+  );
+  return body.data;
+}

@@ -39,6 +39,10 @@ import {
   approveListing as storeApproveListing,
   rejectListing as storeRejectListing,
   getMatchesForUser,
+  getThreadsForUser,
+  getThread as storeGetThread,
+  findOrCreateThread as storeFindOrCreateThread,
+  postMessage as storePostMessage,
 } from "./store";
 import {
   apiListProperties,
@@ -68,9 +72,13 @@ import {
   apiApproveListing,
   apiRejectListing,
   apiGetMatches,
+  apiListThreads,
+  apiGetThread,
+  apiFindOrCreateThread,
+  apiSendMessage,
   USE_API,
 } from "./api";
-import type { Property, PropertySummary, SavedSearch, SavedSearchParams, Lead, Review, Occupant, BedStatus, SaleStatus } from "./types";
+import type { Property, PropertySummary, SavedSearch, SavedSearchParams, Lead, Review, Occupant, BedStatus, SaleStatus, Thread, Message } from "./types";
 import type { MatchResult } from "./matching";
 
 // Home + search consume the full published set (they filter/sort client-side).
@@ -502,6 +510,72 @@ export function useMatches(userId: string | undefined) {
       USE_API || !userId ? undefined : () => getMatchesForUser(userId),
     staleTime: USE_API ? 30_000 : Infinity,
   });
+}
+
+// ── Chat (CHAT-2) ───────────────────────────────────────────────────────────
+// A user's conversations (owner or renter), newest first. Mock reads the store
+// synchronously (zero-flash); API hits GET /me/threads (threads embed a property
+// summary so the list needs no extra fetch).
+export function useThreads(userId: string | undefined) {
+  return useQuery<Thread[]>({
+    queryKey: ["threads", userId, { source: USE_API ? "api" : "mock" }],
+    enabled: !!userId,
+    queryFn: async () => {
+      if (USE_API) return apiListThreads();
+      if (!userId) return [];
+      return getThreadsForUser(userId);
+    },
+    initialData: USE_API || !userId ? undefined : () => getThreadsForUser(userId),
+    staleTime: USE_API ? 10_000 : Infinity,
+  });
+}
+
+// One thread with its full message history. API marks it read server-side.
+export function useThread(threadId: string, userId: string | undefined) {
+  return useQuery<Thread | undefined>({
+    queryKey: ["thread", threadId, userId, { source: USE_API ? "api" : "mock" }],
+    enabled: !!threadId && !!userId,
+    queryFn: async () => {
+      if (USE_API) return apiGetThread(threadId);
+      return storeGetThread(threadId);
+    },
+    initialData: USE_API ? undefined : () => storeGetThread(threadId),
+    staleTime: USE_API ? 5_000 : Infinity,
+  });
+}
+
+// Start (or re-open) a thread about a listing — returns the thread (callers
+// navigate to thread.id). Flag-aware: mock upserts locally, API is idempotent.
+export async function startThread(propertyId: string, renterId: string): Promise<Thread> {
+  if (USE_API) return apiFindOrCreateThread(propertyId);
+  return storeFindOrCreateThread(propertyId, renterId);
+}
+
+export async function sendChatMessage(
+  threadId: string,
+  senderId: string,
+  body: string,
+  type: Message["type"] = "text",
+): Promise<Message> {
+  if (USE_API) return apiSendMessage(threadId, body, type);
+  return storePostMessage(threadId, senderId, body, type);
+}
+
+// Normalized property summary for a thread (flag-agnostic): API embeds it on the
+// thread; mock derives it from the store. Keeps the messages pages on one path.
+export function threadPropertyOf(
+  thread: Thread,
+): { id: string; title: string; image: string; area: string; landlord: { name: string; initials: string; verified: boolean } } | undefined {
+  if (USE_API) return thread.property;
+  const p = getProperty(thread.propertyId);
+  if (!p) return undefined;
+  return {
+    id: p.id,
+    title: p.title,
+    image: p.image,
+    area: p.area,
+    landlord: { name: p.landlord.name, initials: p.landlord.initials, verified: p.landlord.verified },
+  };
 }
 
 

@@ -11,13 +11,18 @@
 
 ## 🟢 In Progress
 
-_(Backend B-0→MOD-1 done. **Flag-on app fully interactive** (FE wiring slices 1–6d + T-MATCH). `_unported/` cleaned (CLEANUP-1). **CHAT-1 (backend REST) done** — wiring the FE `/messages` next (CHAT-2). Then notifications (NOTIF-1).)_
+_(Backend B-0→MOD-1 done. **Flag-on app fully interactive** (FE wiring slices 1–6d + T-MATCH). `_unported/` cleaned (CLEANUP-1). **Chat shipped end-to-end** (CHAT-1 REST + CHAT-2 FE wiring) — "كلّم صاحب الشقة" now works against the API. Remaining: notifications (NOTIF-1, saved-search/lead alerts) + an optional Socket.io gateway for live chat delivery.)_
 
 > **Known seed-fidelity note (not a wiring bug):** properties carry a hand-set display `reviewsCount` (e.g. 32) larger than their actual seeded review rows. The trust recompute counts real rows, so after the first real review the count snaps to the true value. Fix later by seeding more reviews or setting `reviewsCount = reviews.length` in the seed.
 
 ---
 
 ## ✅ Done
+
+### CHAT-2 · Wire chat to the frontend behind the flag ✅ (June 23)
+- `api.ts`: `apiListThreads`/`apiGetThread`/`apiFindOrCreateThread`/`apiSendMessage`. `queries.ts`: `useThreads(userId)` + `useThread(threadId, userId)` (flag-aware, zero-flash mock) + `startThread`/`sendChatMessage` + `threadPropertyOf(thread)` (flag-agnostic property summary: API embeds it, mock derives via `getProperty`). `Thread` type gained the optional embedded `property`.
+- Wired all 5 chat surfaces: `/messages` (list via `useThreads` + `threadPropertyOf`), `/messages/$threadId` (**restructured** — dropped the store-backed route loader, now `useThread` + invalidate on send; all hooks moved before the early returns), property-detail "كلّم صاحب الشقة" + viewing-request submit (`startThread`+`sendChatMessage`), `/me/applications` openChat, and the mobile `BottomNav` unread badge (`useThreads`).
+- **Verified:** `tsc` + 31 web tests; flag-on `/messages`, `/property/1`, `/me/applications` render 200. Mock path unchanged (default). (End-to-end conversation already proven server-side in CHAT-1.)
 
 ### CHAT-1 · Chat backend REST ("كلّم صاحب الشقة") ✅ (June 23)
 - New `src/chat` module (ported from the web mock `store.ts` against the existing `Thread`/`Message`/`ResponseEvent` schema): `GET /me/threads` (my conversations, newest first, each with an embedded property summary {title,image,area,landlord} so the FE needs no extra fetches + the last message), `GET /threads/:id` (full history; **participant-only**; **marks read** for the viewer), `POST /threads` ({propertyId} → **idempotent** find-or-create on the unique (propertyId,renterId); renter can't message their own listing), `POST /threads/:id/messages` ({body, type?}).

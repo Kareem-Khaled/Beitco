@@ -2,8 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { Inbox, Calendar, MessageCircle, Search } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
-import { findOrCreateThread } from "@/lib/beitco/store";
-import { useRenterLeads, usePropertyLookup } from "@/lib/beitco/queries";
+import { useRenterLeads, usePropertyLookup, startThread } from "@/lib/beitco/queries";
 import type { Lead } from "@/lib/beitco/types";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/beitco/EmptyState";
@@ -25,8 +24,8 @@ function MeApplications() {
 
   if (!user) return null;
 
-  const openChat = (propertyId: string) => {
-    const t = findOrCreateThread(propertyId, user.id);
+  const openChat = async (propertyId: string) => {
+    const t = await startThread(propertyId, user.id);
     navigate({ to: "/messages/$threadId", params: { threadId: t.id } });
   };
 
