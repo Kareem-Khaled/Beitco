@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { TrustService } from '../trust/trust.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { serializeProperty, type PropertyRow } from './listings.serializer';
 import { CreateListingDto, ManageListingDto } from './dto/create-listing.dto';
 
@@ -54,6 +55,7 @@ export class ListingsWriteService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly trust: TrustService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   // Owner's own listings (all statuses) for the dashboard. Full Property shape
@@ -120,6 +122,11 @@ export class ListingsWriteService {
 
     // Fresh listing: compute its real trust from (zero) reviews + owner signal.
     await this.trust.recomputeListing(created.id);
+    // If it went live immediately (verified/admin owner), alert matching saved
+    // searches now. Best-effort -- never blocks the create response.
+    if (status === 'published') {
+      await this.notifications.notifyForNewListing(created.id);
+    }
     const fresh = await this.findRow(created.id);
     return { ...serializeProperty(fresh!), status };
   }

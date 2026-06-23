@@ -23,6 +23,7 @@ const META: Record<
   review: { icon: Star, tone: "bg-amber-500/15 text-amber-600" },
   verification: { icon: ShieldCheck, tone: "bg-trust-soft text-trust" },
   link: { icon: BadgeCheck, tone: "bg-amber-500/15 text-amber-600" },
+  saved_search: { icon: Search, tone: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" },
 };
 
 function NotificationsPage() {
@@ -115,7 +116,7 @@ function NotificationsPage() {
                   </li>
                 );
               }
-              if ((n.type === "review") && n.propertyId) {
+              if ((n.type === "review" || n.type === "saved_search") && n.propertyId) {
                 return (
                   <li key={n.id}>
                     <Link to="/property/$id" params={{ id: n.propertyId }}>

@@ -11,13 +11,21 @@
 
 ## 🟢 In Progress
 
-_(Backend B-0→MOD-1 done. **Flag-on app fully interactive** (FE wiring slices 1–6d + T-MATCH). `_unported/` cleaned (CLEANUP-1). **Chat shipped** (CHAT-1/2) and **notifications shipped** (NOTIF-1). The flag-on app now covers every core surface against the backend. Optional follow-ups: a Socket.io gateway for live chat (CHAT-3) and a BullMQ saved-search "هنبلّغك" matching job (NOTIF-2).)_
+_(Backend B-0→MOD-1 done. **Flag-on app fully interactive** (FE wiring slices 1–6d + T-MATCH). `_unported/` cleaned (CLEANUP-1). **Chat shipped** (CHAT-1/2), **notifications shipped** (NOTIF-1), and **saved-search alerts shipped** (NOTIF-2) — the "هنبلّغك أول ما ينزل مكان يطابقه" promise is now real. The flag-on app covers every core surface against the backend. Only optional infra remains: a Socket.io gateway for live chat delivery (CHAT-3) and moving the saved-search match-on-publish to a BullMQ worker for scale.)_
 
 > **Known seed-fidelity note (not a wiring bug):** properties carry a hand-set display `reviewsCount` (e.g. 32) larger than their actual seeded review rows. The trust recompute counts real rows, so after the first real review the count snaps to the true value. Fix later by seeding more reviews or setting `reviewsCount = reviews.length` in the seed.
 
 ---
 
 ## ✅ Done
+
+### NOTIF-2 · Saved-search alerts ("هنبلّغك") ✅ (June 23)
+- **Migration:** added `saved_search` to the `NotificationType` enum (`20260623105042_add_saved_search_notification`).
+- **Pure matcher** (`saved-search.matcher.ts`, ASCII): `propertyMatchesSavedSearch(serializedListing, params)` mirrors the client filter in `search.tsx` **exactly** (q→title/area/address, type Arabic, purpose, gender, area substring, freeOnly→beds.available, verifiedOnly, min/max price; AND of all present constraints). **10 Jest tests** lock the parity.
+- **Trigger** (`NotificationsService.notifyForNewListing(propertyId)`): on publish, serialize the listing, scan all saved searches, and **persist one `Notification` per matching user** (the property owner is never alerted; deduped per (user, property); best-effort — wrapped so it never breaks listing creation). Fired from `ListingsWriteService.create` (when status=published) and `AdminService.approve`. `NotificationsModule` now **exports** the service; `ListingsModule`/`AdminModule` import it (no DI cycle — the service only depends on Prisma + the pure serializer/matcher).
+- **Feed merge:** `feed()` now returns derived items **+ persisted `Notification` rows** (saved-search alerts), still unread-gated by the same Redis last-seen marker. Frontend: `AppNotification.type` gained `saved_search`; the notifications page got its icon (`Search`, emerald) + a property link.
+- **Verified (curl):** renterA (saved "المعادي/شقة/≤12000") **gets alerted** when a verified owner publishes a matching المعادي apartment (and again when an admin **approves** an unverified owner's matching listing → count 1→2); renterB (saved "الزمالك") and the **owner** get nothing; unread-count 0→1. Re-seeded. `tsc`+`nest build`+**41 Jest** (17 trust + 13 matching + 10 saved-search + 1) + **31 web**; flag-on `/notifications`,`/search`,`/` render 200. Flag OFF unchanged (the mock doesn't simulate publish events, so it emits no `saved_search`).
+- **Deferred:** move match-on-publish to a **BullMQ worker** (it's synchronous/inline today — correct and instant, but a queue decouples it at scale); the occupant-link consent notification + its action flow (not yet ported).
 
 ### NOTIF-1 · Notifications (derived feed) ✅ (June 23)
 - New `src/notifications` (ported from the web mock `store.ts getNotificationsForUser` — a **derived** feed, no stored table): `GET /me/notifications` → `{ items, lastSeen }` computed from pending leads (owner), unread threads (both), review-eligible tenancies (≥30 days), and verification status; `GET /me/notifications/unread-count` (bell badge); `POST /me/notifications/seen`. Read-state is a per-user "last seen" epoch-ms marker in **Redis** (mirrors the mock's localStorage marker; auth-style lazy client; degrades gracefully if Redis is down). Em-dash/guillemet/emoji Arabic strings → written via heredoc.

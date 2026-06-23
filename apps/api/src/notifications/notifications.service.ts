@@ -2,25 +2,40 @@ import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/commo
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 import { PrismaService } from '../prisma/prisma.service';
+import { serializeProperty, type PropertyRow } from '../listings/listings.serializer';
+import {
+  propertyMatchesSavedSearch,
+  type MatchableListing,
+  type SavedSearchParams,
+} from './saved-search.matcher';
 
-// Derived notification feed -- ported from the web mock (store.ts
-// getNotificationsForUser). We DON'T store a notifications table; we compute the
-// feed from existing activity (pending leads, unread threads, review-eligible
-// tenancies, verification status). Read-state is a single per-user "last seen"
-// epoch-ms timestamp in Redis (mirrors the mock's localStorage marker).
+// Notification feed = DERIVED items (computed from current activity: pending
+// leads, unread threads, review-eligible tenancies, verification) MERGED with
+// PERSISTED rows (saved-search alerts, NOTIF-2). Ported from the web mock
+// (store.ts getNotificationsForUser). Read-state is a single per-user "last
+// seen" epoch-ms timestamp in Redis (mirrors the mock's localStorage marker).
 
 const REVIEW_GATE_DAYS = 30;
 const SEEN_KEY = (userId: string) => `notif:seen:${userId}`;
 
 export interface AppNotification {
   id: string;
-  type: 'lead' | 'message' | 'review' | 'verification' | 'link';
+  type: 'lead' | 'message' | 'review' | 'verification' | 'link' | 'saved_search';
   title: string;
   body: string;
   date: string; // ISO
   propertyId?: string;
   threadId?: string;
 }
+
+// Relations needed to serialize a property for matching (Arabic type + beds).
+const matchInclude = {
+  owner: true,
+  rooms: { include: { beds: true } },
+  nearby: true,
+  customSpecs: true,
+  reviews: true,
+};
 
 @Injectable()
 export class NotificationsService implements OnModuleInit, OnModuleDestroy {
@@ -48,7 +63,7 @@ export class NotificationsService implements OnModuleInit, OnModuleDestroy {
     await this.redis?.quit();
   }
 
-  // The full derived feed for a user, newest first.
+  // The full feed for a user, newest first (derived + persisted).
   async feed(userId: string): Promise<AppNotification[]> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -107,7 +122,7 @@ export class NotificationsService implements OnModuleInit, OnModuleDestroy {
         id: `rev-${ten.id}`,
         type: 'review',
         title: 'تقدر تكتب رأيك دلوقتي',
-        body: `عدّى 30 يوم على سكنك في «${ten.property?.title ?? 'المكان'}» — رأيك بيساعد ناس كتير.`,
+        body: `عدّى 30 يوم على سكنك في «${ten.property?.title ?? 'المكان'}»، رأيك بيساعد ناس كتير.`,
         date: new Date(ten.moveInDate).toISOString(),
         propertyId: ten.propertyId,
       });
@@ -119,7 +134,7 @@ export class NotificationsService implements OnModuleInit, OnModuleDestroy {
       out.push({
         id: 'verif-done',
         type: 'verification',
-        title: 'حسابك اتوثّق ✅',
+        title: 'حسابك اتوثّق',
         body: 'مبروك! دلوقتي عندك علامة موثّق وبتظهر للناس بثقة أكتر.',
         date: user.createdAt.toISOString(),
       });
@@ -130,6 +145,23 @@ export class NotificationsService implements OnModuleInit, OnModuleDestroy {
         title: 'طلب التوثيق بيتراجع',
         body: 'استلمنا مستنداتك وبنراجعها. هنبلّغك أول ما يخلص.',
         date: user.createdAt.toISOString(),
+      });
+    }
+
+    // 5) Persisted rows (saved-search alerts, NOTIF-2).
+    const stored = await this.prisma.notification.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+    });
+    for (const n of stored) {
+      out.push({
+        id: n.id,
+        type: n.type as AppNotification['type'],
+        title: n.title,
+        body: n.body,
+        date: n.createdAt.toISOString(),
+        propertyId: n.propertyId ?? undefined,
+        threadId: n.threadId ?? undefined,
       });
     }
 
@@ -154,9 +186,72 @@ export class NotificationsService implements OnModuleInit, OnModuleDestroy {
     return { ok: true };
   }
 
-  // Feed annotated with each item's read state (for the page UI).
+  // Feed annotated with the last-seen marker (for the page UI).
   async feedWithState(userId: string): Promise<{ items: AppNotification[]; lastSeen: number }> {
     const [items, seen] = await Promise.all([this.feed(userId), this.lastSeen(userId)]);
     return { items, lastSeen: seen };
+  }
+
+  // NOTIF-2: when a listing goes live, alert every user whose saved search it
+  // matches ("hanballaghak awwel ma yinzil makan yutabe2u"). Best-effort: it must
+  // never break listing creation, so callers wrap it / it swallows its own errors.
+  // One alert per (user, property); the property owner is never alerted.
+  async notifyForNewListing(propertyId: string): Promise<{ created: number }> {
+    try {
+      const row = (await this.prisma.property.findFirst({
+        where: { id: propertyId, status: 'published', deletedAt: null },
+        include: matchInclude,
+      })) as unknown as (PropertyRow & { ownerId: string }) | null;
+      if (!row) return { created: 0 };
+
+      const full = serializeProperty(row) as Record<string, unknown>;
+      const matchable: MatchableListing = {
+        title: full.title as string,
+        area: full.area as string,
+        address: (full.address as string) ?? '',
+        type: full.type as string,
+        listingType: full.listingType as string | undefined,
+        rentToGender: (full.rentToGender as string | null) ?? null,
+        verified: full.verified as boolean,
+        price: full.price as number,
+        beds: { available: (full.beds as { available?: number })?.available ?? 0 },
+      };
+
+      const searches = await this.prisma.savedSearch.findMany({
+        select: { userId: true, params: true },
+      });
+      const matchedUserIds = new Set<string>();
+      for (const s of searches) {
+        if (s.userId === row.ownerId) continue;
+        if (propertyMatchesSavedSearch(matchable, s.params as SavedSearchParams)) {
+          matchedUserIds.add(s.userId);
+        }
+      }
+      if (matchedUserIds.size === 0) return { created: 0 };
+
+      let created = 0;
+      for (const userId of matchedUserIds) {
+        const exists = await this.prisma.notification.findFirst({
+          where: { userId, propertyId, type: 'saved_search' },
+          select: { id: true },
+        });
+        if (exists) continue;
+        await this.prisma.notification.create({
+          data: {
+            userId,
+            type: 'saved_search',
+            propertyId,
+            title: 'نزل مكان يطابق بحثك',
+            body: `«${full.title as string}» في ${full.area as string}، شكله بيطابق اللي بتدوّر عليه.`,
+          },
+        });
+        created++;
+      }
+      if (created > 0) this.logger.log(`Saved-search alerts: ${created} for listing ${propertyId}`);
+      return { created };
+    } catch (err) {
+      this.logger.warn(`notifyForNewListing(${propertyId}) failed: ${String(err)}`);
+      return { created: 0 };
+    }
   }
 }
