@@ -1,17 +1,16 @@
 # Task Board — Beitco (Frontend)
 
-> Active working board for the **frontend** (`apps/web`). Update as work happens.
-> Last updated: June 17, 2026 · Aligned with `.ai/PRD.md` and `.ai/TRUST_SPEC.md`.
+> Frontend (`apps/web`) board. **Last updated: June 23, 2026.**
 >
-> ➡️ **Backend work is tracked separately in `.ai/BACKEND_TASKS.md`** (the current focus after the June 17 git setup + backend cleanup).
+> ➡️ **The active backlog for the whole project is now `.ai/NEXT_STEPS.md`** (production hardening — security, testing, deploy, observability). The backend build log is `.ai/BACKEND_TASKS.md`. Current status is `.ai/CURRENT_STATE.md`.
 >
-> **Reality note:** The frontend is a **feature-complete prototype** on a localStorage mock. We shipped the full trust wedge (T-1→T-5: computed listing/owner/renter scores, real response-rate, two-sided reputation, transparency UI), the matching engine, moderation queue (MOD-1), bed-level booking, sale + nightly, KYC verification, public profiles, maps (Leaflet pin-drop + Google embeds), mobile bottom-nav, PWA, dark mode, accessibility pass, and 31 engine unit tests — plus a `store.ts` split and a wave of UX polish. **The frontier is now the backend:** make it all real on a server (see `.ai/BACKEND_TASKS.md`). Remaining FE-only items below are optional polish.
+> **Reality note (updated):** Both the frontend **and the backend are done end-to-end.** The frontend is fully wired to a real NestJS + Postgres API behind the `VITE_USE_API` flag (browse, auth, listings + moderation, leads, Q&A, reviews, matching, owner dashboard, live chat, notifications + saved-search alerts). The trust wedge is computed and proven on the server. **There is no remaining core FE feature work** — the items below are historical (shipped) or optional polish. **For "what's next," go to `.ai/NEXT_STEPS.md`** (e.g. POLISH-1 decompose `list/new.tsx`/`property.$id.tsx`, TEST-3 component tests, PROD-1 image uploads).
 
 ---
 
 ## 🟢 In Progress
 
-_(nothing currently in flight — frontend prototype is feature-complete; focus has moved to `.ai/BACKEND_TASKS.md`)_
+_(nothing in flight on the frontend — it's feature-complete and wired to the API. Active work is the hardening backlog in `.ai/NEXT_STEPS.md`.)_
 
 ---
 

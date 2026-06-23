@@ -93,17 +93,19 @@ Run backend: `pnpm api` (port 3001)
 
 ---
 
-## Permission Tiers (planned, not yet implemented)
+## Permission Model (actual — corrected June 23, 2026)
 
-| Tier | Role | Powers |
-|---|---|---|
-| 1 | Admin | Full access |
-| 2 | Verified Owner/Renter | Auto-publish listings, post reviews after 30 days |
-| 3 | Trusted Member | Listings need approval, can comment & ask Q&A |
-| 4 | New User | Browse only, limited messaging |
-| 5 | Restricted | Read-only |
+> The 5-tier `@RequireTier` system was inherited from the pre-pivot social app and **never built.** The real model is identity + verification + ownership:
 
-Guard: `@RequireTier(2)` decorator on controllers.
+| Concern | Rule |
+|---|---|
+| Auth | Global `JwtAuthGuard`; open routes are `@Public()` (browse, health, OTP). |
+| Admin | `User.isAdmin` → `AdminGuard` (moderation queue only). |
+| Verified | Verified/admin owners auto-publish listings; others go to `pending_approval`. |
+| Ownership | Every write checks the resource owner (403 otherwise). |
+| Participant | Chat is restricted to the two participants. |
+
+See `.ai/CURRENT_STATE.md` for the authoritative description.
 
 ---
 

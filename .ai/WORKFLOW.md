@@ -89,8 +89,8 @@ Step 2: Service
 Step 3: Controller
 ├── Create `*.controller.ts`
 ├── Add route decorators
-├── Add @UseGuards(JwtAuthGuard)
-├── Add @RequireTier(X) where needed
+├── Add @Public() for open routes (everything else is auth by default)
+├── Add @UseGuards(AdminGuard) for admin-only; owner/participant checks live in the service
 ├── Add @ApiTags, @ApiOperation (Swagger)
 └── Use standard ApiResponse format
 

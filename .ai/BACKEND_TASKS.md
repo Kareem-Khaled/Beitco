@@ -11,7 +11,7 @@
 
 ## 🟢 In Progress
 
-_(Backend B-0→MOD-1 done. **Flag-on app fully interactive** (FE wiring slices 1–6d + T-MATCH). `_unported/` cleaned (CLEANUP-1). **Chat shipped** (CHAT-1/2 + live delivery CHAT-3), **notifications shipped** (NOTIF-1 + saved-search alerts NOTIF-2). **Every planned surface — core and optional infra — now runs against the backend.** The only remaining notes are nice-to-haves: a BullMQ worker for saved-search matching at scale, and the occupant-link consent flow.)_
+_(**Build phase complete.** Backend B-0→MOD-1 + FE wiring (slices 1–6d) + T-MATCH done. `_unported/` cleaned (CLEANUP-1). Chat shipped (CHAT-1/2 + live CHAT-3), notifications shipped (NOTIF-1 + saved-search alerts NOTIF-2). **Every planned surface runs against the backend.** → **The active backlog has moved to `.ai/NEXT_STEPS.md`** (production hardening: security, testing, deploy, observability). This file is now the historical build log; keep appending finished work below.)_
 
 > **Known seed-fidelity note (not a wiring bug):** properties carry a hand-set display `reviewsCount` (e.g. 32) larger than their actual seeded review rows. The trust recompute counts real rows, so after the first real review the count snaps to the true value. Fix later by seeding more reviews or setting `reviewsCount = reviews.length` in the seed.
 

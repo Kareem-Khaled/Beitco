@@ -160,7 +160,7 @@ Rules:
 - Services NEVER import other controllers — only other services
 - Guards handle authorization — services handle business rules
 - Use @CurrentUser() decorator to get authenticated user, NEVER parse JWT in services
-- Use TierGuard(@MinTier(2)) for permission checks
+- Authorize via `@Public()`/`AdminGuard` + explicit owner/participant checks in services (see §4.5) — there is no tier guard
 - Pagination: always use cursor-based for feeds, offset for admin lists
 ```
 
@@ -231,22 +231,27 @@ Files:
 - Indexes: every FK must be indexed. Every query filter must have an index.
 ```
 
-### 4.5 Permission Tier Enforcement
+### 4.5 Permission & Authorization (actual model)
+
+> ⚠️ **Corrected June 23, 2026.** An earlier draft described a 5-tier `@RequireTier`/`permissionTier` system inherited from the pre-pivot social platform. **It was never implemented and is not the design.** The real, shipped model is identity + verification + ownership.
 
 ```
-CRITICAL: Every endpoint that creates or modifies content MUST check permission tier.
+CRITICAL: Every endpoint that creates or modifies content MUST authorize on the backend.
+Never rely on frontend-only checks.
 
-Tier 1 (Admin):       Full access to everything
-Tier 2 (Verified):    Create posts (direct publish), videos, polls, listings, groups
-Tier 3 (Member):      Create posts (approval required), text + image only, comments
-Tier 4 (New User):    Read-only, like, save, follow. Cannot post or comment.
-Tier 5 (Restricted):  Read-only, no interactions. Account under review.
+Auth (global):  JwtAuthGuard is global. Routes are authenticated by default; open
+                ones are explicitly @Public() (browse, health, otp send/verify).
+Admin:          User.isAdmin -> passes AdminGuard (the moderation queue only).
+Verified:       User.verified / verificationStatus. Verified (or admin) owners
+                auto-publish listings; everyone else's listing enters the
+                moderation queue (pending_approval).
+Ownership:      Every write checks the resource owner and throws 403 otherwise
+                (listing edit/manage/delete, lead status, review reply).
+Participant:    Chat is restricted to the two participants; the WS gateway
+                re-verifies the cookie JWT.
 
-Implementation:
-- Use @MinTier(N) decorator on controller methods
-- TierGuard reads user.permissionTier from JWT payload
-- Frontend uses useTier() hook to conditionally render UI
-- NEVER rely on frontend-only checks — backend MUST enforce
+Frontend gates UI on user.isAdmin / verification (store.ts: isPlatformAdmin,
+getInitialListingStatus, getVerificationStatus) but the backend is the enforcer.
 ```
 
 ---

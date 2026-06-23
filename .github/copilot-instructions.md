@@ -25,13 +25,13 @@ Run frontend: `pnpm web` (port 8080) · Run backend: `pnpm api` (port 3001)
 - Cursor-based pagination (no offset pagination).
 - **Use CSS logical properties only:** `ms-`, `me-`, `ps-`, `pe-`, `start-`, `end-`. Never `ml-`, `mr-`, `left-`, `right-`.
 
-## Permission System (planned)
-- Tier 1: Admin (full access)
-- Tier 2: Verified Owner/Renter (auto-publish listings, can post reviews after 30-day tenancy)
-- Tier 3: Trusted Member (listings need approval, can comment & ask Q&A)
-- Tier 4: New User (browse only, limited messaging)
-- Tier 5: Restricted (read-only)
-- Guard: `@RequireTier(2)` decorator on controllers
+## Permission System (actual — corrected)
+> The 5-tier `@RequireTier` system was never built. Real model: identity + verification + ownership.
+- **Admin:** `User.isAdmin` → `AdminGuard` (moderation queue only).
+- **Verified:** verified/admin owners auto-publish listings; others go to `pending_approval`.
+- **Ownership:** every write checks the resource owner (403 otherwise).
+- **Participant:** chat is restricted to the two participants.
+- **Auth:** global `JwtAuthGuard`; open routes marked `@Public()`. See `.ai/CURRENT_STATE.md`.
 
 ## Domain Vocabulary (use exact Arabic terms in UI)
 
@@ -69,7 +69,6 @@ export class PropertiesController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  @RequireTier(3)
   async create(@CurrentUser() user: User, @Body() dto: CreatePropertyDto) {
     const property = await this.propertiesService.create(user, dto);
     return { success: true, data: property };
@@ -84,7 +83,8 @@ export class PropertiesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(owner: User, dto: CreatePropertyDto) {
-    const status = owner.permissionTier <= 2 ? 'published' : 'pending_approval';
+    // Verified/admin owners auto-publish; others enter the moderation queue.
+    const status = owner.isAdmin || owner.verified ? 'published' : 'pending_approval';
     return this.prisma.property.create({
       data: {
         ...dto,
@@ -122,12 +122,16 @@ export function PropertyCard({ p }: { p: PropertySummary }) {
 
 ## Reference Files
 - `.ai/ENTRY_PROMPT.md` — canonical product context (start here)
+- `.ai/CURRENT_STATE.md` — what's actually built right now (full-stack, done)
+- `.ai/NEXT_STEPS.md` — **the active backlog (production hardening) — what's next**
 - `.ai/PROJECT_OVERVIEW.md` — product vision, personas, MVP scope
-- `.ai/CURRENT_STATE.md` — what's actually built right now
+- `.ai/PRD.md` — product requirements (source of truth for scope)
 - `.ai/BUSINESS_MODEL.md` — monetization strategy
-- `.ai/ROADMAP.md` — phased plan
-- `.ai/TASKS.md` — active task board
+- `.ai/ROADMAP.md` — phased plan (Phases 0–3 done; 3.5 hardening now)
+- `.ai/TRUST_SPEC.md` — trust engine (T-1→T-5)
 - `.ai/AI_RULES.md` — detailed coding standards
-- `.ai/ARCHITECTURE.md` — system design (⚠️ pre-pivot, needs update)
-- `.ai/DB_SCHEMA.md` — Prisma schema (⚠️ pre-pivot, needs update)
-- `.ai/API_SPEC.md` — endpoint contracts (⚠️ pre-pivot, needs update)
+- `.ai/ARCHITECTURE.md` — current system design
+- `.ai/DB_SCHEMA.md` — schema map (source of truth: `apps/api/prisma/schema.prisma`)
+- `.ai/API_SPEC.md` — current endpoint inventory (Swagger: `/api/docs`)
+- `.ai/BACKEND_TASKS.md` — backend build log
+- `.ai/TASKS.md` — frontend board (feature-complete)
