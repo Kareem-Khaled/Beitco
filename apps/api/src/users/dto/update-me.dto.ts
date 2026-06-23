@@ -23,4 +23,9 @@ export class UpdateMeDto {
   @IsOptional()
   @IsObject()
   notifications?: Record<string, boolean>;
+
+  @ApiPropertyOptional({ description: 'Renter preferences (RenterProfile shape); upserted + selfGender saved on the user' })
+  @IsOptional()
+  @IsObject()
+  profile?: Record<string, unknown>;
 }

@@ -11,13 +11,21 @@
 
 ## 🟢 In Progress
 
-_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (1) + saved-searches (2) + renter-leads (3) + Q&A (4) + reviews (5) + create/edit listing (6a) + owner-leads & renter-reviews (6b) + admin moderation (6c) + dashboard management/overview (6d) wired behind the flag. **The whole flag-on app is now interactive against the backend.** Next: the matching-engine port + renter-preferences persistence, then port/retire the `_unported/` modules.)_
+_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (1) + saved-searches (2) + renter-leads (3) + Q&A (4) + reviews (5) + create/edit listing (6a) + owner-leads & renter-reviews (6b) + admin moderation (6c) + dashboard management/overview (6d) + **matching engine + renter preferences (T-MATCH)** wired behind the flag. **The whole flag-on app is now interactive against the backend.** Remaining: port/retire the `_unported/` modules (analytics, chat, notifications, payments, search, users) — each currently targets the pre-pivot schema.)_
 
 > **Known seed-fidelity note (not a wiring bug):** properties carry a hand-set display `reviewsCount` (e.g. 32) larger than their actual seeded review rows. The trust recompute counts real rows, so after the first real review the count snaps to the true value. Fix later by seeding more reviews or setting `reviewsCount = reviews.length` in the seed.
 
 ---
 
 ## ✅ Done
+
+### T-MATCH · Matching engine + renter preferences on the API ✅ (June 23)
+- **Pure engine** ported to `apps/api/src/matching/matching.engine.ts` (mirrors `apps/web/src/lib/beitco/matching.ts` — `scoreMatch`/`isGenderEligible`, loose `MatchProperty`/`MatchProfile` inputs, framework-free). **13 Jest tests** mirror the 13 frontend Vitest cases (gender gate, area/budget/type weighting, partial-budget, amenity fraction, trust fallback, ≤100 bound, availability nudge, priceFrom). Heavy Arabic → written via heredoc.
+- **Profile mapper** (`renter-profile.mapper.ts`, pure): frontend `RenterProfile` (Arabic enums + `selfGender`) ↔ Prisma `RenterProfile` row (Latin) + `User.gender`. Handles intent `buy`↔`sale`, `lookingFor` شقة/أوضة/سرير↔apartment/room/bed, occupation/gender-pref maps; builds the engine's `MatchProfile`. Used by both the matching service and the auth serializer (no DI cycle — plain functions).
+- **`MatchingService` + `GET /me/matches`** (auth): loads the caller's `User.gender` + `RenterProfile`, filters published listings by intent (rent vs buy), runs the engine, returns eligible matches sorted by score (cap 24) as `{ property: summary, match }`.
+- **Preferences persistence:** `PATCH /users/me` now accepts `profile` — `UsersService.updateMe` upserts the `RenterProfile` row and stores `selfGender` on `User.gender` (via the mapper). `serializeUser` now includes `profile` (from the loaded relation + gender); `auth.me`/`verifyOtp` load `{ include: { profile: true } }` so the frontend `user.profile` hydrates in API mode.
+- **Frontend:** `api.ts` `apiGetMatches` + `apiUpdateMe` now sends `profile`; `auth.tsx` `updateUser` persists `profile` via the API (the TODO is done). `queries.ts` `useMatches(userId)` (flag-aware, zero-flash mock). Wired `/me/matches` + `/me` overview (top match/count) to `useMatches`; `/me/preferences` save invalidates `["matches"]`.
+- **Verified (curl, the wedge):** no prefs → 0 matches; save prefs (Arabic enums in) → persisted; `/auth/me` round-trips the profile (Arabic `lookingFor`/`selfGender`); `/me/matches` → **5 ranked explainable matches** (top "أوضة مشتركة في المعادي" 85% with reasons في منطقة بتحبها / في حدود ميزانيتك / سرير زي ما بتدوّر), **sorted desc + all eligible**; switching `intent:buy` → for-sale listings only. Re-seeded. `tsc` both apps; **31 Jest** (17 trust + 13 matching + 1) + **31 web tests**; flag-on `/me`, `/me/matches`, `/me/preferences` render 200. Flag OFF unchanged.
 
 ### FE-WIRE (slice 6d) · Dashboard management + overview on the API ✅ (June 23)
 - **New owner-view read:** `GET /properties/mine` now returns **full `Property` objects with owner-only occupant data** (was summaries). `serializeProperty(p, { includeOccupants })` adds bed/room/whole `occupant` blocks **only** for the owner view; an `ownerInclude` (beds+rooms+whole occupant, questions) feeds it. The **public** `/properties/:id` still omits occupant data (privacy verified).

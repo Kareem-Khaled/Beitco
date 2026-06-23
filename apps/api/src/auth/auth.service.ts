@@ -122,7 +122,10 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
 
     await this.redis.del(`${OTP_KEY}${phone}`, `${OTP_ATTEMPTS_KEY}${phone}`, `${OTP_COOLDOWN_KEY}${phone}`);
 
-    const existing = await this.prisma.user.findUnique({ where: { phone } });
+    const existing = await this.prisma.user.findUnique({
+      where: { phone },
+      include: { profile: true },
+    });
     if (existing) {
       const tokens = await this.issueTokens(existing.id, existing.phone);
       return { tokens, user: serializeUser(existing), isNewUser: false };
@@ -151,7 +154,10 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
   }
 
   async me(userId: string): Promise<Record<string, unknown>> {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { profile: true },
+    });
     if (!user || user.deletedAt) throw new UnauthorizedException('User not found');
     return serializeUser(user);
   }

@@ -161,8 +161,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const next = { ...cur, ...patch };
       if (USE_API) {
         // Optimistic local update; persist the supported fields to the API.
-        // (Renter `profile` preferences persist with the matching-engine port.)
-        if (patch.name !== undefined || patch.role !== undefined || patch.notifications !== undefined) {
+        // Renter `profile` preferences upsert via PATCH /users/me (T-MATCH).
+        if (
+          patch.name !== undefined ||
+          patch.role !== undefined ||
+          patch.notifications !== undefined ||
+          patch.profile !== undefined
+        ) {
           apiUpdateMe(patch).catch(() => {/* keep optimistic state */});
         }
       } else {

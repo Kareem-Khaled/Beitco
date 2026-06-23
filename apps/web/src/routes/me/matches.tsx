@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo } from "react";
 import { Sparkles, SlidersHorizontal, Check, X, SearchX } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
-import { getMatchesForUser, profileCompleteness } from "@/lib/beitco/store";
+import { profileCompleteness } from "@/lib/beitco/store";
+import { useMatches } from "@/lib/beitco/queries";
 import { BeitcoListingCard } from "@/components/beitco/BeitcoListingCard";
 import { MatchBadge } from "@/components/beitco/MatchBadge";
 import { EmptyState } from "@/components/beitco/EmptyState";
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/me/matches")({
 
 function MatchesPage() {
   const { user } = useAuth();
-  const matches = useMemo(() => (user ? getMatchesForUser(user.id) : []), [user]);
+  const { data: matches = [] } = useMatches(user?.id);
   const hasProfile = !!user?.profile && profileCompleteness(user.profile) > 0;
 
   if (!user) return null;

@@ -38,6 +38,7 @@ import {
   getPendingListingsCount,
   approveListing as storeApproveListing,
   rejectListing as storeRejectListing,
+  getMatchesForUser,
 } from "./store";
 import {
   apiListProperties,
@@ -66,9 +67,11 @@ import {
   apiModerationCount,
   apiApproveListing,
   apiRejectListing,
+  apiGetMatches,
   USE_API,
 } from "./api";
 import type { Property, PropertySummary, SavedSearch, SavedSearchParams, Lead, Review, Occupant, BedStatus, SaleStatus } from "./types";
+import type { MatchResult } from "./matching";
 
 // Home + search consume the full published set (they filter/sort client-side).
 export function usePublishedProperties() {
@@ -480,6 +483,25 @@ export async function approveListing(id: string): Promise<void> {
 export async function rejectListing(id: string, reason: string): Promise<void> {
   if (USE_API) return apiRejectListing(id, reason);
   storeRejectListing(id, reason);
+}
+
+// ── Matching (T-MATCH) ──────────────────────────────────────────────────────
+// Ranked, explainable matches for the renter's saved preferences. Mock computes
+// locally (getMatchesForUser); API hits GET /me/matches. Both return the same
+// { property, match } shape. Disabled until the user is known.
+export function useMatches(userId: string | undefined) {
+  return useQuery<{ property: Property | PropertySummary; match: MatchResult }[]>({
+    queryKey: ["matches", userId, { source: USE_API ? "api" : "mock" }],
+    enabled: !!userId,
+    queryFn: async () => {
+      if (USE_API) return apiGetMatches();
+      if (!userId) return [];
+      return getMatchesForUser(userId);
+    },
+    initialData:
+      USE_API || !userId ? undefined : () => getMatchesForUser(userId),
+    staleTime: USE_API ? 30_000 : Infinity,
+  });
 }
 
 

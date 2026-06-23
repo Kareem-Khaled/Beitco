@@ -4,13 +4,12 @@ import { Heart, Inbox, KeyRound, Search, Sparkles, SlidersHorizontal, LayoutDash
 import { useAuth } from "@/lib/beitco/auth";
 import {
   getTenanciesForUser,
-  getMatchesForUser,
   profileCompleteness,
   getSavedSearches,
   deleteSavedSearch,
   getRenterReputation,
 } from "@/lib/beitco/store";
-import { useSavedListings, useRenterLeads, useOwnerProperties } from "@/lib/beitco/queries";
+import { useSavedListings, useRenterLeads, useOwnerProperties, useMatches } from "@/lib/beitco/queries";
 import type { SavedSearch } from "@/lib/beitco/types";
 import { MatchBadge } from "@/components/beitco/MatchBadge";
 import { Button } from "@/components/ui/button";
@@ -25,10 +24,10 @@ function MeOverview() {
   const { data: savedList = [] } = useSavedListings(user?.id);
   const { data: renterLeads = [] } = useRenterLeads(user?.id);
   const { data: ownerProps = [] } = useOwnerProperties(user?.id);
+  const { data: matches = [] } = useMatches(user?.id);
   const data = useMemo(() => {
     if (!user)
       return { saved: 0, pending: 0, tenancies: 0, completeness: 0, topMatch: 0, matchCount: 0, listings: 0, reputation: undefined as { score: number; count: number } | undefined };
-    const matches = getMatchesForUser(user.id);
     return {
       saved: savedList.length,
       pending: renterLeads.filter((l) => l.status === "pending").length,
@@ -39,7 +38,7 @@ function MeOverview() {
       listings: ownerProps.length,
       reputation: getRenterReputation(user.id),
     };
-  }, [user, savedList.length, renterLeads, ownerProps.length]);
+  }, [user, savedList.length, renterLeads, ownerProps.length, matches]);
 
   // Saved searches (FE-6) — local list so deletes re-render immediately.
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);

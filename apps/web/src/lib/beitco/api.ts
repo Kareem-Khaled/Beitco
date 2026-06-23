@@ -178,6 +178,8 @@ export async function apiUpdateMe(
   if (patch.role !== undefined) payload.role = patch.role;
   if (patch.avatar !== undefined) payload.avatar = patch.avatar;
   if (patch.notifications !== undefined) payload.notifications = patch.notifications;
+  // Renter preferences — the API upserts the profile + saves selfGender on the user.
+  if (patch.profile !== undefined) payload.profile = patch.profile;
   const body = await patchJSON<import("./types").User>("/users/me", payload);
   return body.data;
 }
@@ -419,4 +421,14 @@ export async function apiApproveListing(id: string): Promise<void> {
 
 export async function apiRejectListing(id: string, reason: string): Promise<void> {
   await postJSON(`/admin/moderation/${encodeURIComponent(id)}/reject`, { reason });
+}
+
+// ── Matching (T-MATCH) ──────────────────────────────────────────────────────
+export async function apiGetMatches(): Promise<
+  { property: import("./types").PropertySummary; match: import("./matching").MatchResult }[]
+> {
+  const body = await getJSON<
+    { property: import("./types").PropertySummary; match: import("./matching").MatchResult }[]
+  >("/me/matches");
+  return body.data;
 }

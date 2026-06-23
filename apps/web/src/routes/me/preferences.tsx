@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Wallet,
   MapPin,
@@ -50,6 +51,7 @@ const TYPES: PropertyType[] = ["شقة", "أوضة", "سرير"];
 function PreferencesPage() {
   const { user, updateUser } = useAuth();
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const [draft, setDraft] = useState<RenterProfile>(() => user?.profile ?? {});
   const [saved, setSaved] = useState(false);
   const [areaQuery, setAreaQuery] = useState("");
@@ -110,6 +112,8 @@ function PreferencesPage() {
 
   const onSave = () => {
     updateUser({ profile: { ...draft, updatedAt: new Date().toISOString() } });
+    // Preferences changed -> recompute matches (server in API mode, store in mock).
+    qc.invalidateQueries({ queryKey: ["matches"] });
     setSaved(true);
     toast.success("اتحفظت تفضيلاتك");
   };
