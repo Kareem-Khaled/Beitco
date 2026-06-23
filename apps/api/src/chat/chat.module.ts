@@ -14,7 +14,7 @@ import { ChatGateway } from './chat.gateway';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET', 'dev-jwt-secret'),
+        secret: config.get<string>('JWT_SECRET'),
       }),
     }),
   ],

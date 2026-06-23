@@ -17,7 +17,7 @@
 | Frontend | 86 | Polished + a11y; monolithic files; no image pipeline |
 | Backend (NestJS) | 85 | Clean modules + guards; shallow health; unlinted |
 | Accessibility / RTL | 82 | RTL-first + aria; no i18n framework, no axe |
-| Security & Auth | 78 | Solid OTP/JWT; hardcoded secret fallbacks, no helmet |
+| Security & Auth | 78 → **92** | OTP/JWT solid; **P0 hardening done** (secrets fail-fast, helmet, readiness, OTP throttle) |
 | DevOps / Deployment | 60 | Good dev infra; no Dockerfiles, no CD, CI lint breaks API |
 | Testing & QA | 55 | Engines tested; no controller/component/e2e tests |
 | Observability & Ops | 35 | No Sentry/metrics/structured logs/readiness probe |
@@ -26,12 +26,14 @@ The gap to "production-ready" is the bottom four rows. P0/P1 below target them d
 
 ---
 
-## 🔴 P0 — Security & correctness (do before any real deploy)
+## 🔴 P0 — Security & correctness (do before any real deploy) — ✅ DONE (June 23)
 
-- [ ] **SEC-1 · Secrets fail-fast.** Hardcoded `'dev-jwt-secret'` / `'dev-jwt-refresh-secret'` fallbacks live in 6 places (`auth.module`, `auth.service` ×3, `jwt.strategy`, `chat.module`, `chat.gateway`). Add a startup guard: when `NODE_ENV=production`, throw if `JWT_SECRET` / `JWT_REFRESH_SECRET` are unset. Centralize secret access in a typed config so the fallback exists in exactly one dev-only place.
-- [ ] **SEC-2 · Security headers.** Install + enable `helmet` in `main.ts` (HSTS, CSP, X-Frame-Options, no-sniff). Add a sane CSP for the API origin.
-- [ ] **SEC-3 · Readiness vs liveness health.** `GET /health` is shallow (`status: ok` + uptime) and never pings dependencies. Add `GET /health/ready` that checks Postgres (`SELECT 1`) and Redis (`PING`) and returns 503 when either is down. Keep the shallow one for liveness.
-- [ ] **SEC-4 · Rate-limit the sensitive routes explicitly.** A global `ThrottlerGuard` exists; add tighter per-route limits on `auth/otp/send` + `auth/otp/verify` (e.g. by phone + IP) to blunt OTP brute-force/abuse beyond the existing 60s cooldown.
+- [x] **SEC-1 · Secrets fail-fast.** `src/config/env.validation.ts` (`validateEnv`, wired into `ConfigModule.forRoot({ validate })`) throws on boot in production when `JWT_SECRET`/`JWT_REFRESH_SECRET` are missing, weak (the dev defaults), under 32 chars, or equal to each other; fills dev defaults locally. All 6 inline `'dev-jwt-secret'` fallbacks removed — they now exist only in that one file. **Verified:** prod boot throws on missing + weak; boots with strong distinct secrets.
+- [x] **SEC-2 · Security headers.** `helmet@8` enabled in `main.ts` (HSTS, CSP, X-Frame-Options `SAMEORIGIN`, `nosniff`, `Referrer-Policy: no-referrer`); CSP tuned to keep Swagger UI working. **Verified** via response headers.
+- [x] **SEC-3 · Readiness vs liveness health.** New `HealthModule` + `HealthService`: `GET /health/ready` pings Postgres (`SELECT 1`) + Redis (`PING`) and returns **503** when either is down (kept `GET /health` shallow for liveness). **Verified:** 200 up; 503 + `redis:down` with Redis stopped; 200 again after restart.
+- [x] **SEC-4 · Rate-limit the sensitive routes.** `@Throttle` on `auth/otp/send` (5 / 5 min) and `auth/otp/verify` (10 / 5 min) per IP, on top of the existing 60s per-phone Redis cooldown.
+
+> Status: `tsc` + `nest build` + **42 Jest** green. Committed in the P0 batch.
 
 ## 🟠 P1 — Make it shippable (deploy + catch regressions)
 

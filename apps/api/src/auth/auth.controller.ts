@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
@@ -33,6 +34,7 @@ export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 300_000 } }) // SEC-4: max 5 sends / 5 min per IP
   @Post('otp/send')
   @ApiOperation({ summary: 'Send a login OTP to an Egyptian phone number' })
   sendOtp(@Body() dto: SendOtpDto) {
@@ -40,6 +42,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ default: { limit: 10, ttl: 300_000 } }) // SEC-4: max 10 verify attempts / 5 min per IP
   @Post('otp/verify')
   @ApiOperation({ summary: 'Verify the OTP, issue a session (httpOnly cookies)' })
   async verifyOtp(@Body() dto: VerifyOtpDto, @Res({ passthrough: true }) res: Response) {

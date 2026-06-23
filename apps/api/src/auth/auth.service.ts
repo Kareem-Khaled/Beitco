@@ -168,7 +168,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     let payload: JwtPayload & { jti: string };
     try {
       payload = this.jwt.verify(refreshToken, {
-        secret: this.config.get<string>('JWT_REFRESH_SECRET', 'dev-jwt-refresh-secret'),
+        secret: this.refreshSecret(),
       });
     } catch {
       throw new UnauthorizedException('Invalid or expired refresh token');
@@ -191,7 +191,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     if (!refreshToken || !this.redisReady) return;
     try {
       const payload = this.jwt.verify<JwtPayload & { jti: string }>(refreshToken, {
-        secret: this.config.get<string>('JWT_REFRESH_SECRET', 'dev-jwt-refresh-secret'),
+        secret: this.refreshSecret(),
       });
       if (payload.sub !== userId) return;
       const ttl = payload.exp ? payload.exp - Math.floor(Date.now() / 1000) : REFRESH_TOKEN_EXPIRY_SECONDS;
@@ -210,7 +210,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     const refreshToken = this.jwt.sign(
       { sub: userId, phone, type: 'refresh', jti } satisfies JwtPayload & { jti: string },
       {
-        secret: this.config.get<string>('JWT_REFRESH_SECRET', 'dev-jwt-refresh-secret'),
+        secret: this.refreshSecret(),
         expiresIn: REFRESH_TOKEN_EXPIRY,
       },
     );
@@ -225,6 +225,11 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
       { sub: userId, phone, type: 'access' } satisfies JwtPayload,
       { expiresIn: ACCESS_TOKEN_EXPIRY },
     );
+  }
+
+  // Guaranteed present by validateEnv (SEC-1) — no inline dev fallback here.
+  private refreshSecret(): string {
+    return this.config.get<string>('JWT_REFRESH_SECRET')!;
   }
 
   private generateOtp(): string {

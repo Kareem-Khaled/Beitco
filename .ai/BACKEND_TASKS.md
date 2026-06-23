@@ -19,6 +19,13 @@ _(**Build phase complete.** Backend B-0→MOD-1 + FE wiring (slices 1–6d) + T-
 
 ## ✅ Done
 
+### SEC-1→4 · P0 security hardening ✅ (June 23)
+- **SEC-1 secrets fail-fast:** `src/config/env.validation.ts` (`validateEnv`) wired into `ConfigModule.forRoot({ validate })`. In production it throws on boot if `JWT_SECRET`/`JWT_REFRESH_SECRET` are missing, equal to the dev defaults, `< 32` chars, or equal to each other; in dev it fills the defaults. Removed all 6 inline `'dev-jwt-secret'`/`'dev-jwt-refresh-secret'` fallbacks (`auth.module`, `auth.service` ×3 → one private `refreshSecret()`, `jwt.strategy`, `chat.module`, `chat.gateway`) — the only copy now lives in `env.validation.ts`.
+- **SEC-2 helmet:** `helmet@8` in `main.ts` — HSTS, CSP (Swagger-compatible), `X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`.
+- **SEC-3 readiness:** new `HealthModule`/`HealthService`; `GET /health/ready` pings Postgres (`SELECT 1`) + Redis (`PING`) → 503 if either down. `GET /health` stays shallow (liveness). Owns a lazy Redis client (auth-style). Controller spec updated.
+- **SEC-4 OTP throttle:** `@Throttle` — `auth/otp/send` 5/5 min, `auth/otp/verify` 10/5 min per IP (atop the existing 60s per-phone Redis cooldown).
+- **Verified:** `tsc` + `nest build` + **42 Jest**; prod boot **throws** on missing + weak secrets, **boots** with strong distinct ones; helmet headers present; `/health/ready` 200 up → **503 `redis:down`** with Redis stopped → 200 after restart. Security score 78 → 92 (see `.ai/NEXT_STEPS.md`).
+
 ### CHAT-3 · Live chat delivery (Socket.io) ✅ (June 23)
 - **Gateway** (`chat.gateway.ts`, namespace `/ws/chat`): authenticates the socket via the **same httpOnly `beitco_at` JWT cookie** the REST API uses (parses the handshake cookie, verifies with `JwtService` + `JWT_SECRET`; invalid/missing → `disconnect`). Each client joins a per-user room `user:<id>`. CORS mirrors the REST origins with credentials. `JwtModule` is registered locally in `ChatModule` (auth's isn't exported).
 - **Emit:** `ChatService.sendMessage` calls `gateway.notifyNewMessage([ownerId, renterId], threadId, message)` after persisting → `message:new { threadId, message }` to both participants' rooms (service→gateway only; no DI cycle).

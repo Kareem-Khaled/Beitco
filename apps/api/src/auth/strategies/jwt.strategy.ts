@@ -27,7 +27,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     configService: ConfigService,
     private readonly prisma: PrismaService,
   ) {
-    const secret = configService.get<string>('JWT_SECRET', 'dev-jwt-secret');
+    // Guaranteed present by validateEnv (SEC-1).
+    const secret = configService.get<string>('JWT_SECRET')!;
     super({
       jwtFromRequest: cookieOrBearer,
       ignoreExpiration: false,

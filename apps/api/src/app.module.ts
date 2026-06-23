@@ -2,7 +2,8 @@ import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { HealthController } from './health/health.controller';
+import { validateEnv } from './config/env.validation';
+import { HealthModule } from './health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
@@ -28,6 +29,9 @@ import { NotificationsModule } from './notifications/notifications.module';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
+      // SEC-1: fail fast in production on missing/weak JWT secrets; fill dev
+      // defaults locally. The only place dev fallbacks exist.
+      validate: validateEnv,
     }),
     ThrottlerModule.forRoot([
       {
@@ -46,8 +50,8 @@ import { NotificationsModule } from './notifications/notifications.module';
     MatchingModule,
     ChatModule,
     NotificationsModule,
+    HealthModule,
   ],
-  controllers: [HealthController],
   providers: [
     // 1. Rate limiting
     {

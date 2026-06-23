@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -8,6 +9,25 @@ import { ResponseEnvelopeInterceptor } from './common/interceptors/response-enve
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // ─── Security headers (SEC-2) ──────────────────────
+  // HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, etc. The CSP
+  // is relaxed only enough for Swagger UI's inline assets at /api/docs; the JSON
+  // API itself doesn't render HTML, so this mainly hardens the docs surface.
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: [`'self'`],
+          scriptSrc: [`'self'`, `'unsafe-inline'`],
+          styleSrc: [`'self'`, `'unsafe-inline'`],
+          imgSrc: [`'self'`, 'data:', 'https:'],
+          connectSrc: [`'self'`],
+        },
+      },
+      crossOriginEmbedderPolicy: false,
+    }),
+  );
 
   // ─── Cookies (auth tokens) ─────────────────────────
   app.use(cookieParser());
