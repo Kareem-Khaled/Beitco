@@ -18,8 +18,8 @@
 | Backend (NestJS) | 85 | Clean modules + guards; shallow health; unlinted |
 | Accessibility / RTL | 82 | RTL-first + aria; no i18n framework, no axe |
 | Security & Auth | 78 → **92** | OTP/JWT solid; **P0 hardening done** (secrets fail-fast, helmet, readiness, OTP throttle) |
-| DevOps / Deployment | 60 | Good dev infra; no Dockerfiles, no CD, CI lint breaks API |
-| Testing & QA | 55 | Engines tested; no controller/component/e2e tests |
+| DevOps / Deployment | 60 → **70** | API now linted; Dockerfiles/CD still pending |
+| Testing & QA | 55 → **78** | **e2e suite (18) codifies the smokes**; +pure-engine units; component/controller-unit pending |
 | Observability & Ops | 35 | No Sentry/metrics/structured logs/readiness probe |
 
 The gap to "production-ready" is the bottom four rows. P0/P1 below target them directly.
@@ -37,11 +37,11 @@ The gap to "production-ready" is the bottom four rows. P0/P1 below target them d
 
 ## 🟠 P1 — Make it shippable (deploy + catch regressions)
 
-- [ ] **OPS-1 · Fix API lint + CI.** `apps/api` has **no `eslint.config.js`**, so `pnpm lint` errors and CI's lint step is unreliable. Add a flat ESLint config for the API (mirror the web one) so the backend is actually linted in CI.
+- [x] **OPS-1 · Fix API lint + CI.** ✅ (June 23) Added `apps/api/eslint.config.mjs` (ESLint 9 flat, NestJS-tuned) + the ESLint devDeps; fixed the one issue it found (`let`→`const`). Also fixed the **web** lint: `.turbo` was OOMing `eslint .` → scoped to `eslint src` + expanded ignores, and **auto-fixed 504 pre-existing `prettier/prettier` errors** (`--fix`, behavior-preserving — tsc + 31 tests confirm). `pnpm lint` now passes across all 8 turbo tasks.
 - [ ] **OPS-2 · Dockerfiles + compose for the apps.** Add multi-stage Dockerfiles for `apps/api` and `apps/web`, and extend compose (or a `docker-compose.prod.yml`) to run them alongside Postgres/Redis. Today only the data services are containerized.
 - [ ] **OPS-3 · CD pipeline.** Extend CI to build the images, run `prisma migrate deploy` against a real test DB, run the e2e suite (TEST-2), and deploy on a tagged release. Wire a staging environment.
-- [ ] **TEST-1 · Controller/service tests.** The 72 tests cover only pure functions. Add NestJS controller tests (mocked services) for the authz matrix (401/403 paths) + service tests with a mocked Prisma for the trust-moving paths (review, owner reply, lead-complete→tenancy).
-- [ ] **TEST-2 · e2e suite (codify the curl smokes).** Stand up a `@nestjs/testing` + Supertest e2e run against an ephemeral Postgres (Testcontainers or a CI service container) covering the flows already smoke-tested by hand: auth, listings CRUD + moderation, leads loop, reviews-move-trust, matching, chat (incl. the Socket.io live path), saved-search alerts.
+- [ ] **TEST-1 · Controller/service tests.** Add NestJS controller tests (mocked services) for the authz matrix (401/403 paths) + service tests with a mocked Prisma for the trust-moving paths. _(Partly covered by TEST-2's e2e authz assertions; unit-level controller tests still pending.)_
+- [x] **TEST-2 · e2e suite (codify the curl smokes).** ✅ (June 23) `apps/api/test/app.e2e-spec.ts` — `@nestjs/testing` + Supertest boots the **real `AppModule`** (mirrors `main.ts`: cookie-parser, ValidationPipe, filter, interceptor, versioning) against the dev Postgres/Redis. **18 tests, all green (×2 back-to-back):** health (liveness+readiness), auth (OTP→session, 401), listings reads + **occupant-privacy**, moderation gate (verified→published / unverified→pending / cross-owner 403), leads→tenancy (+403), **reviews-move-trust**, matching (sorted+eligible), saved-search alerts. Self-sufficient (flushes OTP keys in `beforeAll`; overrides `ThrottlerGuard`; cleans up created rows). `npm run test:e2e`. _(Chat WS live path is covered by its own node smoke; folding it into Jest is a follow-up.)_
 - [ ] **TEST-3 · Frontend component tests.** Add React Testing Library tests for the highest-risk surfaces: the flag-aware query hooks (`queries.ts`), `property.$id` actions, and the listing wizard validation.
 - [ ] **OBS-1 · Structured logging + request IDs.** Replace Nest's default logger with `pino` (JSON, levels, redaction) + a correlation-id middleware. Remove the 2 stray `console.log`s in API src.
 - [ ] **OBS-2 · Error tracking.** Wire Sentry (or equivalent) in both apps — the web already has a `lovable-error-reporting` hook to bridge, and the API needs an exception-filter integration.
