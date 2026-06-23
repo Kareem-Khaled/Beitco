@@ -127,9 +127,7 @@ export function ReviewDialog({
                   min={1}
                   max={10}
                   value={scores[k]}
-                  onChange={(e) =>
-                    setScores((s) => ({ ...s, [k]: Number(e.target.value) }))
-                  }
+                  onChange={(e) => setScores((s) => ({ ...s, [k]: Number(e.target.value) }))}
                   className="w-full accent-primary"
                 />
               </div>

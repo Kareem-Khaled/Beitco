@@ -61,7 +61,7 @@ export class ListingsService {
     })) as unknown as PropertyRow[];
 
     const hasMore = rows.length > limit;
-    let page = hasMore ? rows.slice(0, limit) : rows;
+    const page = hasMore ? rows.slice(0, limit) : rows;
 
     // freeOnly is computed from bed availability — apply on the page.
     let summaries = page.map(serializeSummary);

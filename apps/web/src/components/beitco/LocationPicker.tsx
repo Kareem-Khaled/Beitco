@@ -198,7 +198,11 @@ export function LocationPicker({
           disabled={locating}
           className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-trust hover:text-trust disabled:opacity-60"
         >
-          {locating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <LocateFixed className="h-3.5 w-3.5" />}
+          {locating ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <LocateFixed className="h-3.5 w-3.5" />
+          )}
           موقعي الحالي
         </button>
       </div>

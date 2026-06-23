@@ -84,7 +84,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "بيتكو — لاقي بيتك في مصر" },
-      { name: "description", content: "بيتكو منصة السكن الموثوقة في مصر. لاقي شقة، أوضة، أو سرير للإيجار أو للبيع — بأسعار واضحة وآراء حقيقية ودرجة ثقة لكل مكان." },
+      {
+        name: "description",
+        content:
+          "بيتكو منصة السكن الموثوقة في مصر. لاقي شقة، أوضة، أو سرير للإيجار أو للبيع — بأسعار واضحة وآراء حقيقية ودرجة ثقة لكل مكان.",
+      },
       { name: "theme-color", content: "#14534c" },
       { property: "og:site_name", content: "بيتكو" },
       { property: "og:title", content: "بيتكو — لاقي بيتك في مصر" },

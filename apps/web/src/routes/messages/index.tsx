@@ -27,19 +27,14 @@ function MessagesIndex() {
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-6">
         <header className="mb-5">
           <h1 className="font-display text-2xl font-semibold tracking-tight">الرسايل</h1>
-          <p className="text-sm text-muted-foreground">
-            كل محادثاتك مع أصحاب الشقق والمستأجرين.
-          </p>
+          <p className="text-sm text-muted-foreground">كل محادثاتك مع أصحاب الشقق والمستأجرين.</p>
         </header>
 
         {threads.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border bg-surface p-12 text-center">
             <MessageCircle className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">لسه ما فيش رسايل.</p>
-            <Link
-              to="/search"
-              className="mt-3 inline-block text-sm text-primary hover:underline"
-            >
+            <Link to="/search" className="mt-3 inline-block text-sm text-primary hover:underline">
               دوّر على بيت
             </Link>
           </div>
@@ -49,9 +44,7 @@ function MessagesIndex() {
               const p = threadPropertyOf(t);
               const last = t.messages[t.messages.length - 1];
               const otherIsOwner = user.id !== t.ownerId;
-              const otherName = otherIsOwner
-                ? p?.landlord.name ?? "صاحب الشقة"
-                : "المستأجر";
+              const otherName = otherIsOwner ? (p?.landlord.name ?? "صاحب الشقة") : "المستأجر";
               const unread = t.unreadFor === user.id;
               return (
                 <li key={t.id}>

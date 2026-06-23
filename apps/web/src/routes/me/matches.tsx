@@ -61,10 +61,7 @@ function MatchesPage() {
       ) : (
         <div className="space-y-4">
           {matches.map(({ property, match }) => (
-            <div
-              key={property.id}
-              className="rounded-2xl border border-border bg-card p-3 sm:p-4"
-            >
+            <div key={property.id} className="rounded-2xl border border-border bg-card p-3 sm:p-4">
               <div className="grid gap-4 sm:grid-cols-[1fr_280px]">
                 {/* Match summary */}
                 <div className="order-2 flex flex-col sm:order-1">

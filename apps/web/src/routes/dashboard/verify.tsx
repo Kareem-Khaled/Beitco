@@ -47,97 +47,100 @@ function VerifyPage() {
 
   return (
     <div className="mx-auto max-w-2xl">
-        <div className="mt-2 text-center">
-          <span className="mx-auto mb-3 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-trust-soft text-trust">
-            <ShieldCheck className="h-7 w-7" />
-          </span>
-          <h1 className="font-display text-2xl font-bold sm:text-3xl">وثّق حسابك</h1>
-          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-            {isOwner
-              ? "التوثيق بيدّي الناس ثقة إن إعلاناتك حقيقية — وبيخلّي شققك تظهر بعلامة «موثّق» وتترتّب أعلى."
-              : "التوثيق بيدّي أصحاب الشقق اطمئنان إنك شخص حقيقي — وبيخلّي طلباتك تتقبل أسرع."}
-          </p>
-        </div>
+      <div className="mt-2 text-center">
+        <span className="mx-auto mb-3 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-trust-soft text-trust">
+          <ShieldCheck className="h-7 w-7" />
+        </span>
+        <h1 className="font-display text-2xl font-bold sm:text-3xl">وثّق حسابك</h1>
+        <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+          {isOwner
+            ? "التوثيق بيدّي الناس ثقة إن إعلاناتك حقيقية — وبيخلّي شققك تظهر بعلامة «موثّق» وتترتّب أعلى."
+            : "التوثيق بيدّي أصحاب الشقق اطمئنان إنك شخص حقيقي — وبيخلّي طلباتك تتقبل أسرع."}
+        </p>
+      </div>
 
-        {status === "verified" ? (
-          <StateCard
-            tone="done"
-            icon={Check}
-            title="حسابك موثّق"
-            body="مبروك! كل إعلاناتك بتظهر بعلامة موثّق. مفيش حاجة تانية مطلوبة."
-            cta={
-              <Button asChild>
-                <Link to="/dashboard">ارجع للوحتك</Link>
-              </Button>
-            }
-          />
-        ) : status === "pending" ? (
-          <StateCard
-            tone="pending"
-            icon={Clock}
-            title="طلبك بيتراجع"
-            body="استلمنا مستنداتك وفريقنا بيراجعها. عادةً بياخد أقل من 24 ساعة، وهنبلّغك أول ما يخلص."
-            cta={
-              <Button asChild variant="outline">
-                <Link to="/dashboard">ارجع للوحتك</Link>
-              </Button>
-            }
-          />
-        ) : (
-          <>
-            {/* Benefits */}
-            <div className="mt-6 grid gap-3 sm:grid-cols-3">
-              <Benefit icon={ShieldCheck} text="علامة «موثّق» على حسابك" />
-              {isOwner ? (
-                <Benefit icon={Sparkles} text="ترتيب أعلى في نتائج البحث" />
-              ) : (
-                <Benefit icon={Sparkles} text="طلباتك تتقبل أسرع" />
-              )}
-              <Benefit icon={Check} text={isOwner ? "ثقة أسرع من المستأجرين" : "ثقة أسرع من أصحاب الشقق"} />
-            </div>
-
-            {/* Upload docs */}
-            <div className="mt-6 space-y-3">
-              <DocUpload
-                icon={IdCard}
-                title="صورة البطاقة"
-                subtitle="وجه البطاقة الشخصية — بنتأكد من هويتك بس."
-                value={idDoc}
-                onChange={setIdDoc}
-              />
-              <DocUpload
-                icon={ScanFace}
-                title="سيلفي وانت ماسك البطاقة"
-                subtitle="صورة لوشك وانت ماسك بطاقتك جنب وشك — عشان نتأكد إنها فعلاً إنت."
-                value={selfieDoc}
-                onChange={setSelfieDoc}
-                selfie
-              />
-              {isOwner && (
-                <DocUpload
-                  icon={FileText}
-                  title="إثبات ملكية أو إيجار"
-                  subtitle="عقد، فاتورة مرافق، أو أي ورقة بتثبت علاقتك بالشقة."
-                  value={ownershipDoc}
-                  onChange={setOwnershipDoc}
-                />
-              )}
-            </div>
-
-            <p className="mt-4 text-center text-[11px] text-muted-foreground">
-              مستنداتك سرّية وبتُستخدم للتوثيق بس — مش بتظهر لأي حد.
-            </p>
-
-            <Button
-              size="lg"
-              className="mt-4 w-full rounded-xl"
-              disabled={!idDoc || !selfieDoc || (isOwner && !ownershipDoc) || submitting}
-              onClick={submit}
-            >
-              {submitting ? "بنبعت..." : "ابعت للتوثيق"}
+      {status === "verified" ? (
+        <StateCard
+          tone="done"
+          icon={Check}
+          title="حسابك موثّق"
+          body="مبروك! كل إعلاناتك بتظهر بعلامة موثّق. مفيش حاجة تانية مطلوبة."
+          cta={
+            <Button asChild>
+              <Link to="/dashboard">ارجع للوحتك</Link>
             </Button>
-          </>
-        )}
+          }
+        />
+      ) : status === "pending" ? (
+        <StateCard
+          tone="pending"
+          icon={Clock}
+          title="طلبك بيتراجع"
+          body="استلمنا مستنداتك وفريقنا بيراجعها. عادةً بياخد أقل من 24 ساعة، وهنبلّغك أول ما يخلص."
+          cta={
+            <Button asChild variant="outline">
+              <Link to="/dashboard">ارجع للوحتك</Link>
+            </Button>
+          }
+        />
+      ) : (
+        <>
+          {/* Benefits */}
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            <Benefit icon={ShieldCheck} text="علامة «موثّق» على حسابك" />
+            {isOwner ? (
+              <Benefit icon={Sparkles} text="ترتيب أعلى في نتائج البحث" />
+            ) : (
+              <Benefit icon={Sparkles} text="طلباتك تتقبل أسرع" />
+            )}
+            <Benefit
+              icon={Check}
+              text={isOwner ? "ثقة أسرع من المستأجرين" : "ثقة أسرع من أصحاب الشقق"}
+            />
+          </div>
+
+          {/* Upload docs */}
+          <div className="mt-6 space-y-3">
+            <DocUpload
+              icon={IdCard}
+              title="صورة البطاقة"
+              subtitle="وجه البطاقة الشخصية — بنتأكد من هويتك بس."
+              value={idDoc}
+              onChange={setIdDoc}
+            />
+            <DocUpload
+              icon={ScanFace}
+              title="سيلفي وانت ماسك البطاقة"
+              subtitle="صورة لوشك وانت ماسك بطاقتك جنب وشك — عشان نتأكد إنها فعلاً إنت."
+              value={selfieDoc}
+              onChange={setSelfieDoc}
+              selfie
+            />
+            {isOwner && (
+              <DocUpload
+                icon={FileText}
+                title="إثبات ملكية أو إيجار"
+                subtitle="عقد، فاتورة مرافق، أو أي ورقة بتثبت علاقتك بالشقة."
+                value={ownershipDoc}
+                onChange={setOwnershipDoc}
+              />
+            )}
+          </div>
+
+          <p className="mt-4 text-center text-[11px] text-muted-foreground">
+            مستنداتك سرّية وبتُستخدم للتوثيق بس — مش بتظهر لأي حد.
+          </p>
+
+          <Button
+            size="lg"
+            className="mt-4 w-full rounded-xl"
+            disabled={!idDoc || !selfieDoc || (isOwner && !ownershipDoc) || submitting}
+            onClick={submit}
+          >
+            {submitting ? "بنبعت..." : "ابعت للتوثيق"}
+          </Button>
+        </>
+      )}
     </div>
   );
 }
@@ -185,7 +188,9 @@ function DocUpload({
   return (
     <label
       className={`flex cursor-pointer items-center gap-3 rounded-2xl border p-4 transition-colors ${
-        value ? "border-trust bg-trust-soft" : "border-dashed border-border bg-surface hover:border-trust"
+        value
+          ? "border-trust bg-trust-soft"
+          : "border-dashed border-border bg-surface hover:border-trust"
       }`}
     >
       <span

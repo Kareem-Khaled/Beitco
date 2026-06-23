@@ -35,12 +35,7 @@ import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Textarea } from "@/components/ui/textarea";
-import type {
-  RenterProfile,
-  PropertyType,
-  Occupation,
-  FurnishedPref,
-} from "@/lib/beitco/types";
+import type { RenterProfile, PropertyType, Occupation, FurnishedPref } from "@/lib/beitco/types";
 
 export const Route = createFileRoute("/me/preferences")({
   component: PreferencesPage,
@@ -144,10 +139,12 @@ function PreferencesPage() {
         hint="ده بيغيّر شكل التفضيلات والأماكن اللي هنرشّحها."
       >
         <div className="grid max-w-sm grid-cols-2 gap-2">
-          {([
-            { id: "rent", label: "إيجار", icon: KeyRound },
-            { id: "buy", label: "تمليك", icon: Tag },
-          ] as const).map((o) => {
+          {(
+            [
+              { id: "rent", label: "إيجار", icon: KeyRound },
+              { id: "buy", label: "تمليك", icon: Tag },
+            ] as const
+          ).map((o) => {
             const active = intent === o.id;
             const Icon = o.icon;
             return (
@@ -265,11 +262,7 @@ function PreferencesPage() {
 
       {/* Move-in date — renters only */}
       {intent === "rent" && (
-        <Section
-          icon={CalendarClock}
-          title="هتنقل إمتى؟"
-          hint="تقريبًا — عشان نرتّب الأولوية."
-        >
+        <Section icon={CalendarClock} title="هتنقل إمتى؟" hint="تقريبًا — عشان نرتّب الأولوية.">
           <div className="max-w-xs">
             <DatePicker
               value={draft.moveInBy}
@@ -283,77 +276,73 @@ function PreferencesPage() {
 
       {/* Must-have amenities — renters only */}
       {intent === "rent" && (
-        <Section
-          icon={ListChecks}
-          title="لازم يكون فيه إيه؟"
-          hint="المميزات اللي مش هتتنازل عنها."
-        >
-        <div className="space-y-4">
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {ALL_AMENITIES.map((a) => {
-              const active = selectedAmenities.includes(a);
-              return (
-                <button
-                  key={a}
-                  type="button"
-                  onClick={() => toggleArr("mustHaveAmenities", a)}
-                  className={`rounded-xl border px-3 py-2 text-start text-sm transition-colors ${
-                    active
-                      ? "border-trust bg-trust-soft text-foreground"
-                      : "border-border bg-surface text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {a}
-                </button>
-              );
-            })}
-          </div>
-
-          {selectedAmenities.some((a) => !amenityPresetSet.has(a)) ? (
-            <div className="flex flex-wrap gap-2">
-              {selectedAmenities
-                .filter((a) => !amenityPresetSet.has(a))
-                .map((a) => (
-                  <span
+        <Section icon={ListChecks} title="لازم يكون فيه إيه؟" hint="المميزات اللي مش هتتنازل عنها.">
+          <div className="space-y-4">
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {ALL_AMENITIES.map((a) => {
+                const active = selectedAmenities.includes(a);
+                return (
+                  <button
                     key={a}
-                    className="inline-flex items-center gap-1 rounded-full border border-trust bg-trust-soft px-3 py-1.5 text-sm"
+                    type="button"
+                    onClick={() => toggleArr("mustHaveAmenities", a)}
+                    className={`rounded-xl border px-3 py-2 text-start text-sm transition-colors ${
+                      active
+                        ? "border-trust bg-trust-soft text-foreground"
+                        : "border-border bg-surface text-muted-foreground hover:text-foreground"
+                    }`}
                   >
                     {a}
-                    <button
-                      type="button"
-                      onClick={() => toggleArr("mustHaveAmenities", a)}
-                      className="text-muted-foreground hover:text-red-600"
-                      aria-label={`احذف ${a}`}
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  </span>
-                ))}
+                  </button>
+                );
+              })}
             </div>
-          ) : null}
 
-          <div className="rounded-xl border border-dashed border-border bg-surface p-3">
-            <div className="mb-2 text-xs text-muted-foreground">ضيف حاجة مخصوصة تهمك</div>
-            <div className="flex flex-wrap items-center gap-2">
-              <Input
-                value={customAmenity}
-                onChange={(e) => setCustomAmenity(e.target.value)}
-                placeholder="مثلاً: رووف، دش مركزي، انتركم فيديو"
-                className="max-w-sm"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addCustomAmenity();
-                  }
-                }}
-              />
-              <Button type="button" variant="outline" size="sm" onClick={addCustomAmenity}>
-                <Plus className="me-1 h-4 w-4" />
-                ضيف
-              </Button>
+            {selectedAmenities.some((a) => !amenityPresetSet.has(a)) ? (
+              <div className="flex flex-wrap gap-2">
+                {selectedAmenities
+                  .filter((a) => !amenityPresetSet.has(a))
+                  .map((a) => (
+                    <span
+                      key={a}
+                      className="inline-flex items-center gap-1 rounded-full border border-trust bg-trust-soft px-3 py-1.5 text-sm"
+                    >
+                      {a}
+                      <button
+                        type="button"
+                        onClick={() => toggleArr("mustHaveAmenities", a)}
+                        className="text-muted-foreground hover:text-red-600"
+                        aria-label={`احذف ${a}`}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </span>
+                  ))}
+              </div>
+            ) : null}
+
+            <div className="rounded-xl border border-dashed border-border bg-surface p-3">
+              <div className="mb-2 text-xs text-muted-foreground">ضيف حاجة مخصوصة تهمك</div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Input
+                  value={customAmenity}
+                  onChange={(e) => setCustomAmenity(e.target.value)}
+                  placeholder="مثلاً: رووف، دش مركزي، انتركم فيديو"
+                  className="max-w-sm"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addCustomAmenity();
+                    }
+                  }}
+                />
+                <Button type="button" variant="outline" size="sm" onClick={addCustomAmenity}>
+                  <Plus className="me-1 h-4 w-4" />
+                  ضيف
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
         </Section>
       )}
 
@@ -412,7 +401,9 @@ function PreferencesPage() {
 
           {(draft.nearMetro || draft.nearTransit) && (
             <div className="rounded-xl border border-border bg-surface p-3">
-              <label htmlFor="max-walk-minutes" className="mb-2 block text-sm font-medium">أقصى مشي للمواصلات (دقيقة)</label>
+              <label htmlFor="max-walk-minutes" className="mb-2 block text-sm font-medium">
+                أقصى مشي للمواصلات (دقيقة)
+              </label>
               <NumberInput
                 id="max-walk-minutes"
                 min={1}

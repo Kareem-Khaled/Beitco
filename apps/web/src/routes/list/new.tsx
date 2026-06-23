@@ -205,7 +205,10 @@ function ListNewPage() {
 
   if (notFound) {
     return (
-      <div dir="rtl" className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-4 text-center">
+      <div
+        dir="rtl"
+        className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-4 text-center"
+      >
         <p className="text-sm text-muted-foreground">الإعلان اللي بتحاول تعدّله مش موجود.</p>
         <Button onClick={() => navigate({ to: "/dashboard/listings" })}>ارجع لشققك</Button>
       </div>
@@ -336,7 +339,9 @@ function StepLocation({ draft, update }: StepProps) {
         <div>
           <label className="mb-2 block text-sm font-medium">
             حدّد المكان على الخريطة
-            <span className="ms-1 text-xs font-normal text-muted-foreground">(اختياري بس بيساعد جدًا)</span>
+            <span className="ms-1 text-xs font-normal text-muted-foreground">
+              (اختياري بس بيساعد جدًا)
+            </span>
           </label>
           <LocationPicker
             lat={draft.lat}
@@ -353,13 +358,7 @@ function StepLocation({ draft, update }: StepProps) {
 // Searchable city → district picker. Egypt has many areas, so a flat grid
 // doesn't scale; this lets the owner search a city then pick (or type) a
 // district. Output stays the canonical "المدينة · المنطقة" string.
-function AreaPicker({
-  value,
-  onChange,
-}: {
-  value?: string;
-  onChange: (area: string) => void;
-}) {
+function AreaPicker({ value, onChange }: { value?: string; onChange: (area: string) => void }) {
   const { city, district } = useMemo(() => parseArea(value), [value]);
   const [editingCity, setEditingCity] = useState(!city);
   const [cityQuery, setCityQuery] = useState("");
@@ -537,9 +536,7 @@ function StepSpecs({ draft, update }: StepProps) {
 
   return (
     <div>
-      <h1 className="font-display text-3xl font-bold leading-tight sm:text-4xl">
-        مواصفات الشقة
-      </h1>
+      <h1 className="font-display text-3xl font-bold leading-tight sm:text-4xl">مواصفات الشقة</h1>
       <p className="mt-2 text-sm text-muted-foreground">
         المعلومات دي بتظهر للمستأجر وبتساعده ياخد قراره.
       </p>
@@ -609,10 +606,16 @@ function StepSpecs({ draft, update }: StepProps) {
             <span className="text-sm font-medium">الشقة مفروشة؟</span>
           </div>
           <div className="flex gap-2">
-            <TogglePill active={draft.furnished === true} onClick={() => update({ furnished: true })}>
+            <TogglePill
+              active={draft.furnished === true}
+              onClick={() => update({ furnished: true })}
+            >
               مفروشة
             </TogglePill>
-            <TogglePill active={draft.furnished === false} onClick={() => update({ furnished: false })}>
+            <TogglePill
+              active={draft.furnished === false}
+              onClick={() => update({ furnished: false })}
+            >
               مش مفروشة
             </TogglePill>
           </div>
@@ -629,22 +632,22 @@ function StepSpecs({ draft, update }: StepProps) {
 
 // A fitting example per nearby type so the placeholder guides the owner.
 const NEARBY_PLACEHOLDERS: Record<NearbyType, string> = {
-  "مترو": "اختار الخط الأول",
-  "جامعة": "مثلاً: جامعة القاهرة",
-  "مواصلات": "مثلاً: موقف عبد المنعم رياض",
-  "مول": "مثلاً: سيتي ستارز",
-  "مستشفى": "مثلاً: مستشفى الدمرداش",
+  مترو: "اختار الخط الأول",
+  جامعة: "مثلاً: جامعة القاهرة",
+  مواصلات: "مثلاً: موقف عبد المنعم رياض",
+  مول: "مثلاً: سيتي ستارز",
+  مستشفى: "مثلاً: مستشفى الدمرداش",
   "سوبر ماركت": "مثلاً: كارفور",
   "حاجة تانية": "مثلاً: نادي الجزيرة",
 };
 
 // On-theme lucide icon per nearby type (no emojis).
 const NEARBY_ICONS: Record<NearbyType, React.ComponentType<{ className?: string }>> = {
-  "مترو": TrainFront,
-  "جامعة": GraduationCap,
-  "مواصلات": Bus,
-  "مول": ShoppingBag,
-  "مستشفى": Stethoscope,
+  مترو: TrainFront,
+  جامعة: GraduationCap,
+  مواصلات: Bus,
+  مول: ShoppingBag,
+  مستشفى: Stethoscope,
   "سوبر ماركت": Store,
   "حاجة تانية": MapPin,
 };
@@ -670,7 +673,7 @@ function NearbySection({ draft, update }: StepProps) {
       <div className="flex flex-col gap-3">
         {items.map((n) => {
           const isMetro = n.type === "مترو";
-          const stations = n.line ? CAIRO_METRO_LINES[n.line] ?? [] : [];
+          const stations = n.line ? (CAIRO_METRO_LINES[n.line] ?? []) : [];
           return (
             <div key={n.id} className="rounded-lg border border-border bg-background p-3">
               <div className="flex items-center gap-2">
@@ -918,9 +921,7 @@ function StepRentalMode({ draft, update }: StepProps) {
 
   return (
     <div>
-      <h1 className="font-display text-3xl font-bold leading-tight sm:text-4xl">
-        هتعمل بيها إيه؟
-      </h1>
+      <h1 className="font-display text-3xl font-bold leading-tight sm:text-4xl">هتعمل بيها إيه؟</h1>
       <p className="mt-2 text-sm text-muted-foreground">
         تأجّر المكان ولا تبيعه؟ ده بيحدد شكل التسعير في الخطوة الجاية.
       </p>
@@ -1001,7 +1002,8 @@ function StepRentalMode({ draft, update }: StepProps) {
             <div className="mt-6 rounded-2xl border border-border bg-surface p-5">
               <h3 className="font-display text-base font-semibold">هتأجّر لمين؟</h3>
               <p className="mt-1 text-xs text-muted-foreground">
-                السكن المشترك لازم يكون لجنس واحد. اختار مين ممكن يسكن — ده بيظهر في الإعلان وبيحدد المطابقة.
+                السكن المشترك لازم يكون لجنس واحد. اختار مين ممكن يسكن — ده بيظهر في الإعلان وبيحدد
+                المطابقة.
               </p>
               <div className="mt-4 grid gap-2 sm:grid-cols-2">
                 {genderOptions.map((g) => {
@@ -1043,7 +1045,9 @@ function StepRoomsPricing({ draft, update }: StepProps) {
   if (draft.listingType === "sale") return <SalePricing draft={draft} update={update} />;
   if (!mode) {
     return (
-      <p className="text-sm text-muted-foreground">ارجع للخطوة اللي فاتت واختار نظام الإيجار الأول.</p>
+      <p className="text-sm text-muted-foreground">
+        ارجع للخطوة اللي فاتت واختار نظام الإيجار الأول.
+      </p>
     );
   }
   return (
@@ -1090,7 +1094,9 @@ function NightlyToggle({ draft, update }: StepProps) {
 
       {on && (
         <div className="mt-3">
-          <label htmlFor="nightly-price" className="mb-1 block text-sm font-medium">سعر الليلة</label>
+          <label htmlFor="nightly-price" className="mb-1 block text-sm font-medium">
+            سعر الليلة
+          </label>
           <div className="flex items-center gap-2">
             <NumberInput
               id="nightly-price"
@@ -1115,7 +1121,9 @@ function SalePricing({ draft, update }: StepProps) {
 
       <div className="mt-8 flex flex-col gap-5">
         <div className="rounded-2xl border border-border bg-surface p-5">
-          <label htmlFor="sale-price" className="mb-2 block text-sm font-medium">سعر البيع</label>
+          <label htmlFor="sale-price" className="mb-2 block text-sm font-medium">
+            سعر البيع
+          </label>
           <div className="flex items-center gap-2">
             <NumberInput
               id="sale-price"
@@ -1177,7 +1185,9 @@ function WholePricing({ draft, update }: StepProps) {
 
       <div className="mt-8 flex flex-col gap-5">
         <div className="rounded-2xl border border-border bg-surface p-5">
-          <label htmlFor="whole-price" className="mb-2 block text-sm font-medium">إيجار الشقة</label>
+          <label htmlFor="whole-price" className="mb-2 block text-sm font-medium">
+            إيجار الشقة
+          </label>
           <div className="flex items-center gap-2">
             <NumberInput
               id="whole-price"
@@ -1427,7 +1437,10 @@ function ExtraBills({
       <label className="mb-2 block text-sm font-medium">تكاليف إضافية (فواتير)</label>
       <div className="flex flex-col gap-2">
         {costs.map((c, idx) => (
-          <div key={c.label} className="flex items-center gap-3 rounded-lg border border-border bg-surface p-3">
+          <div
+            key={c.label}
+            className="flex items-center gap-3 rounded-lg border border-border bg-surface p-3"
+          >
             <span className="flex-1 text-sm">{c.label}</span>
             <NumberInput
               placeholder="0"
@@ -1450,10 +1463,7 @@ function StepAmenities({ draft, update }: StepProps) {
   const selected = draft.amenities ?? [];
   const [custom, setCustom] = useState("");
   const furnished = draft.furnished === true;
-  const applianceSet = useMemo(
-    () => new Set<string>(APPLIANCE_AMENITIES as readonly string[]),
-    [],
-  );
+  const applianceSet = useMemo(() => new Set<string>(APPLIANCE_AMENITIES as readonly string[]), []);
 
   const toggle = (a: string) =>
     update({
@@ -1611,7 +1621,8 @@ function StepPhotos({ draft, update }: StepProps) {
     <div>
       <h1 className="font-display text-3xl font-bold leading-tight sm:text-4xl">حطّ صور للمكان</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        3 صور على الأقل، 8 على الأكتر. اضغط «خلّيها الرئيسية» عشان تختار الصورة اللي هتظهر في الإعلان.
+        3 صور على الأقل، 8 على الأكتر. اضغط «خلّيها الرئيسية» عشان تختار الصورة اللي هتظهر في
+        الإعلان.
       </p>
 
       <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -1756,7 +1767,9 @@ function StepDescription({ draft, update }: StepProps) {
             rows={6}
             maxLength={600}
           />
-          <p className="mt-1 text-xs text-muted-foreground">{(draft.description ?? "").length}/600</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {(draft.description ?? "").length}/600
+          </p>
         </div>
       </div>
     </div>
@@ -1801,7 +1814,9 @@ function StepReview({ draft }: { draft: ListingDraft }) {
       <h1 className="font-display text-3xl font-bold leading-tight sm:text-4xl">
         راجع الإعلان قبل ما تنشره
       </h1>
-      <p className="mt-2 text-sm text-muted-foreground">شيك على المعلومات. تقدر ترجع وتعدّل أي حاجة.</p>
+      <p className="mt-2 text-sm text-muted-foreground">
+        شيك على المعلومات. تقدر ترجع وتعدّل أي حاجة.
+      </p>
 
       <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-surface">
         {draft.images?.[0] && (
@@ -1811,7 +1826,9 @@ function StepReview({ draft }: { draft: ListingDraft }) {
         )}
         <div className="p-5">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium">{summary.type}</span>
+            <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium">
+              {summary.type}
+            </span>
             <span className="rounded-full bg-trust-soft px-2 py-0.5 text-xs font-medium text-trust">
               {modeLabel}
             </span>
@@ -2160,7 +2177,8 @@ function validateStep(step: StepId, d: ListingDraft): boolean {
       if (d.listingType === "sale") return true;
       if (!d.rentalMode) return false;
       // Shared rentals must target one gender — no "anyone" option.
-      if (d.rentalMode !== "whole") return d.rentToGender === "male_only" || d.rentToGender === "female_only";
+      if (d.rentalMode !== "whole")
+        return d.rentToGender === "male_only" || d.rentToGender === "female_only";
       return true;
     case 4: {
       if (d.listingType === "sale") return (d.salePrice ?? 0) > 0;
@@ -2217,7 +2235,11 @@ function draftToProperty(
   const summary = summarizeListing(base);
 
   const rentLabel =
-    d.rentalMode === "whole" ? "إيجار الشقة" : d.rentalMode === "by_room" ? "أرخص أوضة" : "أرخص سرير";
+    d.rentalMode === "whole"
+      ? "إيجار الشقة"
+      : d.rentalMode === "by_room"
+        ? "أرخص أوضة"
+        : "أرخص سرير";
 
   return {
     id,
@@ -2240,9 +2262,13 @@ function draftToProperty(
     image: d.images?.[0] ?? "",
     images: d.images ?? [],
     description: d.description ?? "",
-    quality:
-      existing?.quality ??
-      { internet: 7.5, safety: 7.5, noise: 7.5, maintenance: 7.5, cleanliness: 7.5 },
+    quality: existing?.quality ?? {
+      internet: 7.5,
+      safety: 7.5,
+      noise: 7.5,
+      maintenance: 7.5,
+      cleanliness: 7.5,
+    },
     amenities: d.amenities ?? [],
     costs: isSale
       ? []
@@ -2255,7 +2281,7 @@ function draftToProperty(
     rentToGender: isSale || d.rentalMode === "whole" ? undefined : d.rentToGender,
     listingType: d.listingType ?? "rent",
     salePrice: isSale ? d.salePrice : undefined,
-    saleStatus: isSale ? d.saleStatus ?? "available" : undefined,
+    saleStatus: isSale ? (d.saleStatus ?? "available") : undefined,
     negotiable: isSale ? d.negotiable : undefined,
     spec,
     wholePrice: isSale ? undefined : d.wholePrice,
@@ -2264,16 +2290,14 @@ function draftToProperty(
     rooms: isSale ? undefined : d.rooms,
     nearby: (d.nearby ?? []).filter((n) => n.name.trim()),
     customSpecs: (d.customSpecs ?? []).filter((c) => c.label.trim() && c.value.trim()),
-    landlord:
-      existing?.landlord ??
-      {
-        id: ownerId,
-        name: ownerName,
-        initials: initialsOf(ownerName),
-        trust: 6.5,
-        responseRate: 0,
-        verified: false,
-      },
+    landlord: existing?.landlord ?? {
+      id: ownerId,
+      name: ownerName,
+      initials: initialsOf(ownerName),
+      trust: 6.5,
+      responseRate: 0,
+      verified: false,
+    },
     reviews: existing?.reviews ?? [],
     qa: existing?.qa ?? [],
     createdAt: existing?.createdAt ?? new Date().toISOString(),

@@ -59,8 +59,16 @@ function ProfilePage() {
 
           {/* Stats */}
           <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Stat icon={Home} label="إعلانات" value={profile.listings.length.toLocaleString("ar-EG-u-nu-latn")} />
-            <Stat icon={Star} label="آراء" value={profile.totalReviews.toLocaleString("ar-EG-u-nu-latn")} />
+            <Stat
+              icon={Home}
+              label="إعلانات"
+              value={profile.listings.length.toLocaleString("ar-EG-u-nu-latn")}
+            />
+            <Stat
+              icon={Star}
+              label="آراء"
+              value={profile.totalReviews.toLocaleString("ar-EG-u-nu-latn")}
+            />
             <Stat
               icon={Star}
               label="متوسط التقييم"
@@ -113,7 +121,8 @@ function ProfilePage() {
                       <div>
                         <div className="text-sm font-medium">{review.author}</div>
                         <div className="text-[11px] text-muted-foreground">
-                          سكن {review.monthsLived.toLocaleString("ar-EG-u-nu-latn")} شهر · {review.date}
+                          سكن {review.monthsLived.toLocaleString("ar-EG-u-nu-latn")} شهر ·{" "}
+                          {review.date}
                         </div>
                       </div>
                     </div>
@@ -122,7 +131,9 @@ function ProfilePage() {
                       {review.rating.toFixed(1)}
                     </span>
                   </div>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{review.body}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                    {review.body}
+                  </p>
                   <Link
                     to="/property/$id"
                     params={{ id: property.id }}

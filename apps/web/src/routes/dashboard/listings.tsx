@@ -1,7 +1,24 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Eye, Pause, Play, Trash2, Plus, ChevronDown, BedDouble, DoorOpen, Home, Pencil, User, Calendar, BadgeCheck, Tag, Clock, AlertCircle } from "lucide-react";
+import {
+  Eye,
+  Pause,
+  Play,
+  Trash2,
+  Plus,
+  ChevronDown,
+  BedDouble,
+  DoorOpen,
+  Home,
+  Pencil,
+  User,
+  Calendar,
+  BadgeCheck,
+  Tag,
+  Clock,
+  AlertCircle,
+} from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
 import { timeAgo } from "@/lib/beitco/store";
 import {
@@ -58,7 +75,12 @@ function DashboardListings() {
     refresh();
   };
 
-  const setRoomOccupancy = async (p: Property, roomId: string, status: BedStatus, occupant?: Occupant) => {
+  const setRoomOccupancy = async (
+    p: Property,
+    roomId: string,
+    status: BedStatus,
+    occupant?: Occupant,
+  ) => {
     await manageRoomOccupancy(p, roomId, status, occupant);
     refresh();
   };
@@ -126,7 +148,9 @@ function DashboardListings() {
                       اتنشر {timeAgo(p.createdAt)}
                     </p>
                     <p className="mt-1 font-display text-sm tabular-nums">
-                      {!p.listingType?.includes("sale") && p.rentalMode && p.rentalMode !== "whole" ? (
+                      {!p.listingType?.includes("sale") &&
+                      p.rentalMode &&
+                      p.rentalMode !== "whole" ? (
                         <span className="text-xs font-normal text-muted-foreground">يبدأ من </span>
                       ) : null}
                       {(p.priceFrom ?? p.price).toLocaleString("ar-EG-u-nu-latn")}{" "}
@@ -154,7 +178,9 @@ function DashboardListings() {
                           <AlertCircle className="h-3 w-3" />
                           اترفض الإعلان
                         </span>
-                        {p.rejectionReason ? <p className="mt-0.5 text-foreground/80">{p.rejectionReason}</p> : null}
+                        {p.rejectionReason ? (
+                          <p className="mt-0.5 text-foreground/80">{p.rejectionReason}</p>
+                        ) : null}
                         <p className="mt-1">عدّل الإعلان وابعته تاني للمراجعة.</p>
                       </div>
                     ) : null}
@@ -229,7 +255,9 @@ function DashboardListings() {
                       className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
                     >
                       إدارة الإتاحة
-                      <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+                      <ChevronDown
+                        className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`}
+                      />
                     </button>
                   </div>
                 </div>
@@ -268,7 +296,8 @@ function DashboardListings() {
                       <>
                         <p className="mb-3 flex items-center gap-1.5 text-[11px] text-muted-foreground">
                           <Pencil className="h-3 w-3" />
-                          اضغط على حالة أي وحدة (فاضي / محجوز / متأجّر) عشان تغيّرها وتسجّل بيانات الساكن.
+                          اضغط على حالة أي وحدة (فاضي / محجوز / متأجّر) عشان تغيّرها وتسجّل بيانات
+                          الساكن.
                         </p>
                         <AvailabilityManager
                           p={p}
@@ -341,7 +370,8 @@ function AvailabilityManager({
               </div>
             ) : (
               <span className="text-xs text-muted-foreground">
-                {room.beds.filter((b) => b.status === "available").length} فاضي من {room.beds.length}
+                {room.beds.filter((b) => b.status === "available").length} فاضي من{" "}
+                {room.beds.length}
               </span>
             )}
           </div>
@@ -353,14 +383,9 @@ function AvailabilityManager({
           {p.rentalMode === "by_bed" ? (
             <ul className="mt-2 space-y-1.5">
               {room.beds.map((bed) => (
-                <li
-                  key={bed.id}
-                  className="rounded-lg bg-background px-3 py-2"
-                >
+                <li key={bed.id} className="rounded-lg bg-background px-3 py-2">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm">
-                      {bed.label}
-                    </span>
+                    <span className="text-sm">{bed.label}</span>
                     <div className="flex items-center gap-2">
                       <span className="text-xs tabular-nums text-muted-foreground">
                         {bed.price.toLocaleString("ar-EG-u-nu-latn")} ج.م
@@ -505,12 +530,20 @@ function ModeBadge({ p }: { p: Property }) {
 
 function StatusPill({ status }: { status: Property["status"] }) {
   const map: Record<Property["status"], { tone: string; label: string }> = {
-    published: { tone: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400", label: "شغّالة" },
+    published: {
+      tone: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+      label: "شغّالة",
+    },
     paused: { tone: "bg-muted text-muted-foreground", label: "موقوفة" },
     draft: { tone: "bg-amber-500/10 text-amber-600 dark:text-amber-400", label: "مسودة" },
-    pending_approval: { tone: "bg-blue-500/10 text-blue-600 dark:text-blue-400", label: "بنراجعها" },
+    pending_approval: {
+      tone: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+      label: "بنراجعها",
+    },
     rejected: { tone: "bg-red-500/10 text-red-600 dark:text-red-400", label: "اترفضت" },
   };
   const s = map[status];
-  return <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${s.tone}`}>{s.label}</span>;
+  return (
+    <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${s.tone}`}>{s.label}</span>
+  );
 }

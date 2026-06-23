@@ -24,7 +24,8 @@ export function PropertyGallery({ images, alt = "" }: { images: string[]; alt?: 
     if (openAt === null) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
-      else if (e.key === "ArrowLeft") go(1); // RTL: left = next
+      else if (e.key === "ArrowLeft")
+        go(1); // RTL: left = next
       else if (e.key === "ArrowRight") go(-1); // RTL: right = prev
     };
     window.addEventListener("keydown", onKey);
@@ -170,7 +171,8 @@ function Lightbox({
       {/* Top bar */}
       <div className="flex items-center justify-between p-4 text-white">
         <span className="rounded-full bg-white/10 px-3 py-1 text-sm tabular-nums">
-          {(index + 1).toLocaleString("ar-EG-u-nu-latn")} / {images.length.toLocaleString("ar-EG-u-nu-latn")}
+          {(index + 1).toLocaleString("ar-EG-u-nu-latn")} /{" "}
+          {images.length.toLocaleString("ar-EG-u-nu-latn")}
         </span>
         <button
           ref={closeRef}

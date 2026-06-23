@@ -109,9 +109,7 @@ export function computeListingTrust(input: ListingTrustInput): TrustBreakdown {
   const reviewsNorm = clamp01(bayesianMean(reviews.map((r) => r.rating)) / 10);
   const tenureNorm =
     n > 0
-      ? clamp01(
-          reviews.reduce((s, r) => s + r.monthsLived, 0) / n / TRUST_TUNING.tenureCapMonths,
-        )
+      ? clamp01(reviews.reduce((s, r) => s + r.monthsLived, 0) / n / TRUST_TUNING.tenureCapMonths)
       : TRUST_TUNING.neutralTenure;
   const responsivenessNorm =
     typeof responseRate === "number"

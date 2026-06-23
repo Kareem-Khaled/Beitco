@@ -88,9 +88,7 @@ export function scoreMatch(p: Property, prof: RenterProfile): MatchResult {
       const lineOk =
         !prof.metroLines?.length || (metro.line ? prof.metroLines.includes(metro.line) : false);
       const walkOk =
-        !prof.maxWalkMinutes ||
-        metro.minutes === undefined ||
-        metro.minutes <= prof.maxWalkMinutes;
+        !prof.maxWalkMinutes || metro.minutes === undefined || metro.minutes <= prof.maxWalkMinutes;
       let pts = 12;
       if (!lineOk) pts -= 4;
       if (!walkOk) pts -= 4;

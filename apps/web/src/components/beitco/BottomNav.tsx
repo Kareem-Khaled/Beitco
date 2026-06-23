@@ -12,12 +12,9 @@ export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { data: threads = [] } = useThreads(user?.id);
 
-  const unread = user
-    ? threads.filter((t) => t.unreadFor === user.id).length
-    : 0;
+  const unread = user ? threads.filter((t) => t.unreadFor === user.id).length : 0;
 
-  const isActive = (to: string) =>
-    to === "/" ? pathname === "/" : pathname.startsWith(to);
+  const isActive = (to: string) => (to === "/" ? pathname === "/" : pathname.startsWith(to));
 
   return (
     <nav

@@ -168,7 +168,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           patch.notifications !== undefined ||
           patch.profile !== undefined
         ) {
-          apiUpdateMe(patch).catch(() => {/* keep optimistic state */});
+          apiUpdateMe(patch).catch(() => {
+            /* keep optimistic state */
+          });
         }
       } else {
         saveUser(next);

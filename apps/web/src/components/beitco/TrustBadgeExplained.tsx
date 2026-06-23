@@ -1,4 +1,13 @@
-import { ShieldCheck, Star, Users, MessageCircle, Activity, HelpCircle, Clock, Sparkles } from "lucide-react";
+import {
+  ShieldCheck,
+  Star,
+  Users,
+  MessageCircle,
+  Activity,
+  HelpCircle,
+  Clock,
+  Sparkles,
+} from "lucide-react";
 import { TrustBadge } from "./TrustBadge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { TrustBreakdown } from "@/lib/beitco/types";
@@ -36,7 +45,12 @@ export function TrustBadgeExplained({
   breakdown,
 }: TrustInputs) {
   // Legacy descriptive rows (used when no computed breakdown is supplied).
-  const rows: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; good: boolean }[] = [
+  const rows: {
+    icon: React.ComponentType<{ className?: string }>;
+    label: string;
+    value: string;
+    good: boolean;
+  }[] = [
     {
       icon: ShieldCheck,
       label: "التوثيق",
@@ -66,8 +80,7 @@ export function TrustBadgeExplained({
   // Largest contributor — highlighted as "أكتر حاجة رفعت الدرجة".
   const topKey = breakdown
     ? COMPONENT_META.reduce(
-        (best, m) =>
-          breakdown.components[m.key] > breakdown.components[best.key] ? m : best,
+        (best, m) => (breakdown.components[m.key] > breakdown.components[best.key] ? m : best),
         COMPONENT_META[0],
       ).key
     : null;
@@ -75,7 +88,11 @@ export function TrustBadgeExplained({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button type="button" className="inline-flex items-center gap-1" aria-label="ليه الدرجة دي؟">
+        <button
+          type="button"
+          className="inline-flex items-center gap-1"
+          aria-label="ليه الدرجة دي؟"
+        >
           <TrustBadge score={score} />
           <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
         </button>
@@ -118,11 +135,18 @@ export function TrustBadgeExplained({
                         ) : null}
                       </span>
                       <span className="font-medium tabular-nums text-trust">
-                        +{pts.toLocaleString("ar-EG-u-nu-latn", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+                        +
+                        {pts.toLocaleString("ar-EG-u-nu-latn", {
+                          minimumFractionDigits: 1,
+                          maximumFractionDigits: 1,
+                        })}
                       </span>
                     </div>
                     <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
-                      <div className="h-full rounded-full bg-trust/70" style={{ inlineSize: `${pct}%` }} />
+                      <div
+                        className="h-full rounded-full bg-trust/70"
+                        style={{ inlineSize: `${pct}%` }}
+                      />
                     </div>
                   </li>
                 );

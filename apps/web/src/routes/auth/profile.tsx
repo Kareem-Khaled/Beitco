@@ -38,10 +38,7 @@ function ProfilePage() {
   };
 
   return (
-    <AuthLayout
-      title="عرّفنا بنفسك"
-      subtitle="معلومتين بسيطتين عشان نقدر نخدمك صح."
-    >
+    <AuthLayout title="عرّفنا بنفسك" subtitle="معلومتين بسيطتين عشان نقدر نخدمك صح.">
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <div>
           <label htmlFor="name" className="mb-2 block text-sm font-medium">
@@ -61,16 +58,8 @@ function ProfilePage() {
         <div>
           <label className="mb-3 block text-sm font-medium">إنت</label>
           <div className="grid grid-cols-2 gap-3">
-            <GenderCard
-              label="شاب"
-              active={gender === "ذكر"}
-              onClick={() => setGender("ذكر")}
-            />
-            <GenderCard
-              label="بنت"
-              active={gender === "أنثى"}
-              onClick={() => setGender("أنثى")}
-            />
+            <GenderCard label="شاب" active={gender === "ذكر"} onClick={() => setGender("ذكر")} />
+            <GenderCard label="بنت" active={gender === "أنثى"} onClick={() => setGender("أنثى")} />
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
             بنستخدمها عشان نطابقك صح مع السكن المشترك (شباب مع شباب، بنات مع بنات).
@@ -78,9 +67,7 @@ function ProfilePage() {
         </div>
 
         <div>
-          <label className="mb-3 block text-sm font-medium">
-            انت هنا عشان إيه؟
-          </label>
+          <label className="mb-3 block text-sm font-medium">انت هنا عشان إيه؟</label>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <RoleCard
               icon={UserIcon}

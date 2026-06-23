@@ -45,7 +45,8 @@ function HomePage() {
             لاقي <span className="text-trust">بيتك</span> في مصر
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground sm:text-lg">
-            بتدوّر على شقة، أوضة، أو سرير — أو شقة للبيع؟ هتلاقي أماكن موثّقة، بأسعار واضحة وآراء ساكنين حقيقية.
+            بتدوّر على شقة، أوضة، أو سرير — أو شقة للبيع؟ هتلاقي أماكن موثّقة، بأسعار واضحة وآراء
+            ساكنين حقيقية.
           </p>
 
           <form

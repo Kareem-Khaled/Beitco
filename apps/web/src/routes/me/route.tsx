@@ -1,6 +1,14 @@
 import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { User as UserIcon, Heart, Inbox, KeyRound, Sparkles, SlidersHorizontal, Settings } from "lucide-react";
+import {
+  User as UserIcon,
+  Heart,
+  Inbox,
+  KeyRound,
+  Sparkles,
+  SlidersHorizontal,
+  Settings,
+} from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
 import { SiteHeader } from "@/components/beitco/SiteHeader";
 import { SiteFooter } from "@/components/beitco/SiteFooter";
@@ -10,7 +18,14 @@ export const Route = createFileRoute("/me")({
 });
 
 const items: {
-  to: "/me" | "/me/matches" | "/me/preferences" | "/me/saved" | "/me/applications" | "/me/tenancies" | "/me/settings";
+  to:
+    | "/me"
+    | "/me/matches"
+    | "/me/preferences"
+    | "/me/saved"
+    | "/me/applications"
+    | "/me/tenancies"
+    | "/me/settings";
   label: string;
   icon: typeof UserIcon;
   exact?: boolean;

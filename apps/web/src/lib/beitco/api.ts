@@ -157,7 +157,8 @@ async function patchJSON<T>(path: string, payload: unknown): Promise<Envelope<T>
     body: JSON.stringify(payload),
   });
   const body = (await res.json()) as Envelope<T>;
-  if (!res.ok || !body.success) throw new Error(body.error?.message ?? `Request failed (${res.status})`);
+  if (!res.ok || !body.success)
+    throw new Error(body.error?.message ?? `Request failed (${res.status})`);
   return body;
 }
 
@@ -168,7 +169,8 @@ async function delJSON<T>(path: string): Promise<Envelope<T>> {
     credentials: "include",
   });
   const body = (await res.json()) as Envelope<T>;
-  if (!res.ok || !body.success) throw new Error(body.error?.message ?? `Request failed (${res.status})`);
+  if (!res.ok || !body.success)
+    throw new Error(body.error?.message ?? `Request failed (${res.status})`);
   return body;
 }
 
@@ -188,7 +190,9 @@ export async function apiUpdateMe(
 }
 
 export async function apiToggleSaved(propertyId: string): Promise<boolean> {
-  const body = await postJSON<{ saved: boolean }>(`/properties/${encodeURIComponent(propertyId)}/save`);
+  const body = await postJSON<{ saved: boolean }>(
+    `/properties/${encodeURIComponent(propertyId)}/save`,
+  );
   return body.data.saved;
 }
 
@@ -245,10 +249,9 @@ export async function apiUpdateLeadStatus(
   id: string,
   status: import("./types").Lead["status"],
 ): Promise<import("./types").Lead> {
-  const body = await patchJSON<import("./types").Lead>(
-    `/leads/${encodeURIComponent(id)}/status`,
-    { status },
-  );
+  const body = await patchJSON<import("./types").Lead>(`/leads/${encodeURIComponent(id)}/status`, {
+    status,
+  });
   return body.data;
 }
 
@@ -309,7 +312,14 @@ type ListingPayload = {
   listingType?: "rent" | "sale";
   rentalMode?: "whole" | "by_room" | "by_bed";
   description?: string;
-  spec?: { unitType: string; bedrooms: number; bathrooms: number; floor?: number; sizeM2?: number; furnished: boolean };
+  spec?: {
+    unitType: string;
+    bedrooms: number;
+    bathrooms: number;
+    floor?: number;
+    sizeM2?: number;
+    furnished: boolean;
+  };
   wholePrice?: number;
   wholeStatus?: string;
   nightlyPrice?: number;
@@ -320,7 +330,14 @@ type ListingPayload = {
   images?: string[];
   amenities?: string[];
   costs?: { label: string; amount: number }[];
-  rooms?: { name: string; features: string[]; sizeM2?: number; price?: number; status?: string; beds?: { label: string; status: string; price: number; features?: string[] }[] }[];
+  rooms?: {
+    name: string;
+    features: string[];
+    sizeM2?: number;
+    price?: number;
+    status?: string;
+    beds?: { label: string; status: string; price: number; features?: string[] }[];
+  }[];
   nearby?: { type: string; name: string; line?: string; minutes?: number }[];
   customSpecs?: { label: string; value: string }[];
 };
@@ -361,9 +378,19 @@ function propertyToListingPayload(p: Property): ListingPayload {
       sizeM2: r.sizeM2,
       price: r.price,
       status: r.status,
-      beds: r.beds?.map((b) => ({ label: b.label, status: b.status, price: b.price, features: b.features })),
+      beds: r.beds?.map((b) => ({
+        label: b.label,
+        status: b.status,
+        price: b.price,
+        features: b.features,
+      })),
     })),
-    nearby: p.nearby?.map((n) => ({ type: n.type, name: n.name, line: n.line, minutes: n.minutes })),
+    nearby: p.nearby?.map((n) => ({
+      type: n.type,
+      name: n.name,
+      line: n.line,
+      minutes: n.minutes,
+    })),
     customSpecs: p.customSpecs?.map((c) => ({ label: c.label, value: c.value })),
   };
 }
@@ -430,9 +457,10 @@ export async function apiRejectListing(id: string, reason: string): Promise<void
 export async function apiGetMatches(): Promise<
   { property: import("./types").PropertySummary; match: import("./matching").MatchResult }[]
 > {
-  const body = await getJSON<
-    { property: import("./types").PropertySummary; match: import("./matching").MatchResult }[]
-  >("/me/matches");
+  const body =
+    await getJSON<
+      { property: import("./types").PropertySummary; match: import("./matching").MatchResult }[]
+    >("/me/matches");
   return body.data;
 }
 

@@ -2,13 +2,47 @@ import { createFileRoute, Link, notFound, useNavigate, useRouter } from "@tansta
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  MapPin, ShieldCheck, Star, Users, Wifi, Snowflake, WashingMachine,
-  Microwave, Refrigerator, ArrowUpDown, Car, Lock, Sofa, Coffee,
-  MessageCircle, Heart, Share2, ChevronRight, BedDouble, CheckCircle2, HelpCircle, Pencil,
-  DoorOpen, Home, Bath, Layers, Maximize,
-  TrainFront, GraduationCap, Bus, ShoppingBag, Stethoscope, Store, Sparkles, Footprints,
-  Mars, Venus,
-  CalendarDays, Check, ThumbsUp, CornerDownLeft,
+  MapPin,
+  ShieldCheck,
+  Star,
+  Users,
+  Wifi,
+  Snowflake,
+  WashingMachine,
+  Microwave,
+  Refrigerator,
+  ArrowUpDown,
+  Car,
+  Lock,
+  Sofa,
+  Coffee,
+  MessageCircle,
+  Heart,
+  Share2,
+  ChevronRight,
+  BedDouble,
+  CheckCircle2,
+  HelpCircle,
+  Pencil,
+  DoorOpen,
+  Home,
+  Bath,
+  Layers,
+  Maximize,
+  TrainFront,
+  GraduationCap,
+  Bus,
+  ShoppingBag,
+  Stethoscope,
+  Store,
+  Sparkles,
+  Footprints,
+  Mars,
+  Venus,
+  CalendarDays,
+  Check,
+  ThumbsUp,
+  CornerDownLeft,
 } from "lucide-react";
 import { SiteHeader } from "@/components/beitco/SiteHeader";
 import { SiteFooter } from "@/components/beitco/SiteFooter";
@@ -21,7 +55,19 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { getProperty, timeAgo, formatDate } from "@/lib/beitco/store";
 import { USE_API, apiGetProperty } from "@/lib/beitco/api";
-import { useSavedListings, toggleSavedListing, submitLead, submitQuestion, submitAnswer, useReviewMeta, submitReview, toggleHelpful, replyReview, startThread, sendChatMessage } from "@/lib/beitco/queries";
+import {
+  useSavedListings,
+  toggleSavedListing,
+  submitLead,
+  submitQuestion,
+  submitAnswer,
+  useReviewMeta,
+  submitReview,
+  toggleHelpful,
+  replyReview,
+  startThread,
+  sendChatMessage,
+} from "@/lib/beitco/queries";
 import { useAuth } from "@/lib/beitco/auth";
 import { toast } from "sonner";
 import { ViewingRequestDialog } from "@/components/beitco/ViewingRequestDialog";
@@ -48,13 +94,16 @@ export const Route = createFileRoute("/property/$id")({
       return {
         meta: [
           { title: "بيت — بيتكو" },
-          { name: "description", content: "سكن متأكدين منه، بآراء حقيقية ومعلومات عن المنطقة على بيتكو." },
+          {
+            name: "description",
+            content: "سكن متأكدين منه، بآراء حقيقية ومعلومات عن المنطقة على بيتكو.",
+          },
         ],
       };
     }
     const kind = p.listingType === "sale" ? "للبيع" : "للإيجار";
     const title = `${p.title} — ${p.area} | بيتكو`;
-    const priceNum = p.listingType === "sale" ? p.salePrice ?? p.price : p.priceFrom ?? p.price;
+    const priceNum = p.listingType === "sale" ? (p.salePrice ?? p.price) : (p.priceFrom ?? p.price);
     const price = priceNum.toLocaleString("ar-EG-u-nu-latn");
     const unit = p.listingType === "sale" ? "ج.م" : "ج.م/شهر";
     const description = `${p.type} ${kind} في ${p.area} — ${price} ${unit}. درجة الثقة ${p.trust.toFixed(1)}، ${p.reviewsCount.toLocaleString("ar-EG-u-nu-latn")} رأي من ساكنين حقيقيين على بيتكو.`;
@@ -79,15 +128,15 @@ export const Route = createFileRoute("/property/$id")({
 });
 
 const amenityIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-  "نت": Wifi,
-  "تكييف": Snowflake,
-  "غسالة": WashingMachine,
-  "ميكروويف": Microwave,
-  "تلاجة": Refrigerator,
-  "أسانسير": ArrowUpDown,
-  "جراج": Car,
-  "أمن": Lock,
-  "مفروشة": Sofa,
+  نت: Wifi,
+  تكييف: Snowflake,
+  غسالة: WashingMachine,
+  ميكروويف: Microwave,
+  تلاجة: Refrigerator,
+  أسانسير: ArrowUpDown,
+  جراج: Car,
+  أمن: Lock,
+  مفروشة: Sofa,
   "مطبخ مشترك": Coffee,
   "نضافة أسبوعية": Sofa,
   "مكان شغل": Sofa,
@@ -116,7 +165,7 @@ function PropertyPage() {
 // price, trust) but the real details (reviews, owner, rooms, contact) are gated.
 function PropertyGate({ p }: { p: Property }) {
   const isSale = p.listingType === "sale";
-  const price = (isSale ? p.salePrice ?? p.price : p.priceFrom ?? p.price).toLocaleString(
+  const price = (isSale ? (p.salePrice ?? p.price) : (p.priceFrom ?? p.price)).toLocaleString(
     "ar-EG-u-nu-latn",
   );
   return (
@@ -224,7 +273,11 @@ function PropertyDetail() {
     if (!requireAuth() || !user) return;
     const t = await startThread(p.id, user.id);
     if (t.messages.length === 0) {
-      await sendChatMessage(t.id, user.id, `أهلاً، أنا مهتم بـ "${p.title}". ممكن أعرف تفاصيل أكتر؟`);
+      await sendChatMessage(
+        t.id,
+        user.id,
+        `أهلاً، أنا مهتم بـ "${p.title}". ممكن أعرف تفاصيل أكتر؟`,
+      );
     }
     navigate({ to: "/messages/$threadId", params: { threadId: t.id } });
   };
@@ -279,9 +332,7 @@ function PropertyDetail() {
 
       const count = units.length;
       const header =
-        count === 1
-          ? "طلبت أحجز:"
-          : `طلبت أحجز ${count.toLocaleString("ar-EG-u-nu-latn")} وحدات:`;
+        count === 1 ? "طلبت أحجز:" : `طلبت أحجز ${count.toLocaleString("ar-EG-u-nu-latn")} وحدات:`;
       const totalLine = total
         ? `\nالإجمالي: ${total.toLocaleString("ar-EG-u-nu-latn")} ج.م/شهر`
         : "";
@@ -329,7 +380,9 @@ function PropertyDetail() {
 
   const [reviewOpen, setReviewOpen] = useState(false);
   const [questionOpen, setQuestionOpen] = useState(false);
-  const [reviewSort, setReviewSort] = useState<"newest" | "highest" | "lowest" | "helpful">("newest");
+  const [reviewSort, setReviewSort] = useState<"newest" | "highest" | "lowest" | "helpful">(
+    "newest",
+  );
   const [, force] = useState(0);
   const refresh = () => force((x) => x + 1);
   // After a Q&A/review mutation: mock re-reads the store via a local re-render;
@@ -344,9 +397,7 @@ function PropertyDetail() {
   const { data: reviewMeta } = useReviewMeta(p.id, user?.id);
   const eligibleToReview = reviewMeta?.canReview ?? false;
   const votedReviewIds = reviewMeta?.votedReviewIds ?? [];
-  const alreadyReviewed = user
-    ? p.reviews.some((r) => r.author === user.name)
-    : false;
+  const alreadyReviewed = user ? p.reviews.some((r) => r.author === user.name) : false;
 
   // After a review mutation: re-read the property (loader/store) and refresh the
   // per-user review meta (helpful-vote state, eligibility).
@@ -404,7 +455,10 @@ function PropertyDetail() {
 
       <main className="mx-auto max-w-7xl px-4 pb-24 pt-6 sm:px-6 lg:px-8">
         {/* Back */}
-        <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+        >
           <ChevronRight className="h-4 w-4" /> ارجع للاستكشاف
         </Link>
 
@@ -412,7 +466,9 @@ function PropertyDetail() {
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium">{p.type}</span>
+              <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium">
+                {p.type}
+              </span>
               {isSale && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-accent-foreground">
                   للبيع
@@ -439,12 +495,17 @@ function PropertyDetail() {
               )}
               <TrustBadge score={p.trust} />
             </div>
-            <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight sm:text-3xl">{p.title}</h1>
+            <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight sm:text-3xl">
+              {p.title}
+            </h1>
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
               <span className="inline-flex items-center gap-1">
                 <MapPin className="h-4 w-4" /> {p.address}
               </span>
-              <span className="inline-flex items-center gap-1" title={`اتنشر ${formatDate(p.createdAt)}`}>
+              <span
+                className="inline-flex items-center gap-1"
+                title={`اتنشر ${formatDate(p.createdAt)}`}
+              >
                 <CalendarDays className="h-4 w-4" /> اتنشر {timeAgo(p.createdAt)}
               </span>
             </div>
@@ -461,7 +522,8 @@ function PropertyDetail() {
               </Button>
             ) : null}
             <Button variant="ghost" size="sm" className="gap-1.5" onClick={onShare}>
-              <Share2 className="h-4 w-4" />شير
+              <Share2 className="h-4 w-4" />
+              شير
             </Button>
             <Button variant="ghost" size="sm" className="gap-1.5" onClick={onSave}>
               <Heart className={`h-4 w-4 ${saved ? "fill-red-500 text-red-500" : ""}`} />
@@ -490,10 +552,19 @@ function PropertyDetail() {
                 />
               </div>
               <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                <Stat icon={ShieldCheck} label="التوثيق" value={p.verified ? "موثّق" : "لسه بيتراجع"} tone={p.verified ? "trust" : "muted"} />
+                <Stat
+                  icon={ShieldCheck}
+                  label="التوثيق"
+                  value={p.verified ? "موثّق" : "لسه بيتراجع"}
+                  tone={p.verified ? "trust" : "muted"}
+                />
                 <Stat icon={Star} label="الآراء" value={String(p.reviewsCount)} />
                 <Stat icon={Users} label="ساكنين قبل كده" value={String(p.residents)} />
-                <Stat icon={MessageCircle} label="بيرد بسرعة" value={`${p.landlord.responseRate}%`} />
+                <Stat
+                  icon={MessageCircle}
+                  label="بيرد بسرعة"
+                  value={`${p.landlord.responseRate}%`}
+                />
               </div>
             </section>
 
@@ -502,7 +573,9 @@ function PropertyDetail() {
               <div className="flex items-baseline justify-between">
                 <h2 className="font-display text-lg font-semibold">جودة السكن</h2>
                 <span className="text-sm text-muted-foreground">
-                  المتوسط <span className="font-semibold text-foreground">{avgQuality.toFixed(1)}</span> · من تقييم الساكنين
+                  المتوسط{" "}
+                  <span className="font-semibold text-foreground">{avgQuality.toFixed(1)}</span> ·
+                  من تقييم الساكنين
                 </span>
               </div>
               <div className="mt-5 grid grid-cols-1 gap-x-8 gap-y-4 rounded-2xl border border-border bg-surface p-6 sm:grid-cols-2">
@@ -517,7 +590,9 @@ function PropertyDetail() {
             {/* Description */}
             <section>
               <h2 className="font-display text-lg font-semibold">عن المكان ده</h2>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">{p.description}</p>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
+                {p.description}
+              </p>
             </section>
 
             {/* Amenities */}
@@ -527,7 +602,10 @@ function PropertyDetail() {
                 {p.amenities.map((a) => {
                   const Icon = iconFor(a);
                   return (
-                    <div key={a} className="flex items-center gap-3 rounded-xl border border-border bg-surface p-3">
+                    <div
+                      key={a}
+                      className="flex items-center gap-3 rounded-xl border border-border bg-surface p-3"
+                    >
                       <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-trust-soft text-primary">
                         <Icon className="h-4 w-4" />
                       </span>
@@ -603,7 +681,8 @@ function PropertyDetail() {
                     </Button>
                   ) : (
                     <p className="rounded-xl border border-dashed border-border bg-surface px-4 py-2.5 text-xs text-muted-foreground">
-                      عشان تقدر تكتب رأيك، لازم تكون قعدت في المكان ده 30 يوم على الأقل. ده بيخلّي الآراء موثوقة.
+                      عشان تقدر تكتب رأيك، لازم تكون قعدت في المكان ده 30 يوم على الأقل. ده بيخلّي
+                      الآراء موثوقة.
                     </p>
                   )}
                 </div>
@@ -618,12 +697,14 @@ function PropertyDetail() {
 
                 {p.reviews.length > 1 && (
                   <div className="flex flex-wrap gap-1.5">
-                    {([
-                      { id: "newest", label: "الأحدث" },
-                      { id: "highest", label: "الأعلى تقييم" },
-                      { id: "lowest", label: "الأقل تقييم" },
-                      { id: "helpful", label: "الأكثر إفادة" },
-                    ] as const).map((o) => (
+                    {(
+                      [
+                        { id: "newest", label: "الأحدث" },
+                        { id: "highest", label: "الأعلى تقييم" },
+                        { id: "lowest", label: "الأقل تقييم" },
+                        { id: "helpful", label: "الأكثر إفادة" },
+                      ] as const
+                    ).map((o) => (
                       <button
                         key={o.id}
                         type="button"
@@ -666,7 +747,8 @@ function PropertyDetail() {
               <div className="flex items-baseline justify-between">
                 <h2 className="font-display text-lg font-semibold">أسئلة وأجوبة</h2>
                 <Button size="sm" variant="ghost" className="gap-1.5" onClick={onOpenQuestion}>
-                  <HelpCircle className="h-4 w-4" />اسأل سؤال
+                  <HelpCircle className="h-4 w-4" />
+                  اسأل سؤال
                 </Button>
               </div>
               <div className="mt-5 flex flex-col gap-3">
@@ -678,7 +760,9 @@ function PropertyDetail() {
                 {p.qa.map((q) => (
                   <article key={q.id} className="rounded-2xl border border-border bg-surface p-5">
                     <div className="text-sm font-medium">{q.q}</div>
-                    <div className="mt-1 text-xs text-muted-foreground">سأل {q.asker} · {q.date}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      سأل {q.asker} · {q.date}
+                    </div>
                     {q.a ? (
                       <div className="mt-3 rounded-xl bg-trust-soft p-3 text-sm">
                         <div className="text-xs font-semibold text-primary">{q.answerer}</div>
@@ -710,7 +794,9 @@ function PropertyDetail() {
                     {!isSale && p.rentalMode && p.rentalMode !== "whole" && (
                       <span className="text-sm font-normal text-muted-foreground">يبدأ من </span>
                     )}
-                    {(isSale ? p.salePrice ?? p.price : p.priceFrom ?? p.price).toLocaleString("ar-EG-u-nu-latn")}
+                    {(isSale ? (p.salePrice ?? p.price) : (p.priceFrom ?? p.price)).toLocaleString(
+                      "ar-EG-u-nu-latn",
+                    )}
                     <span className="ms-1 text-sm font-normal text-muted-foreground">
                       {isSale ? "ج.م" : "ج.م / شهر"}
                     </span>
@@ -721,10 +807,10 @@ function PropertyDetail() {
                         ? "السعر قابل للتفاوض"
                         : "السعر الإجمالي للشقة"
                       : p.rentalMode === "by_bed"
-                      ? "سعر أرخص سرير فاضي — تحت تفاصيل كل سرير"
-                      : p.rentalMode === "by_room"
-                        ? "سعر أرخص أوضة فاضية — تحت تفاصيل كل أوضة"
-                        : "الإيجار الأساسي — تحت هتلاقي التفاصيل كاملة"}
+                        ? "سعر أرخص سرير فاضي — تحت تفاصيل كل سرير"
+                        : p.rentalMode === "by_room"
+                          ? "سعر أرخص أوضة فاضية — تحت تفاصيل كل أوضة"
+                          : "الإيجار الأساسي — تحت هتلاقي التفاصيل كاملة"}
                   </div>
                   {!isSale && p.nightlyPrice ? (
                     <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-trust-soft px-2 py-0.5 text-xs font-medium text-trust">
@@ -736,11 +822,27 @@ function PropertyDetail() {
               </div>
 
               <div className="mt-5 flex flex-col gap-2">
-                <Button size="lg" className="w-full rounded-xl" onClick={() => (requireAuth() ? setViewingOpen(true) : null)}>اطلب معاينة</Button>
-                <Button size="lg" variant="outline" className="w-full rounded-xl gap-2" onClick={onMessageOwner}>
+                <Button
+                  size="lg"
+                  className="w-full rounded-xl"
+                  onClick={() => (requireAuth() ? setViewingOpen(true) : null)}
+                >
+                  اطلب معاينة
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full rounded-xl gap-2"
+                  onClick={onMessageOwner}
+                >
                   <MessageCircle className="h-4 w-4" /> كلّم صاحب الشقة
                 </Button>
-                <Button size="sm" variant="ghost" className="w-full gap-2 text-muted-foreground" onClick={onSave}>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="w-full gap-2 text-muted-foreground"
+                  onClick={onSave}
+                >
                   <Heart className={`h-4 w-4 ${saved ? "fill-red-500 text-red-500" : ""}`} />
                   {saved ? "محفوظة" : "احفظها"}
                 </Button>
@@ -757,7 +859,9 @@ function PropertyDetail() {
                       <li key={c.label} className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">{c.label}</span>
                         <span className="tabular-nums">
-                          {c.amount === 0 ? "محسوبة في السعر" : `${c.amount.toLocaleString("ar-EG-u-nu-latn")} ج.م`}
+                          {c.amount === 0
+                            ? "محسوبة في السعر"
+                            : `${c.amount.toLocaleString("ar-EG-u-nu-latn")} ج.م`}
                         </span>
                       </li>
                     ))}
@@ -903,15 +1007,29 @@ function Stat({
 
 function SpecsSection({ p }: { p: Property }) {
   const s = p.spec!;
-  const items: { icon: React.ComponentType<{ className?: string }>; label: string; value: string }[] = [
+  const items: {
+    icon: React.ComponentType<{ className?: string }>;
+    label: string;
+    value: string;
+  }[] = [
     { icon: Home, label: "النوع", value: s.unitType },
-    { icon: DoorOpen, label: "الأوض", value: `${s.bedrooms.toLocaleString("ar-EG-u-nu-latn")} أوض` },
+    {
+      icon: DoorOpen,
+      label: "الأوض",
+      value: `${s.bedrooms.toLocaleString("ar-EG-u-nu-latn")} أوض`,
+    },
     { icon: Bath, label: "الحمّامات", value: s.bathrooms.toLocaleString("ar-EG-u-nu-latn") },
     ...(s.floor != null
       ? [{ icon: Layers, label: "الدور", value: s.floor.toLocaleString("ar-EG-u-nu-latn") }]
       : []),
     ...(s.sizeM2 != null
-      ? [{ icon: Maximize, label: "المساحة", value: `${s.sizeM2.toLocaleString("ar-EG-u-nu-latn")} م²` }]
+      ? [
+          {
+            icon: Maximize,
+            label: "المساحة",
+            value: `${s.sizeM2.toLocaleString("ar-EG-u-nu-latn")} م²`,
+          },
+        ]
       : []),
     { icon: Sofa, label: "الفرش", value: s.furnished ? "مفروشة" : "فاضية" },
     // Owner-defined extra specs render alongside the standard ones.
@@ -950,11 +1068,11 @@ function SpecsSection({ p }: { p: Property }) {
 // ───────────────────────── Nearby & transit ─────────────────────────
 
 const NEARBY_ICONS: Record<NearbyType, React.ComponentType<{ className?: string }>> = {
-  "مترو": TrainFront,
-  "جامعة": GraduationCap,
-  "مواصلات": Bus,
-  "مول": ShoppingBag,
-  "مستشفى": Stethoscope,
+  مترو: TrainFront,
+  جامعة: GraduationCap,
+  مواصلات: Bus,
+  مول: ShoppingBag,
+  مستشفى: Stethoscope,
   "سوبر ماركت": Store,
   "حاجة تانية": MapPin,
 };
@@ -1138,13 +1256,15 @@ function RoomsSection({
           </h2>
         </div>
         <span className="text-sm text-muted-foreground">
-          فاضي {available.toLocaleString("ar-EG-u-nu-latn")} من {total.toLocaleString("ar-EG-u-nu-latn")}
+          فاضي {available.toLocaleString("ar-EG-u-nu-latn")} من{" "}
+          {total.toLocaleString("ar-EG-u-nu-latn")}
         </span>
       </div>
 
       {canBook && available > 0 && (
         <p className="mt-2 text-xs text-muted-foreground">
-          اختار {isBed ? "السرير أو الأسرّة" : "الأوضة أو الأوض"} اللي عايزها — تقدر تختار أكتر من واحد.
+          اختار {isBed ? "السرير أو الأسرّة" : "الأوضة أو الأوض"} اللي عايزها — تقدر تختار أكتر من
+          واحد.
         </p>
       )}
 
@@ -1220,7 +1340,9 @@ function RoomsSection({
                           <UnitBadge status={bed.status} />
                           <span className="font-display text-sm font-semibold tabular-nums">
                             {bed.price.toLocaleString("ar-EG-u-nu-latn")}{" "}
-                            <span className="text-[11px] font-normal text-muted-foreground">ج.م</span>
+                            <span className="text-[11px] font-normal text-muted-foreground">
+                              ج.م
+                            </span>
                           </span>
                         </div>
                       </>
@@ -1385,7 +1507,9 @@ function ReviewCard({
       {/* Owner reply */}
       {review.ownerReply && (
         <div className="mt-3 rounded-xl border-s-2 border-trust bg-trust-soft/50 p-3">
-          <div className="text-xs font-semibold text-trust">ردّ صاحب البيت · {review.ownerReply.date}</div>
+          <div className="text-xs font-semibold text-trust">
+            ردّ صاحب البيت · {review.ownerReply.date}
+          </div>
           <p className="mt-1 text-sm text-foreground">{review.ownerReply.body}</p>
         </div>
       )}

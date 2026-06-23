@@ -37,10 +37,7 @@ function LoginPage() {
   };
 
   return (
-    <AuthLayout
-      title="ادخل حسابك"
-      subtitle="هنبعتلك كود على الموبايل عشان نتأكد إنك انت."
-    >
+    <AuthLayout title="ادخل حسابك" subtitle="هنبعتلك كود على الموبايل عشان نتأكد إنك انت.">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label htmlFor="phone" className="mb-2 block text-sm font-medium">

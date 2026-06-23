@@ -35,9 +35,7 @@ export function EmptyState({
         <Icon className={compact ? "h-6 w-6" : "h-8 w-8"} />
       </span>
       <h3 className={`font-display font-semibold ${compact ? "text-base" : "text-lg"}`}>{title}</h3>
-      {hint ? (
-        <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">{hint}</p>
-      ) : null}
+      {hint ? <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">{hint}</p> : null}
       {action ? <div className="mt-4">{action}</div> : null}
     </div>
   );

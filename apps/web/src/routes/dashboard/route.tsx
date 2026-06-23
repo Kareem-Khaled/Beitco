@@ -12,7 +12,17 @@ export const Route = createFileRoute("/dashboard")({
   component: DashboardLayout,
 });
 
-const items: { to: "/dashboard" | "/dashboard/listings" | "/dashboard/leads" | "/dashboard/reviews" | "/dashboard/verify"; label: string; icon: typeof Home; exact?: boolean }[] = [
+const items: {
+  to:
+    | "/dashboard"
+    | "/dashboard/listings"
+    | "/dashboard/leads"
+    | "/dashboard/reviews"
+    | "/dashboard/verify";
+  label: string;
+  icon: typeof Home;
+  exact?: boolean;
+}[] = [
   { to: "/dashboard", label: "نظرة عامة", icon: Home, exact: true },
   { to: "/dashboard/listings", label: "شققي", icon: ListChecks },
   { to: "/dashboard/leads", label: "طلبات المعاينة", icon: Inbox },

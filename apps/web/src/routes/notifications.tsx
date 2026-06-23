@@ -85,17 +85,25 @@ function NotificationsPage() {
                     unread ? "border-primary/40" : "border-border"
                   }`}
                 >
-                  <span className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${m.tone}`}>
+                  <span
+                    className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${m.tone}`}
+                  >
                     <Icon className="h-5 w-5" />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
                       <p className="truncate text-base font-semibold text-foreground">{n.title}</p>
-                      <span className="shrink-0 text-xs text-muted-foreground">{timeAgo(n.date)}</span>
+                      <span className="shrink-0 text-xs text-muted-foreground">
+                        {timeAgo(n.date)}
+                      </span>
                     </div>
-                    <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{n.body}</p>
+                    <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                      {n.body}
+                    </p>
                   </div>
-                  {unread ? <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-primary" /> : null}
+                  {unread ? (
+                    <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-primary" />
+                  ) : null}
                 </div>
               );
 

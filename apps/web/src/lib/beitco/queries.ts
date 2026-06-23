@@ -86,7 +86,19 @@ import {
   apiMarkNotificationsSeen,
   USE_API,
 } from "./api";
-import type { Property, PropertySummary, SavedSearch, SavedSearchParams, Lead, Review, Occupant, BedStatus, SaleStatus, Thread, Message } from "./types";
+import type {
+  Property,
+  PropertySummary,
+  SavedSearch,
+  SavedSearchParams,
+  Lead,
+  Review,
+  Occupant,
+  BedStatus,
+  SaleStatus,
+  Thread,
+  Message,
+} from "./types";
 import type { MatchResult } from "./matching";
 
 // Home + search consume the full published set (they filter/sort client-side).
@@ -146,8 +158,7 @@ export function useSavedSearches(userId: string | undefined) {
       if (!userId) return [];
       return getSavedSearches(userId);
     },
-    initialData:
-      USE_API || !userId ? undefined : () => getSavedSearches(userId),
+    initialData: USE_API || !userId ? undefined : () => getSavedSearches(userId),
     staleTime: USE_API ? 15_000 : Infinity,
   });
 }
@@ -182,8 +193,7 @@ export function useRenterLeads(userId: string | undefined) {
       if (!userId) return [];
       return getLeadsForRenter(userId);
     },
-    initialData:
-      USE_API || !userId ? undefined : () => getLeadsForRenter(userId),
+    initialData: USE_API || !userId ? undefined : () => getLeadsForRenter(userId),
     staleTime: USE_API ? 15_000 : Infinity,
   });
 }
@@ -191,9 +201,7 @@ export function useRenterLeads(userId: string | undefined) {
 // Create a viewing/booking request. Same input shape as the mock store's
 // createLead so call sites barely change; the API ignores renterId/renterName
 // (taken from the session) and reads propertyId from the URL.
-export async function submitLead(
-  input: Omit<Lead, "id" | "createdAt" | "status">,
-): Promise<Lead> {
+export async function submitLead(input: Omit<Lead, "id" | "createdAt" | "status">): Promise<Lead> {
   if (USE_API) {
     return apiCreateLead(input.propertyId, {
       intent: input.intent,
@@ -249,7 +257,10 @@ export function useReviewMeta(propertyId: string, userId: string | undefined) {
     queryFn: async () => {
       if (USE_API) return apiGetReviewMeta(propertyId);
       if (!userId) return { canReview: false, votedReviewIds: [] };
-      return { canReview: canUserReview(userId, propertyId), votedReviewIds: getVotedReviewIds(userId) };
+      return {
+        canReview: canUserReview(userId, propertyId),
+        votedReviewIds: getVotedReviewIds(userId),
+      };
     },
     initialData:
       USE_API || !userId
@@ -312,8 +323,7 @@ export function useOwnerProperties(userId: string | undefined) {
       if (!userId) return [];
       return getPropertiesByOwner(userId);
     },
-    initialData:
-      USE_API || !userId ? undefined : () => getPropertiesByOwner(userId),
+    initialData: USE_API || !userId ? undefined : () => getPropertiesByOwner(userId),
     staleTime: USE_API ? 15_000 : Infinity,
   });
 }
@@ -424,8 +434,7 @@ export function useOwnerLeads(userId: string | undefined) {
       if (!userId) return [];
       return getLeadsForOwner(userId);
     },
-    initialData:
-      USE_API || !userId ? undefined : () => getLeadsForOwner(userId),
+    initialData: USE_API || !userId ? undefined : () => getLeadsForOwner(userId),
     staleTime: USE_API ? 15_000 : Infinity,
   });
 }
@@ -448,7 +457,11 @@ export async function submitRenterReview(
   },
 ): Promise<void> {
   if (USE_API) {
-    await apiReviewRenter(renterId, { rating: input.rating, body: input.body, scores: input.scores });
+    await apiReviewRenter(renterId, {
+      rating: input.rating,
+      body: input.body,
+      scores: input.scores,
+    });
     return;
   }
   storePostRenterReview(ownerId, renterId, input);
@@ -514,8 +527,7 @@ export function useMatches(userId: string | undefined) {
       if (!userId) return [];
       return getMatchesForUser(userId);
     },
-    initialData:
-      USE_API || !userId ? undefined : () => getMatchesForUser(userId),
+    initialData: USE_API || !userId ? undefined : () => getMatchesForUser(userId),
     staleTime: USE_API ? 30_000 : Infinity,
   });
 }
@@ -571,9 +583,15 @@ export async function sendChatMessage(
 
 // Normalized property summary for a thread (flag-agnostic): API embeds it on the
 // thread; mock derives it from the store. Keeps the messages pages on one path.
-export function threadPropertyOf(
-  thread: Thread,
-): { id: string; title: string; image: string; area: string; landlord: { name: string; initials: string; verified: boolean } } | undefined {
+export function threadPropertyOf(thread: Thread):
+  | {
+      id: string;
+      title: string;
+      image: string;
+      area: string;
+      landlord: { name: string; initials: string; verified: boolean };
+    }
+  | undefined {
   if (USE_API) return thread.property;
   const p = getProperty(thread.propertyId);
   if (!p) return undefined;
@@ -582,7 +600,11 @@ export function threadPropertyOf(
     title: p.title,
     image: p.image,
     area: p.area,
-    landlord: { name: p.landlord.name, initials: p.landlord.initials, verified: p.landlord.verified },
+    landlord: {
+      name: p.landlord.name,
+      initials: p.landlord.initials,
+      verified: p.landlord.verified,
+    },
   };
 }
 
@@ -601,7 +623,10 @@ export function useNotifications(userId: string | undefined) {
     initialData:
       USE_API || !userId
         ? undefined
-        : () => ({ items: getNotificationsForUser(userId), lastSeen: getLastSeenNotifications(userId) }),
+        : () => ({
+            items: getNotificationsForUser(userId),
+            lastSeen: getLastSeenNotifications(userId),
+          }),
     staleTime: USE_API ? 20_000 : Infinity,
   });
 }
@@ -625,5 +650,3 @@ export async function markNotificationsSeen(userId: string): Promise<void> {
   if (USE_API) return apiMarkNotificationsSeen();
   storeMarkNotificationsSeen(userId);
 }
-
-

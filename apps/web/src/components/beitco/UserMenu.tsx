@@ -1,6 +1,17 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { LogOut, LayoutDashboard, User as UserIcon, Heart, MessageCircle, Plus, Bell, Settings, Sun, Moon } from "lucide-react";
+import {
+  LogOut,
+  LayoutDashboard,
+  User as UserIcon,
+  Heart,
+  MessageCircle,
+  Plus,
+  Bell,
+  Settings,
+  Sun,
+  Moon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -131,12 +142,20 @@ export function UserMenu() {
             <Settings className="me-2 h-4 w-4" />
             الإعدادات
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={(e) => { e.preventDefault(); toggleDark(); }}>
+          <DropdownMenuItem
+            onSelect={(e) => {
+              e.preventDefault();
+              toggleDark();
+            }}
+          >
             {isDark ? <Sun className="me-2 h-4 w-4" /> : <Moon className="me-2 h-4 w-4" />}
             {isDark ? "بيتكو بالنهاري" : "بيتكو بالليل"}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+          <DropdownMenuItem
+            onClick={handleLogout}
+            className="text-destructive focus:text-destructive"
+          >
             <LogOut className="me-2 h-4 w-4" />
             اخرج من الحساب
           </DropdownMenuItem>

@@ -1,14 +1,29 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState, useEffect } from "react";
-import { Search, X, BedDouble, ShieldCheck, SlidersHorizontal, BookmarkPlus, BookmarkCheck, SearchX, Moon } from "lucide-react";
+import {
+  Search,
+  X,
+  BedDouble,
+  ShieldCheck,
+  SlidersHorizontal,
+  BookmarkPlus,
+  BookmarkCheck,
+  SearchX,
+  Moon,
+} from "lucide-react";
 import { z } from "zod";
 import { SiteHeader } from "@/components/beitco/SiteHeader";
 import { SiteFooter } from "@/components/beitco/SiteFooter";
 import { BeitcoListingCard } from "@/components/beitco/BeitcoListingCard";
 import { EmptyState } from "@/components/beitco/EmptyState";
 import { EGYPT_AREAS } from "@/lib/beitco/store";
-import { usePublishedProperties, useSavedSearches, createSavedSearch, alreadySavedIn } from "@/lib/beitco/queries";
+import {
+  usePublishedProperties,
+  useSavedSearches,
+  createSavedSearch,
+  alreadySavedIn,
+} from "@/lib/beitco/queries";
 import { useAuth } from "@/lib/beitco/auth";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -80,8 +95,7 @@ function SearchPage() {
       );
     }
     if (params.type) list = list.filter((p) => p.type === params.type);
-    if (params.purpose)
-      list = list.filter((p) => (p.listingType ?? "rent") === params.purpose);
+    if (params.purpose) list = list.filter((p) => (p.listingType ?? "rent") === params.purpose);
     if (params.gender) list = list.filter((p) => p.rentToGender === params.gender);
     if (params.area) list = list.filter((p) => p.area.includes(params.area!));
     if (params.freeOnly) list = list.filter((p) => p.beds.available > 0);
@@ -343,9 +357,7 @@ function SearchPage() {
             {hasFilters && filtered.length > 0 ? (
               <div
                 className={`mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-3.5 transition-colors ${
-                  alreadySaved
-                    ? "border-trust/30 bg-trust-soft/50"
-                    : "border-border bg-card"
+                  alreadySaved ? "border-trust/30 bg-trust-soft/50" : "border-border bg-card"
                 }`}
               >
                 <div className="flex items-center gap-3">

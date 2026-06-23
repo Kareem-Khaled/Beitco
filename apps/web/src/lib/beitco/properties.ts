@@ -48,7 +48,13 @@ export type PropertyDetail = {
   amenities: string[];
   costs: { label: string; amount: number }[];
   beds?: { total: number; occupied: number };
-  landlord: { name: string; initials: string; trust: number; responseRate: number; verified: boolean };
+  landlord: {
+    name: string;
+    initials: string;
+    trust: number;
+    responseRate: number;
+    verified: boolean;
+  };
   reviews: Review[];
   qa: QA[];
 };
@@ -102,8 +108,7 @@ const sample: Record<string, PropertyDetail> = {
         monthsLived: 11,
         rating: 9.4,
         date: "مارس 2026",
-        body:
-          "بصراحة من أهدى الشوارع في التجمع الخامس. النت ما بيقطعش وانت في الميتنجات، التكييف شغّال في كل الأوض، ومصطفى بيصلّح أي حاجة في يوم واحد.",
+        body: "بصراحة من أهدى الشوارع في التجمع الخامس. النت ما بيقطعش وانت في الميتنجات، التكييف شغّال في كل الأوض، ومصطفى بيصلّح أي حاجة في يوم واحد.",
       },
       {
         id: "r2",
@@ -112,8 +117,7 @@ const sample: Record<string, PropertyDetail> = {
         monthsLived: 6,
         rating: 9.0,
         date: "يناير 2026",
-        body:
-          "السعر ممتاز بالنسبة للمنطقة. شوية دوشة يوم الجمعة بالليل بسبب الكافيه اللي قريب، بس عدا كده الشقة نضيفة جدًا والمكان آمن.",
+        body: "السعر ممتاز بالنسبة للمنطقة. شوية دوشة يوم الجمعة بالليل بسبب الكافيه اللي قريب، بس عدا كده الشقة نضيفة جدًا والمكان آمن.",
       },
       {
         id: "r3",
@@ -122,8 +126,7 @@ const sample: Record<string, PropertyDetail> = {
         monthsLived: 14,
         rating: 9.6,
         date: "نوفمبر 2025",
-        body:
-          "قعدت هنا عقدين متتاليين. صاحب الشقة محترم ومش بيدخل من غير ما يقول، وعمّال العمارة محترفين.",
+        body: "قعدت هنا عقدين متتاليين. صاحب الشقة محترم ومش بيدخل من غير ما يقول، وعمّال العمارة محترفين.",
       },
     ],
     qa: [
@@ -165,7 +168,13 @@ const sample: Record<string, PropertyDetail> = {
       { label: "النضافة", amount: 0 },
     ],
     beds: { total: 8, occupied: 6 },
-    landlord: { name: "بيتكو كولايفنج", initials: "ب.ك", trust: 8.6, responseRate: 92, verified: true },
+    landlord: {
+      name: "بيتكو كولايفنج",
+      initials: "ب.ك",
+      trust: 8.6,
+      responseRate: 92,
+      verified: true,
+    },
     reviews: [
       {
         id: "r1",

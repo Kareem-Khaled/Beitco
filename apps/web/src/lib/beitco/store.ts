@@ -66,7 +66,6 @@ function writeJSON<T>(key: string, value: T) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
-
 // ---------- Initialization ----------
 
 function ensureSeeded() {
@@ -454,7 +453,12 @@ export function findOrCreateThread(propertyId: string, renterId: string): Thread
   return thread;
 }
 
-export function postMessage(threadId: string, senderId: string, body: string, type: Message["type"] = "text"): Message {
+export function postMessage(
+  threadId: string,
+  senderId: string,
+  body: string,
+  type: Message["type"] = "text",
+): Message {
   ensureSeeded();
   const all = readJSON<Thread[]>(STORAGE_KEYS.threads, []);
   const t = all.find((x) => x.id === threadId);
@@ -755,7 +759,7 @@ export function getPublicProfile(id: string): PublicProfile | undefined {
   return {
     id,
     name,
-    initials: account ? initialsOf(name) : landlord?.initials ?? initialsOf(name),
+    initials: account ? initialsOf(name) : (landlord?.initials ?? initialsOf(name)),
     verified: account?.verified ?? landlord?.verified ?? false,
     trust: landlord?.trust ?? account?.trust ?? 6.5,
     trustBreakdown: account?.trustBreakdown,
@@ -824,15 +828,30 @@ export function getPendingOccupantLinks(userId: string): PendingOccupantLink[] {
   for (const p of getAllProperties()) {
     const base = { propertyId: p.id, propertyTitle: p.title, ownerName: p.landlord.name };
     if (p.wholeOccupant?.userId === userId && p.wholeOccupant.linkStatus === "pending") {
-      out.push({ ...base, unitLabel: "الشقة", moveInDate: p.wholeOccupant.moveInDate, ref: { kind: "whole" } });
+      out.push({
+        ...base,
+        unitLabel: "الشقة",
+        moveInDate: p.wholeOccupant.moveInDate,
+        ref: { kind: "whole" },
+      });
     }
     for (const room of p.rooms ?? []) {
       if (room.occupant?.userId === userId && room.occupant.linkStatus === "pending") {
-        out.push({ ...base, unitLabel: room.name, moveInDate: room.occupant.moveInDate, ref: { kind: "room", roomId: room.id } });
+        out.push({
+          ...base,
+          unitLabel: room.name,
+          moveInDate: room.occupant.moveInDate,
+          ref: { kind: "room", roomId: room.id },
+        });
       }
       for (const bed of room.beds ?? []) {
         if (bed.occupant?.userId === userId && bed.occupant.linkStatus === "pending") {
-          out.push({ ...base, unitLabel: bed.label, moveInDate: bed.occupant.moveInDate, ref: { kind: "bed", roomId: room.id, bedId: bed.id } });
+          out.push({
+            ...base,
+            unitLabel: bed.label,
+            moveInDate: bed.occupant.moveInDate,
+            ref: { kind: "bed", roomId: room.id, bedId: bed.id },
+          });
         }
       }
     }
@@ -853,7 +872,9 @@ export function resolveOccupantLink(
   if (idx < 0) return;
   const p = all[idx];
 
-  const apply = (occ: import("./types").Occupant | undefined): import("./types").Occupant | undefined => {
+  const apply = (
+    occ: import("./types").Occupant | undefined,
+  ): import("./types").Occupant | undefined => {
     if (!occ || occ.userId !== userId || occ.linkStatus !== "pending") return occ;
     if (action === "confirm") return { ...occ, linkStatus: "confirmed" };
     // decline: drop the account link, keep owner's private notes
@@ -872,7 +893,10 @@ export function resolveOccupantLink(
     const { roomId, bedId } = link.ref;
     p.rooms = (p.rooms ?? []).map((r) =>
       r.id === roomId
-        ? { ...r, beds: r.beds.map((b) => (b.id === bedId ? { ...b, occupant: apply(b.occupant) } : b)) }
+        ? {
+            ...r,
+            beds: r.beds.map((b) => (b.id === bedId ? { ...b, occupant: apply(b.occupant) } : b)),
+          }
         : r,
     );
   }
@@ -928,7 +952,9 @@ export function updateUserProfile(userId: string, profile: RenterProfile): User 
 
 // ---------- Verification ----------
 // `verified` is the legacy boolean; `verificationStatus` adds the pending state.
-export function getVerificationStatus(u: Pick<User, "verified" | "verificationStatus">): VerificationStatus {
+export function getVerificationStatus(
+  u: Pick<User, "verified" | "verificationStatus">,
+): VerificationStatus {
   return u.verificationStatus ?? (u.verified ? "verified" : "unverified");
 }
 
@@ -1350,8 +1376,7 @@ function effectiveOwnerResponseRate(owner: User, listings: Property[]): number |
   const computed = computeOwnerResponseRate(owner.id);
   if (computed != null) return computed;
   if (typeof owner.responseRate === "number") return owner.responseRate;
-  return listings.find((l) => typeof l.landlord?.responseRate === "number")?.landlord
-    ?.responseRate;
+  return listings.find((l) => typeof l.landlord?.responseRate === "number")?.landlord?.responseRate;
 }
 
 // Mutate a property in place with freshly computed quality + trust.
@@ -2093,4 +2118,3 @@ export const CAIRO_METRO_LINES: Record<string, string[]> = {
     "رود الفرج",
   ],
 };
-

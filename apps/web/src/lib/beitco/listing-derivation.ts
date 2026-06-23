@@ -4,7 +4,6 @@
 
 import type { Property, PropertyType } from "./types";
 
-
 type Summarizable = Pick<
   Property,
   | "rentalMode"
@@ -54,7 +53,7 @@ export function summarizeListing(p: Summarizable): {
       .filter((n) => n > 0);
     return {
       type: "أوضة",
-      priceFrom: prices.length ? Math.min(...prices) : p.price ?? 0,
+      priceFrom: prices.length ? Math.min(...prices) : (p.price ?? 0),
       beds: { total, available: availableRooms.length, occupied: total - availableRooms.length },
     };
   }
@@ -68,7 +67,7 @@ export function summarizeListing(p: Summarizable): {
       .filter((n) => n > 0);
     return {
       type: "سرير",
-      priceFrom: prices.length ? Math.min(...prices) : p.price ?? 0,
+      priceFrom: prices.length ? Math.min(...prices) : (p.price ?? 0),
       beds: { total, available: availableBeds.length, occupied: total - availableBeds.length },
     };
   }
@@ -84,4 +83,3 @@ export function normalizeProperty(p: Property): Property {
   const s = summarizeListing(p);
   return { ...p, type: s.type, price: s.priceFrom, priceFrom: s.priceFrom, beds: s.beds };
 }
-

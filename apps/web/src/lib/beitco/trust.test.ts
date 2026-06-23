@@ -66,10 +66,7 @@ describe("computeQualityFromReviews (T-2)", () => {
   });
 
   it("falls back per-category when only some reviews score it", () => {
-    const q = computeQualityFromReviews(
-      [{ scores: { internet: 6 } as QualityScores }],
-      fallback,
-    );
+    const q = computeQualityFromReviews([{ scores: { internet: 6 } as QualityScores }], fallback);
     expect(q.internet).toBe(6); // supplied
     expect(q.safety).toBe(8); // fallback
   });
@@ -169,9 +166,7 @@ describe("computeOwnerTrust (T-1/T-3)", () => {
       accountCreatedAt,
     });
     expect(responsive.score).toBeGreaterThan(ghoster.score);
-    expect(responsive.components.responsiveness).toBeGreaterThan(
-      ghoster.components.responsiveness,
-    );
+    expect(responsive.components.responsiveness).toBeGreaterThan(ghoster.components.responsiveness);
   });
 
   it("caps an unverified owner at the verification cap", () => {

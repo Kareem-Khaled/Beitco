@@ -65,7 +65,11 @@ function DashboardReviews() {
                   </div>
                   <p className="mt-2 text-sm leading-relaxed">{r.body}</p>
                   <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
-                    <Link to="/property/$id" params={{ id: p.id }} className="text-primary hover:underline">
+                    <Link
+                      to="/property/$id"
+                      params={{ id: p.id }}
+                      className="text-primary hover:underline"
+                    >
                       {p.title}
                     </Link>
                     <span>{r.date}</span>

@@ -18,13 +18,7 @@ import {
 import { Logo } from "./Logo";
 import { UserMenu } from "./UserMenu";
 import { useAuth } from "@/lib/beitco/auth";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
 const nav = [{ label: "اكتشف", to: "/" as const }];
@@ -102,8 +96,16 @@ export function SiteHeader() {
                     )}
                     <MobileItem icon={UserIcon} label="حسابي" onClick={() => go("/me")} />
                     <MobileItem icon={Heart} label="المحفوظات" onClick={() => go("/me/saved")} />
-                    <MobileItem icon={MessageCircle} label="الرسايل" onClick={() => go("/messages")} />
-                    <MobileItem icon={Bell} label="الإشعارات" onClick={() => go("/notifications")} />
+                    <MobileItem
+                      icon={MessageCircle}
+                      label="الرسايل"
+                      onClick={() => go("/messages")}
+                    />
+                    <MobileItem
+                      icon={Bell}
+                      label="الإشعارات"
+                      onClick={() => go("/notifications")}
+                    />
                     <div className="my-2 border-t border-border" />
                     <MobileItem icon={HelpCircle} label="مساعدة" onClick={() => go("/help")} />
                     <MobileItem icon={ShieldCheck} label="الثقة" onClick={() => go("/trust")} />

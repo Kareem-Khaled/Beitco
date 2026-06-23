@@ -1,6 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
-import { Heart, Inbox, KeyRound, Search, Sparkles, SlidersHorizontal, LayoutDashboard, Home, Bookmark, Trash2, ShieldCheck } from "lucide-react";
+import {
+  Heart,
+  Inbox,
+  KeyRound,
+  Search,
+  Sparkles,
+  SlidersHorizontal,
+  LayoutDashboard,
+  Home,
+  Bookmark,
+  Trash2,
+  ShieldCheck,
+} from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
 import {
   getTenanciesForUser,
@@ -9,7 +21,12 @@ import {
   deleteSavedSearch,
   getRenterReputation,
 } from "@/lib/beitco/store";
-import { useSavedListings, useRenterLeads, useOwnerProperties, useMatches } from "@/lib/beitco/queries";
+import {
+  useSavedListings,
+  useRenterLeads,
+  useOwnerProperties,
+  useMatches,
+} from "@/lib/beitco/queries";
 import type { SavedSearch } from "@/lib/beitco/types";
 import { MatchBadge } from "@/components/beitco/MatchBadge";
 import { Button } from "@/components/ui/button";
@@ -27,7 +44,16 @@ function MeOverview() {
   const { data: matches = [] } = useMatches(user?.id);
   const data = useMemo(() => {
     if (!user)
-      return { saved: 0, pending: 0, tenancies: 0, completeness: 0, topMatch: 0, matchCount: 0, listings: 0, reputation: undefined as { score: number; count: number } | undefined };
+      return {
+        saved: 0,
+        pending: 0,
+        tenancies: 0,
+        completeness: 0,
+        topMatch: 0,
+        matchCount: 0,
+        listings: 0,
+        reputation: undefined as { score: number; count: number } | undefined,
+      };
     return {
       saved: savedList.length,
       pending: renterLeads.filter((l) => l.status === "pending").length,
@@ -70,7 +96,9 @@ function MeOverview() {
           <div className="flex items-center gap-4">
             <span
               className={`inline-flex h-12 w-12 items-center justify-center rounded-xl ${
-                data.reputation.score >= 7.5 ? "bg-trust-soft text-trust" : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                data.reputation.score >= 7.5
+                  ? "bg-trust-soft text-trust"
+                  : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
               }`}
             >
               <ShieldCheck className="h-5 w-5" />
@@ -83,7 +111,8 @@ function MeOverview() {
                 <h3 className="text-sm font-medium text-muted-foreground">سمعتك كساكن</h3>
               </div>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                من تقييم {data.reputation.count.toLocaleString("ar-EG-u-nu-latn")} من الملّاك اللي سكنت عندهم — بتساعدك توصل لبيتك الجاي أسرع.
+                من تقييم {data.reputation.count.toLocaleString("ar-EG-u-nu-latn")} من الملّاك اللي
+                سكنت عندهم — بتساعدك توصل لبيتك الجاي أسرع.
               </p>
             </div>
           </div>
@@ -127,49 +156,49 @@ function MeOverview() {
       {/* Matching hero — renters only */}
       {showRenterHero &&
         (data.completeness >= 30 ? (
-        <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-trust/30 bg-trust-soft/50 p-5">
-          <div className="flex items-center gap-4">
-            <MatchBadge score={data.topMatch} />
+          <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-trust/30 bg-trust-soft/50 p-5">
+            <div className="flex items-center gap-4">
+              <MatchBadge score={data.topMatch} />
+              <div>
+                <h3 className="font-display text-base font-semibold">
+                  لاقينالك {data.matchCount.toLocaleString("ar-EG-u-nu-latn")} مكان يناسبك
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  أعلى تطابق {data.topMatch}% حسب تفضيلاتك الحالية.
+                </p>
+              </div>
+            </div>
+            <Button asChild>
+              <Link to="/me/matches">
+                <Sparkles className="me-1 h-4 w-4" />
+                شوف اللي يناسبك
+              </Link>
+            </Button>
+          </section>
+        ) : (
+          <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5">
             <div>
-              <h3 className="font-display text-base font-semibold">
-                لاقينالك {data.matchCount.toLocaleString("ar-EG-u-nu-latn")} مكان يناسبك
-              </h3>
-              <p className="text-xs text-muted-foreground">
-                أعلى تطابق {data.topMatch}% حسب تفضيلاتك الحالية.
+              <h3 className="font-display text-base font-semibold">كمّل ملفك عشان نلاقيلك بيتك</h3>
+              <p className="mt-1 max-w-md text-xs text-muted-foreground">
+                قولنا ميزانيتك ومناطقك واللي بتدوّر عليه — وهنرتّبلك الأماكن اللي تناسبك بالظبط.
+              </p>
+              <div className="mt-3 h-2 w-48 overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full bg-trust transition-all"
+                  style={{ width: `${data.completeness}%` }}
+                />
+              </div>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                اكتمل {data.completeness}% من ملفك
               </p>
             </div>
-          </div>
-          <Button asChild>
-            <Link to="/me/matches">
-              <Sparkles className="me-1 h-4 w-4" />
-              شوف اللي يناسبك
-            </Link>
-          </Button>
-        </section>
-      ) : (
-        <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5">
-          <div>
-            <h3 className="font-display text-base font-semibold">كمّل ملفك عشان نلاقيلك بيتك</h3>
-            <p className="mt-1 max-w-md text-xs text-muted-foreground">
-              قولنا ميزانيتك ومناطقك واللي بتدوّر عليه — وهنرتّبلك الأماكن اللي تناسبك بالظبط.
-            </p>
-            <div className="mt-3 h-2 w-48 overflow-hidden rounded-full bg-muted">
-              <div
-                className="h-full rounded-full bg-trust transition-all"
-                style={{ width: `${data.completeness}%` }}
-              />
-            </div>
-            <p className="mt-1 text-[11px] text-muted-foreground">
-              اكتمل {data.completeness}% من ملفك
-            </p>
-          </div>
-          <Button asChild>
-            <Link to="/me/preferences">
-              <SlidersHorizontal className="me-1 h-4 w-4" />
-              حدّد تفضيلاتك
-            </Link>
-          </Button>
-        </section>
+            <Button asChild>
+              <Link to="/me/preferences">
+                <SlidersHorizontal className="me-1 h-4 w-4" />
+                حدّد تفضيلاتك
+              </Link>
+            </Button>
+          </section>
         ))}
 
       <section className="grid gap-3 sm:grid-cols-3">
@@ -220,7 +249,9 @@ function MeOverview() {
             </span>
             <div>
               <h2 className="font-display text-base font-semibold">عمليات البحث المحفوظة</h2>
-              <p className="text-xs text-muted-foreground">ارجع لأي بحث بضغطة — وقريّب هنبعتلك لما ينزل مكان جديد يطابقه.</p>
+              <p className="text-xs text-muted-foreground">
+                ارجع لأي بحث بضغطة — وقريّب هنبعتلك لما ينزل مكان جديد يطابقه.
+              </p>
             </div>
           </div>
           <ul className="space-y-2">

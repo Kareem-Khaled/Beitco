@@ -132,7 +132,9 @@ function ModerationQueue() {
                     <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                       <span>
                         صاحبه: <span className="text-foreground">{p.landlord.name}</span>{" "}
-                        <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px]">غير موثّق</span>
+                        <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px]">
+                          غير موثّق
+                        </span>
                       </span>
                       <span className="inline-flex items-center gap-1">
                         <BedDouble className="h-3 w-3" />
@@ -144,7 +146,9 @@ function ModerationQueue() {
                       <span>اتبعت {formatDate(p.createdAt)}</span>
                     </div>
                     {p.description ? (
-                      <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
+                      <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+                        {p.description}
+                      </p>
                     ) : null}
 
                     <div className="mt-3 flex flex-wrap items-center gap-2">

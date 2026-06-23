@@ -76,7 +76,8 @@ function MeApplications() {
                     {l.preferredDate ? (
                       <p className="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground">
                         <Calendar className="h-3 w-3" />
-                        طلبت ميعاد: {new Date(l.preferredDate).toLocaleDateString("ar-EG-u-nu-latn")}
+                        طلبت ميعاد:{" "}
+                        {new Date(l.preferredDate).toLocaleDateString("ar-EG-u-nu-latn")}
                       </p>
                     ) : null}
                   </div>
@@ -118,5 +119,7 @@ function StatusPill({ status }: { status: Lead["status"] }) {
     completed: { tone: "bg-muted text-muted-foreground", label: "خلص" },
   };
   const s = map[status];
-  return <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${s.tone}`}>{s.label}</span>;
+  return (
+    <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${s.tone}`}>{s.label}</span>
+  );
 }

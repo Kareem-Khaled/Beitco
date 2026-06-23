@@ -98,7 +98,9 @@ function DashboardLeads() {
             }`}
           >
             {t.label}
-            <span className="ms-1 text-[11px] opacity-70">({counts[t.id].toLocaleString("ar-EG-u-nu-latn")})</span>
+            <span className="ms-1 text-[11px] opacity-70">
+              ({counts[t.id].toLocaleString("ar-EG-u-nu-latn")})
+            </span>
           </button>
         ))}
       </div>
@@ -138,7 +140,9 @@ function DashboardLeads() {
                             ) : (
                               <BedDouble className="h-3.5 w-3.5 text-trust" />
                             )}
-                            {u.kind === "bed" && u.roomName ? `${u.roomName} · ${u.label}` : u.label}
+                            {u.kind === "bed" && u.roomName
+                              ? `${u.roomName} · ${u.label}`
+                              : u.label}
                           </span>
                         ))}
                         {l.units.length > 1 && (
@@ -169,7 +173,8 @@ function DashboardLeads() {
                     {l.preferredDate ? (
                       <p className="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground">
                         <Calendar className="h-3 w-3" />
-                        ميعاد مقترح: {new Date(l.preferredDate).toLocaleDateString("ar-EG-u-nu-latn")}
+                        ميعاد مقترح:{" "}
+                        {new Date(l.preferredDate).toLocaleDateString("ar-EG-u-nu-latn")}
                       </p>
                     ) : null}
                     {l.note ? (
@@ -199,7 +204,9 @@ function DashboardLeads() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => setReviewing({ renterId: l.renterId, renterName: l.renterName })}
+                        onClick={() =>
+                          setReviewing({ renterId: l.renterId, renterName: l.renterName })
+                        }
                       >
                         <Star className="me-1 h-4 w-4" />
                         قيّم الساكن
@@ -259,5 +266,7 @@ function StatusPill({ status }: { status: Lead["status"] }) {
     completed: { tone: "bg-muted text-muted-foreground", label: "خلص" },
   };
   const s = map[status];
-  return <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${s.tone}`}>{s.label}</span>;
+  return (
+    <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${s.tone}`}>{s.label}</span>
+  );
 }

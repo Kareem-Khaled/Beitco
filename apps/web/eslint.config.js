@@ -6,7 +6,20 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist", ".output", ".vinxi"] },
+  // Global ignores: build output, framework caches (.turbo caused OOM when
+  // `eslint .` walked it), and generated files.
+  {
+    ignores: [
+      "dist",
+      ".output",
+      ".vinxi",
+      ".nitro",
+      ".tanstack",
+      ".turbo",
+      "node_modules",
+      "src/routeTree.gen.ts",
+    ],
+  },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],

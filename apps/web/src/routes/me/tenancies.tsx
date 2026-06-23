@@ -78,7 +78,12 @@ function MeTenancies() {
                     <Check className="h-3.5 w-3.5" />
                     أكّد
                   </Button>
-                  <Button size="sm" variant="outline" className="gap-1" onClick={() => resolve(link, "decline")}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="gap-1"
+                    onClick={() => resolve(link, "decline")}
+                  >
                     <X className="h-3.5 w-3.5" />
                     مش أنا
                   </Button>

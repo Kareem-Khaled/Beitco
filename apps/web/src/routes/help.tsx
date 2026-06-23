@@ -85,11 +85,7 @@ function HelpPage() {
           </p>
           <div className="mt-4 flex flex-wrap justify-center gap-2">
             <Button asChild>
-              <a
-                href="https://wa.me/201000000000"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer">
                 <MessageCircle className="me-1.5 h-4 w-4" />
                 واتساب
               </a>

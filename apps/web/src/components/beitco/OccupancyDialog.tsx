@@ -208,7 +208,13 @@ export function OccupancyDialog({
                       onChange={(e) => setInvitePhone(e.target.value)}
                       className="flex-1"
                     />
-                    <Button type="button" size="sm" variant="outline" onClick={sendInvite} disabled={!invitePhone.trim()}>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={sendInvite}
+                      disabled={!invitePhone.trim()}
+                    >
                       <Send className="me-1 h-3.5 w-3.5" />
                       ابعت دعوة
                     </Button>
@@ -234,9 +240,7 @@ export function OccupancyDialog({
                 />
               </div>
               <div>
-                <label className="mb-1 block text-[11px] text-muted-foreground">
-                  تاريخ الدخول
-                </label>
+                <label className="mb-1 block text-[11px] text-muted-foreground">تاريخ الدخول</label>
                 <DatePicker
                   value={occ.moveInDate}
                   onChange={(v) => setField({ moveInDate: v })}
@@ -283,7 +287,9 @@ export function OccupancyPill({ status }: { status: BedStatus }) {
   };
   const s = map[status];
   return (
-    <span className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors ${s.tone}`}>
+    <span
+      className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors ${s.tone}`}
+    >
       {s.label}
     </span>
   );

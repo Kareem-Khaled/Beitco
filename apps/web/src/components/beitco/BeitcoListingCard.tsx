@@ -1,5 +1,16 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, Wifi, ShieldCheck, Users, Home, Mars, Venus, BedDouble, DoorOpen, Moon } from "lucide-react";
+import {
+  MapPin,
+  Wifi,
+  ShieldCheck,
+  Users,
+  Home,
+  Mars,
+  Venus,
+  BedDouble,
+  DoorOpen,
+  Moon,
+} from "lucide-react";
 import { TrustBadge } from "./TrustBadge";
 import { OptimizedImage } from "./OptimizedImage";
 import { cn } from "@/lib/utils";
@@ -113,7 +124,8 @@ export function BeitcoListingCard({ p, className }: { p: CardProperty; className
             <span className="font-medium text-foreground">شقة كاملة</span>
             {p.spec && (
               <span className="text-muted-foreground">
-                · {p.spec.bedrooms.toLocaleString("ar-EG-u-nu-latn")} أوض · {p.spec.bathrooms.toLocaleString("ar-EG-u-nu-latn")} حمام
+                · {p.spec.bedrooms.toLocaleString("ar-EG-u-nu-latn")} أوض ·{" "}
+                {p.spec.bathrooms.toLocaleString("ar-EG-u-nu-latn")} حمام
               </span>
             )}
           </div>

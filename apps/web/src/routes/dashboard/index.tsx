@@ -1,6 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { Home, BedDouble, Inbox, Star, TrendingUp, Plus, Eye, Heart, BarChart3, MessageCircle } from "lucide-react";
+import {
+  Home,
+  BedDouble,
+  Inbox,
+  Star,
+  TrendingUp,
+  Plus,
+  Eye,
+  Heart,
+  BarChart3,
+  MessageCircle,
+} from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
 import { getOwnerAnalytics, ownerAnalyticsFromData } from "@/lib/beitco/store";
 import { USE_API } from "@/lib/beitco/api";
@@ -26,9 +37,7 @@ function DashboardOverview() {
     // Analytics: mock reads localStorage (real saves+leads, estimate views);
     // API estimates views/saves but counts real leads from the owner-leads API.
     const analytics =
-      USE_API || !user
-        ? ownerAnalyticsFromData(properties, leads)
-        : getOwnerAnalytics(user.id);
+      USE_API || !user ? ownerAnalyticsFromData(properties, leads) : getOwnerAnalytics(user.id);
     return { totalBeds, freeBeds, avgTrust, totalReviews, pendingLeads, analytics };
   }, [user, properties, leads]);
   const responseRate = user?.responseRate;
@@ -40,7 +49,9 @@ function DashboardOverview() {
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight">لوحتي</h1>
-          <p className="text-sm text-muted-foreground">شوف شققك وطلبات المعاينة كلها في مكان واحد.</p>
+          <p className="text-sm text-muted-foreground">
+            شوف شققك وطلبات المعاينة كلها في مكان واحد.
+          </p>
         </div>
         <Button asChild>
           <Link to="/list/new">
@@ -87,9 +98,17 @@ function DashboardOverview() {
                 <span className="ms-auto text-[11px] text-muted-foreground">آخر فترة</span>
               </div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <Metric icon={<Eye className="h-4 w-4" />} label="مشاهدات" value={analytics.views} />
+                <Metric
+                  icon={<Eye className="h-4 w-4" />}
+                  label="مشاهدات"
+                  value={analytics.views}
+                />
                 <Metric icon={<Heart className="h-4 w-4" />} label="حفظ" value={analytics.saves} />
-                <Metric icon={<Inbox className="h-4 w-4" />} label="طلبات معاينة" value={analytics.leads} />
+                <Metric
+                  icon={<Inbox className="h-4 w-4" />}
+                  label="طلبات معاينة"
+                  value={analytics.leads}
+                />
                 <Metric
                   icon={<TrendingUp className="h-4 w-4" />}
                   label="نسبة التحويل"
@@ -107,7 +126,10 @@ function DashboardOverview() {
                       .sort((a, b) => b.analytics.views - a.analytics.views)
                       .slice(0, 5)
                       .map(({ property, analytics: a }) => (
-                        <li key={property.id} className="flex items-center justify-between gap-3 text-sm">
+                        <li
+                          key={property.id}
+                          className="flex items-center justify-between gap-3 text-sm"
+                        >
                           <Link
                             to="/property/$id"
                             params={{ id: property.id }}
@@ -144,9 +166,7 @@ function DashboardOverview() {
                 <div className="flex items-center gap-4">
                   <span
                     className={`inline-flex h-12 w-12 items-center justify-center rounded-xl ${
-                      responseRate >= 85
-                        ? "bg-trust-soft text-trust"
-                        : "bg-warning/10 text-warning"
+                      responseRate >= 85 ? "bg-trust-soft text-trust" : "bg-warning/10 text-warning"
                     }`}
                   >
                     <MessageCircle className="h-5 w-5" />
@@ -187,7 +207,11 @@ function DashboardOverview() {
           <section className="grid gap-4 lg:grid-cols-2">
             <Panel
               title="آخر طلبات المعاينة"
-              cta={<Link to="/dashboard/leads" className="text-xs text-primary">شوفهم كلهم</Link>}
+              cta={
+                <Link to="/dashboard/leads" className="text-xs text-primary">
+                  شوفهم كلهم
+                </Link>
+              }
             >
               {leads.length === 0 ? (
                 <Empty mini text="لسه ما جالكش طلبات." />
@@ -199,7 +223,9 @@ function DashboardOverview() {
                       <li key={l.id} className="flex items-center justify-between gap-3 py-3">
                         <div className="min-w-0">
                           <p className="truncate text-sm font-medium">{l.renterName}</p>
-                          <p className="truncate text-xs text-muted-foreground">{p?.title ?? "—"}</p>
+                          <p className="truncate text-xs text-muted-foreground">
+                            {p?.title ?? "—"}
+                          </p>
                         </div>
                         <LeadPill status={l.status} />
                       </li>
@@ -211,7 +237,11 @@ function DashboardOverview() {
 
             <Panel
               title="آخر آراء الناس"
-              cta={<Link to="/dashboard/reviews" className="text-xs text-primary">شوفهم كلهم</Link>}
+              cta={
+                <Link to="/dashboard/reviews" className="text-xs text-primary">
+                  شوفهم كلهم
+                </Link>
+              }
             >
               {totalReviews === 0 ? (
                 <Empty mini text="لسه ما حدش كتب رأيه." />
@@ -315,7 +345,9 @@ function Panel({
 
 function Empty({ text, mini }: { text: string; mini?: boolean }) {
   return (
-    <p className={`text-center text-muted-foreground ${mini ? "py-4 text-xs" : "py-8 text-sm"}`}>{text}</p>
+    <p className={`text-center text-muted-foreground ${mini ? "py-4 text-xs" : "py-8 text-sm"}`}>
+      {text}
+    </p>
   );
 }
 

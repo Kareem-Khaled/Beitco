@@ -116,21 +116,37 @@ function SettingsPage() {
       <Section icon={UserIcon} title="الحساب">
         <div className="space-y-4">
           <div>
-            <label htmlFor="settings-name" className="mb-1.5 block text-sm font-medium">الاسم</label>
+            <label htmlFor="settings-name" className="mb-1.5 block text-sm font-medium">
+              الاسم
+            </label>
             <div className="flex items-center gap-2">
-              <Input id="settings-name" value={name} onChange={(e) => setName(e.target.value)} className="max-w-sm" />
-              <Button size="sm" onClick={saveName} disabled={!name.trim() || name.trim() === user.name}>
+              <Input
+                id="settings-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="max-w-sm"
+              />
+              <Button
+                size="sm"
+                onClick={saveName}
+                disabled={!name.trim() || name.trim() === user.name}
+              >
                 {saved ? <Check className="h-4 w-4" /> : "احفظ"}
               </Button>
             </div>
           </div>
           <div>
             <label className="mb-1.5 block text-sm font-medium">رقم التليفون</label>
-            <div className="inline-flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm" dir="ltr">
+            <div
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm"
+              dir="ltr"
+            >
               <Phone className="h-4 w-4 text-muted-foreground" />
               {user.phone}
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">رقم التليفون مش بيتغيّر — هو هويتك على بيتكو.</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              رقم التليفون مش بيتغيّر — هو هويتك على بيتكو.
+            </p>
           </div>
         </div>
       </Section>
@@ -268,7 +284,8 @@ function SettingsPage() {
               <AlertDialogHeader>
                 <AlertDialogTitle>تعيد ضبط كل البيانات؟</AlertDialogTitle>
                 <AlertDialogDescription>
-                  ده هيمسح كل البيانات المحلية (الشقق، الرسايل، الحساب) ويرجّع التجربة من الأول. مفيد للتجربة بس.
+                  ده هيمسح كل البيانات المحلية (الشقق، الرسايل، الحساب) ويرجّع التجربة من الأول.
+                  مفيد للتجربة بس.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

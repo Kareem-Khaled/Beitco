@@ -77,7 +77,8 @@ export function RenterReviewDialog({
           <DialogTitle className="font-display">قيّم الساكن</DialogTitle>
           <DialogDescription>
             تقييمك بيساعد ملّاك تانيين ياخدوا قرار صح.{" "}
-            <span className="font-medium text-foreground">{renterName}</span> مش هيشوف مين قيّمه — بس درجته العامة.
+            <span className="font-medium text-foreground">{renterName}</span> مش هيشوف مين قيّمه —
+            بس درجته العامة.
           </DialogDescription>
         </DialogHeader>
 

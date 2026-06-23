@@ -10,7 +10,8 @@ export const Route = createFileRoute("/trust")({
       { title: "إزاي بنبني الثقة — بيتكو" },
       {
         name: "description",
-        content: "اعرف إزاي بيتكو بتحسب درجة الثقة وبتوثّق الإعلانات عشان تطمن وانت بتدوّر على سكن.",
+        content:
+          "اعرف إزاي بيتكو بتحسب درجة الثقة وبتوثّق الإعلانات عشان تطمن وانت بتدوّر على سكن.",
       },
     ],
   }),
@@ -59,8 +60,8 @@ function TrustPage() {
             إزاي بنبني <span className="text-trust">الثقة</span> في كل إعلان
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-            «درجة الثقة» اللي بتشوفها على كل مكان مش رقم عشوائي. دي خلاصة كذا حاجة بنجمّعها
-            ونحسبها عشان تاخد قرارك وانت مطمن.
+            «درجة الثقة» اللي بتشوفها على كل مكان مش رقم عشوائي. دي خلاصة كذا حاجة بنجمّعها ونحسبها
+            عشان تاخد قرارك وانت مطمن.
           </p>
         </section>
 
@@ -93,17 +94,12 @@ function TrustPage() {
           <h2 className="font-display text-lg font-semibold">إزاي بنحسب الدرجة؟</h2>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             بنجمع التوثيق + عدد وجودة آراء الساكنين + درجات الجودة + سرعة رد صاحب البيت + نشاط
-            الإعلان، وبنطلّع درجة من <span className="font-semibold text-foreground tabular-nums">10</span>.
-            كل ما الدرجة تعلى، كل ما تقدر تثق أكتر. والدرجة بتتحدّث باستمرار مع كل رأي أو تفاعل جديد.
+            الإعلان، وبنطلّع درجة من{" "}
+            <span className="font-semibold text-foreground tabular-nums">10</span>. كل ما الدرجة
+            تعلى، كل ما تقدر تثق أكتر. والدرجة بتتحدّث باستمرار مع كل رأي أو تفاعل جديد.
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-2">
-            {[
-              "التوثيق",
-              "آراء الساكنين",
-              "درجات الجودة",
-              "سرعة الرد",
-              "نشاط الإعلان",
-            ].map((f) => (
+            {["التوثيق", "آراء الساكنين", "درجات الجودة", "سرعة الرد", "نشاط الإعلان"].map((f) => (
               <span
                 key={f}
                 className="inline-flex items-center gap-1 rounded-full bg-trust-soft px-2.5 py-1 text-xs font-medium text-trust"
