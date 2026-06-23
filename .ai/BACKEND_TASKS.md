@@ -11,13 +11,18 @@
 
 ## 🟢 In Progress
 
-_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (1) + saved-searches (2) + renter-leads (3) + Q&A (4) + reviews (5) + create/edit listing (6a) + owner-leads & renter-reviews (6b) + admin moderation (6c) + dashboard management/overview (6d) + **matching engine + renter preferences (T-MATCH)** wired behind the flag. **The whole flag-on app is now interactive against the backend.** Remaining: port/retire the `_unported/` modules (analytics, chat, notifications, payments, search, users) — each currently targets the pre-pivot schema.)_
+_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (1) + saved-searches (2) + renter-leads (3) + Q&A (4) + reviews (5) + create/edit listing (6a) + owner-leads & renter-reviews (6b) + admin moderation (6c) + dashboard management/overview (6d) + **matching engine + renter preferences (T-MATCH)** wired behind the flag. **The whole flag-on app is now interactive against the backend.** `_unported/` cleaned up (CLEANUP-1): 5 dead pre-pivot modules retired, only `chat` + `notifications` remain as scaffolding for dedicated future ports. **Next real features:** chat ("كلّم صاحب الشقة") then notifications (saved-search alerts) — both ported from the frontend mock against the new schema.)_
 
 > **Known seed-fidelity note (not a wiring bug):** properties carry a hand-set display `reviewsCount` (e.g. 32) larger than their actual seeded review rows. The trust recompute counts real rows, so after the first real review the count snaps to the true value. Fix later by seeding more reviews or setting `reviewsCount = reviews.length` in the seed.
 
 ---
 
 ## ✅ Done
+
+### CLEANUP-1 · Retire dead pre-pivot modules ✅ (June 23)
+- Audited `src/_unported/` (nothing in the active build imports it; excluded from both tsconfigs). Decided per-module: **retired** `moderation` (old post-flagging — listing moderation shipped as MOD-1/admin), `analytics` (old social — dashboard analytics now via `ownerAnalyticsFromData`), `payments` (34-loc stub), `search` (old social Meilisearch — listings search is client-side via B-1), `users` (superseded by the wired `src/users`).
+- **Kept** `chat` + `notifications` as infra scaffolding (Socket.io gateway, delivery) for dedicated ports built **from the frontend mock** (the executable spec), documented in `src/_unported/README.md`.
+- **Verified:** `tsc` + `nest build` + 31 Jest pass; API healthy; `/me/matches` still guarded (401 unauth). No active code referenced the deleted modules.
 
 ### T-MATCH · Matching engine + renter preferences on the API ✅ (June 23)
 - **Pure engine** ported to `apps/api/src/matching/matching.engine.ts` (mirrors `apps/web/src/lib/beitco/matching.ts` — `scoreMatch`/`isGenderEligible`, loose `MatchProperty`/`MatchProfile` inputs, framework-free). **13 Jest tests** mirror the 13 frontend Vitest cases (gender gate, area/budget/type weighting, partial-budget, amenity fraction, trust fallback, ≤100 bound, availability nudge, priceFrom). Heavy Arabic → written via heredoc.
