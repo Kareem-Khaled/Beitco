@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { TrustService } from '../trust/trust.service';
-import { serializeProperty, serializeSummary, type PropertyRow } from './listings.serializer';
-import { CreateListingDto } from './dto/create-listing.dto';
+import { serializeProperty, type PropertyRow } from './listings.serializer';
+import { CreateListingDto, ManageListingDto } from './dto/create-listing.dto';
 
 const UNIT_LATIN: Record<string, 'apartment' | 'studio' | 'duplex' | 'roof' | 'villa'> = {
   شقة: 'apartment',
@@ -33,6 +33,22 @@ const detailInclude = {
   reviews: { orderBy: { createdAt: 'desc' as const } },
 };
 
+// Owner-facing include: like detailInclude but WITH occupant data (beds, rooms,
+// whole) + questions, for the dashboard management grid. Ownership-checked, so
+// the private occupant details are only ever returned to the listing's owner.
+const ownerInclude = {
+  owner: true,
+  rooms: {
+    include: { beds: { include: { occupant: true } }, occupant: true },
+    orderBy: { createdAt: 'asc' as const },
+  },
+  nearby: true,
+  customSpecs: true,
+  reviews: { orderBy: { createdAt: 'desc' as const } },
+  questions: { orderBy: { createdAt: 'desc' as const } },
+  wholeOccupant: true,
+};
+
 @Injectable()
 export class ListingsWriteService {
   constructor(
@@ -40,17 +56,16 @@ export class ListingsWriteService {
     private readonly trust: TrustService,
   ) {}
 
-  // Owner's own listings (all statuses) for the dashboard.
+  // Owner's own listings (all statuses) for the dashboard. Full Property shape
+  // WITH occupant data (the management grid edits availability + tenant info).
   async listMine(ownerId: string): Promise<Record<string, unknown>[]> {
     const rows = (await this.prisma.property.findMany({
       where: { ownerId, deletedAt: null },
       orderBy: { createdAt: 'desc' },
-      include: { rooms: { include: { beds: true } } },
+      include: ownerInclude,
     })) as unknown as PropertyRow[];
-    // Summaries but keep status (owner needs to see draft/pending/rejected)
-    // and the rejection reason (so they can fix and resubmit).
     return rows.map((p) => ({
-      ...serializeSummary(p),
+      ...serializeProperty(p, { includeOccupants: true }),
       status: p.status,
       rejectionReason:
         (p as unknown as { rejectionReason: string | null }).rejectionReason ?? undefined,
@@ -189,6 +204,92 @@ export class ListingsWriteService {
     return { ok: true };
   }
 
+  // Owner-only granular status/occupancy updates from the management grid.
+  // Each call carries exactly one concern (pause / sale / whole / room / bed).
+  async manage(ownerId: string, id: string, dto: ManageListingDto): Promise<Record<string, unknown>> {
+    const existing = await this.prisma.property.findFirst({
+      where: { id, deletedAt: null },
+      select: { ownerId: true, status: true },
+    });
+    if (!existing) throw new NotFoundException({ code: 'PROPERTY_NOT_FOUND', message: 'الإعلان مش موجود.' });
+    if (existing.ownerId !== ownerId) {
+      throw new ForbiddenException({ code: 'NOT_OWNER', message: 'مش من حقك تعدّل الإعلان ده.' });
+    }
+
+    // Pause / unpause — only meaningful on a live listing (never override a
+    // pending/rejected one through this path).
+    if (dto.listingStatus) {
+      if (existing.status === 'published' || existing.status === 'paused') {
+        await this.prisma.property.update({ where: { id }, data: { status: dto.listingStatus } });
+      }
+    }
+
+    if (dto.saleStatus) {
+      await this.prisma.property.update({
+        where: { id },
+        data: { saleStatus: dto.saleStatus as never },
+      });
+    }
+
+    if (dto.whole) {
+      await this.prisma.property.update({
+        where: { id },
+        data: { wholeStatus: dto.whole.status as never },
+      });
+      await this.setOccupant({ wholePropertyId: id }, dto.whole.status, dto.whole.occupant);
+    }
+
+    if (dto.room) {
+      const room = await this.prisma.room.findFirst({
+        where: { id: dto.room.roomId, propertyId: id },
+        select: { id: true },
+      });
+      if (!room) throw new NotFoundException({ code: 'ROOM_NOT_FOUND', message: 'الأوضة دي مش في الإعلان ده.' });
+      await this.prisma.room.update({
+        where: { id: room.id },
+        data: { status: dto.room.status as never },
+      });
+      await this.setOccupant({ roomId: room.id }, dto.room.status, dto.room.occupant);
+    }
+
+    if (dto.bed) {
+      const bed = await this.prisma.bed.findFirst({
+        where: { id: dto.bed.bedId, room: { propertyId: id } },
+        select: { id: true },
+      });
+      if (!bed) throw new NotFoundException({ code: 'BED_NOT_FOUND', message: 'السرير ده مش في الإعلان ده.' });
+      await this.prisma.bed.update({
+        where: { id: bed.id },
+        data: { status: dto.bed.status as never },
+      });
+      await this.setOccupant({ bedId: bed.id }, dto.bed.status, dto.bed.occupant);
+    }
+
+    const fresh = await this.findRow(id, true);
+    return { ...serializeProperty(fresh!, { includeOccupants: true }), status: fresh!.status };
+  }
+
+  // Replace the occupant attached to a bed/room/whole-unit. Available -> clear;
+  // occupied/reserved -> upsert the renter details (delete-then-create keeps the
+  // 1:1 unique FK simple).
+  private async setOccupant(
+    link: { bedId?: string; roomId?: string; wholePropertyId?: string },
+    status: string,
+    occupant?: { name?: string; phone?: string; moveInDate?: string; notes?: string },
+  ): Promise<void> {
+    await this.prisma.occupant.deleteMany({ where: link });
+    if (status === 'available' || !occupant) return;
+    await this.prisma.occupant.create({
+      data: {
+        ...link,
+        name: occupant.name ?? null,
+        phone: occupant.phone ?? null,
+        moveInDate: occupant.moveInDate ? new Date(occupant.moveInDate) : null,
+        notes: occupant.notes ?? null,
+      },
+    });
+  }
+
   // ─── helpers ──────────────────────────────────────────
   private initialStatus(owner: { isAdmin: boolean; verified: boolean; verificationStatus: string }):
     'published' | 'pending_approval' {
@@ -255,10 +356,10 @@ export class ListingsWriteService {
     return { type: 'apartment', priceFrom: dto.wholePrice ?? 0 };
   }
 
-  private async findRow(id: string): Promise<PropertyRow | null> {
+  private async findRow(id: string, withOccupants = false): Promise<PropertyRow | null> {
     return (await this.prisma.property.findUnique({
       where: { id },
-      include: detailInclude,
+      include: withOccupants ? ownerInclude : detailInclude,
     })) as unknown as PropertyRow | null;
   }
 }

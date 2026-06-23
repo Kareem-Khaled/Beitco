@@ -53,12 +53,21 @@ function initialsOf(name: string): string {
 
 // Loose shapes for the included relations (avoids coupling to the generated
 // Prisma types, which the editor sometimes caches stale).
+interface OccupantRow {
+  name: string | null;
+  phone: string | null;
+  moveInDate: Date | null;
+  notes: string | null;
+  userId: string | null;
+  linkStatus: string | null;
+}
 interface BedRow {
   id: string;
   label: string;
   status: string;
   price: number;
   features: string[];
+  occupant?: OccupantRow | null;
 }
 interface RoomRow {
   id: string;
@@ -68,6 +77,7 @@ interface RoomRow {
   price: number | null;
   status: string | null;
   beds: BedRow[];
+  occupant?: OccupantRow | null;
 }
 interface NearbyRow {
   id: string;
@@ -153,6 +163,7 @@ export interface PropertyRow {
   customSpecs?: CustomSpecRow[];
   reviews?: ReviewRow[];
   questions?: QuestionRow[];
+  wholeOccupant?: OccupantRow | null;
 }
 
 // Compute the card-facing { total, available, occupied } the way the frontend's
@@ -199,9 +210,25 @@ const DEFAULT_QUALITY: QualityScores = {
 };
 
 /** Full Property shape for the detail page (public — owner-only occupant data omitted). */
-export function serializeProperty(p: PropertyRow): Record<string, unknown> {
+export function serializeProperty(
+  p: PropertyRow,
+  opts: { includeOccupants?: boolean } = {},
+): Record<string, unknown> {
   const quality = (p.quality as QualityScores | null) ?? DEFAULT_QUALITY;
   const beds = bedSummary(p);
+  // Owner-only renter details — included only when the owner views their own
+  // listings (the dashboard management grid). Never on the public detail page.
+  const occ = (o?: OccupantRow | null) =>
+    opts.includeOccupants && o
+      ? {
+          name: o.name ?? undefined,
+          phone: o.phone ?? undefined,
+          moveInDate: o.moveInDate?.toISOString() ?? undefined,
+          notes: o.notes ?? undefined,
+          userId: o.userId ?? undefined,
+          linkStatus: o.linkStatus ?? undefined,
+        }
+      : undefined;
   const spec = p.unitType
     ? {
         unitType: UNIT_AR[p.unitType],
@@ -244,6 +271,7 @@ export function serializeProperty(p: PropertyRow): Record<string, unknown> {
     spec,
     wholePrice: p.wholePrice ?? undefined,
     wholeStatus: p.wholeStatus ?? undefined,
+    wholeOccupant: occ(p.wholeOccupant),
     nightlyPrice: p.nightlyPrice ?? undefined,
     listingType: p.listingType,
     salePrice: p.salePrice ?? undefined,
@@ -257,12 +285,14 @@ export function serializeProperty(p: PropertyRow): Record<string, unknown> {
       sizeM2: r.sizeM2 ?? undefined,
       price: r.price ?? undefined,
       status: r.status ?? undefined,
+      occupant: occ(r.occupant),
       beds: (r.beds ?? []).map((b) => ({
         id: b.id,
         label: b.label,
         status: b.status,
         price: b.price,
         features: b.features,
+        occupant: occ(b.occupant),
       })),
     })),
     nearby: (p.nearby ?? []).map((n) => ({

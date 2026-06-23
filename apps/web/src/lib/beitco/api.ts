@@ -380,11 +380,25 @@ export async function apiDeleteProperty(id: string): Promise<void> {
   await delJSON(`/properties/${encodeURIComponent(id)}`);
 }
 
-// Owner's own listings (all statuses). Summaries + status (+ rejectionReason).
-export async function apiListMine(): Promise<(import("./types").PropertySummary & { status: string })[]> {
-  const body = await getJSON<(import("./types").PropertySummary & { status: string })[]>(
-    "/properties/mine",
-  );
+// Owner's own listings (all statuses) — FULL Property objects with owner-only
+// occupant data (the dashboard management grid edits availability + tenants).
+export async function apiListMine(): Promise<Property[]> {
+  const body = await getJSON<Property[]>("/properties/mine");
+  return body.data;
+}
+
+// Granular status/occupancy mutation from the management grid. Each call sends
+// exactly one concern; the API returns the full updated Property.
+export type ManageListingPatch = {
+  listingStatus?: "published" | "paused";
+  saleStatus?: "available" | "sold";
+  whole?: { status: string; occupant?: import("./types").Occupant };
+  room?: { roomId: string; status: string; occupant?: import("./types").Occupant };
+  bed?: { bedId: string; status: string; occupant?: import("./types").Occupant };
+};
+
+export async function apiManageListing(id: string, patch: ManageListingPatch): Promise<Property> {
+  const body = await patchJSON<Property>(`/properties/${encodeURIComponent(id)}/manage`, patch);
   return body.data;
 }
 

@@ -2,7 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { Home, BedDouble, Inbox, Star, TrendingUp, Plus, Eye, Heart, BarChart3, MessageCircle } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
-import { getPropertiesByOwner, getLeadsForOwner, getOwnerAnalytics, getUser } from "@/lib/beitco/store";
+import { getOwnerAnalytics, ownerAnalyticsFromData } from "@/lib/beitco/store";
+import { USE_API } from "@/lib/beitco/api";
+import { useOwnerProperties, useOwnerLeads } from "@/lib/beitco/queries";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/dashboard/")({
@@ -11,12 +13,9 @@ export const Route = createFileRoute("/dashboard/")({
 
 function DashboardOverview() {
   const { user } = useAuth();
-  const { properties, leads, totalBeds, freeBeds, avgTrust, totalReviews, pendingLeads, analytics, responseRate } = useMemo(() => {
-    if (!user) {
-      return { properties: [], leads: [], totalBeds: 0, freeBeds: 0, avgTrust: 0, totalReviews: 0, pendingLeads: 0, analytics: null };
-    }
-    const properties = getPropertiesByOwner(user.id);
-    const leads = getLeadsForOwner(user.id);
+  const { data: properties = [] } = useOwnerProperties(user?.id);
+  const { data: leads = [] } = useOwnerLeads(user?.id);
+  const { totalBeds, freeBeds, avgTrust, totalReviews, pendingLeads, analytics } = useMemo(() => {
     const totalBeds = properties.reduce((s, p) => s + p.beds.total, 0);
     const freeBeds = properties.reduce((s, p) => s + p.beds.available, 0);
     const avgTrust = properties.length
@@ -24,10 +23,15 @@ function DashboardOverview() {
       : 0;
     const totalReviews = properties.reduce((s, p) => s + p.reviewsCount, 0);
     const pendingLeads = leads.filter((l) => l.status === "pending").length;
-    const analytics = getOwnerAnalytics(user.id);
-    const responseRate = getUser(user.id)?.responseRate;
-    return { properties, leads, totalBeds, freeBeds, avgTrust, totalReviews, pendingLeads, analytics, responseRate };
-  }, [user]);
+    // Analytics: mock reads localStorage (real saves+leads, estimate views);
+    // API estimates views/saves but counts real leads from the owner-leads API.
+    const analytics =
+      USE_API || !user
+        ? ownerAnalyticsFromData(properties, leads)
+        : getOwnerAnalytics(user.id);
+    return { totalBeds, freeBeds, avgTrust, totalReviews, pendingLeads, analytics };
+  }, [user, properties, leads]);
+  const responseRate = user?.responseRate;
 
   if (!user) return null;
 

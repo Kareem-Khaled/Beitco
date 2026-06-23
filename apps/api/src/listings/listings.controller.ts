@@ -3,7 +3,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ListingsService } from './listings.service';
 import { ListingsWriteService } from './listings.write.service';
 import { ListPropertiesQueryDto } from './dto/list-properties-query.dto';
-import { CreateListingDto } from './dto/create-listing.dto';
+import { CreateListingDto, ManageListingDto } from './dto/create-listing.dto';
 import { Public } from '../auth/decorators/public.decorator';
 import { CurrentUser, type AuthUser } from '../auth/decorators/current-user.decorator';
 
@@ -48,6 +48,12 @@ export class ListingsController {
   @ApiOperation({ summary: 'Edit my listing' })
   update(@CurrentUser() me: AuthUser, @Param('id') id: string, @Body() dto: CreateListingDto) {
     return this.write.update(me.id, id, dto);
+  }
+
+  @Patch(':id/manage')
+  @ApiOperation({ summary: 'Manage my listing: pause / sale-status / occupancy' })
+  manage(@CurrentUser() me: AuthUser, @Param('id') id: string, @Body() dto: ManageListingDto) {
+    return this.write.manage(me.id, id, dto);
   }
 
   @Delete(':id')

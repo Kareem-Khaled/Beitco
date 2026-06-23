@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { Star } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
-import { getPropertiesByOwner } from "@/lib/beitco/store";
+import { useOwnerProperties } from "@/lib/beitco/queries";
 
 export const Route = createFileRoute("/dashboard/reviews")({
   component: DashboardReviews,
@@ -10,12 +10,12 @@ export const Route = createFileRoute("/dashboard/reviews")({
 
 function DashboardReviews() {
   const { user } = useAuth();
+  const { data: properties = [] } = useOwnerProperties(user?.id);
   const data = useMemo(() => {
-    if (!user) return [];
-    return getPropertiesByOwner(user.id)
+    return properties
       .flatMap((p) => p.reviews.map((r) => ({ r, p })))
       .sort((a, b) => +new Date(b.r.date) - +new Date(a.r.date));
-  }, [user]);
+  }, [properties]);
 
   if (!user) return null;
 

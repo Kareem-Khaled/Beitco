@@ -58,6 +58,7 @@ import {
   apiUpdateProperty,
   apiDeleteProperty,
   apiListMine,
+  apiManageListing,
   apiListOwnerLeads,
   apiUpdateLeadStatus,
   apiReviewRenter,
@@ -67,7 +68,7 @@ import {
   apiRejectListing,
   USE_API,
 } from "./api";
-import type { Property, PropertySummary, SavedSearch, SavedSearchParams, Lead, Review } from "./types";
+import type { Property, PropertySummary, SavedSearch, SavedSearchParams, Lead, Review, Occupant, BedStatus, SaleStatus } from "./types";
 
 // Home + search consume the full published set (they filter/sort client-side).
 export function usePublishedProperties() {
@@ -280,10 +281,11 @@ export async function replyReview(
 }
 
 // ── Listings write (FE-WIRE slice 6a) ───────────────────────────────────────
-// Owner's own listings (all statuses) for the dashboard/count. Mock returns
-// full Property objects; API returns summaries + status from GET /properties/mine.
+// Owner's own listings (all statuses) for the dashboard/count/management grid.
+// Both modes return FULL Property objects (with owner-only occupant data); the
+// API path hits GET /properties/mine (ownership-checked).
 export function useOwnerProperties(userId: string | undefined) {
-  return useQuery<(Property | PropertySummary)[]>({
+  return useQuery<Property[]>({
     queryKey: ["ownerProperties", userId, { source: USE_API ? "api" : "mock" }],
     enabled: !!userId,
     queryFn: async () => {
@@ -316,6 +318,78 @@ export async function saveListing(
 export async function deleteListing(id: string): Promise<void> {
   if (USE_API) return apiDeleteProperty(id);
   storeDeleteProperty(id);
+}
+
+// ── Listing management (FE-WIRE slice 6d) ───────────────────────────────────
+// Granular status/occupancy mutations from the dashboard grid. Each takes the
+// full `property` (so the mock can upsert) but the API only needs its id + the
+// one changed concern. Pause/unpause, sale status, and whole/room/bed occupancy.
+export async function manageListingStatus(
+  property: Property,
+  status: "published" | "paused",
+): Promise<void> {
+  if (USE_API) {
+    await apiManageListing(property.id, { listingStatus: status });
+    return;
+  }
+  storeSaveProperty({ ...property, status });
+}
+
+export async function manageSaleStatus(property: Property, saleStatus: SaleStatus): Promise<void> {
+  if (USE_API) {
+    await apiManageListing(property.id, { saleStatus });
+    return;
+  }
+  storeSaveProperty({ ...property, saleStatus });
+}
+
+export async function manageWholeOccupancy(
+  property: Property,
+  status: BedStatus,
+  occupant?: Occupant,
+): Promise<void> {
+  if (USE_API) {
+    await apiManageListing(property.id, { whole: { status, occupant } });
+    return;
+  }
+  storeSaveProperty({ ...property, wholeStatus: status, wholeOccupant: occupant });
+}
+
+export async function manageRoomOccupancy(
+  property: Property,
+  roomId: string,
+  status: BedStatus,
+  occupant?: Occupant,
+): Promise<void> {
+  if (USE_API) {
+    await apiManageListing(property.id, { room: { roomId, status, occupant } });
+    return;
+  }
+  storeSaveProperty({
+    ...property,
+    rooms: (property.rooms ?? []).map((r) => (r.id === roomId ? { ...r, status, occupant } : r)),
+  });
+}
+
+export async function manageBedOccupancy(
+  property: Property,
+  roomId: string,
+  bedId: string,
+  status: BedStatus,
+  occupant?: Occupant,
+): Promise<void> {
+  if (USE_API) {
+    await apiManageListing(property.id, { bed: { bedId, status, occupant } });
+    return;
+  }
+  storeSaveProperty({
+    ...property,
+    rooms: (property.rooms ?? []).map((r) =>
+      r.id === roomId
+        ? { ...r, beds: r.beds.map((b) => (b.id === bedId ? { ...b, status, occupant } : b)) }
+        : r,
+    ),
+  });
 }
 
 // ── Owner leads + owner→renter reviews (FE-WIRE slice 6b) ───────────────────

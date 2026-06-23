@@ -616,6 +616,47 @@ export function getOwnerAnalytics(ownerId: string): {
   };
 }
 
+// API-mode analytics: there's no events/views table yet, so views & saves stay
+// deterministic estimates (same as mock), but LEADS are real — passed in from
+// the owner-leads API response. Keeps the dashboard believable without a mock
+// localStorage dependency. Mirrors getOwnerAnalytics' shape.
+export function ownerAnalyticsFromData(
+  properties: Property[],
+  leads: { propertyId: string }[],
+): {
+  views: number;
+  saves: number;
+  leads: number;
+  conversion: number;
+  perListing: { property: Property; analytics: ListingAnalytics }[];
+} {
+  const perListing = properties.map((property) => {
+    const views = estimatedViews(property);
+    const saves = Math.round(views * (0.06 + (stableHash(property.id + "s") % 6) / 100));
+    const leadCount = leads.filter((l) => l.propertyId === property.id).length;
+    return {
+      property,
+      analytics: {
+        propertyId: property.id,
+        views,
+        saves,
+        leads: leadCount,
+        conversion: views > 0 ? leadCount / views : 0,
+      } as ListingAnalytics,
+    };
+  });
+  const views = perListing.reduce((s, x) => s + x.analytics.views, 0);
+  const saves = perListing.reduce((s, x) => s + x.analytics.saves, 0);
+  const leadsTotal = perListing.reduce((s, x) => s + x.analytics.leads, 0);
+  return {
+    views,
+    saves,
+    leads: leadsTotal,
+    conversion: views > 0 ? leadsTotal / views : 0,
+    perListing,
+  };
+}
+
 export function createLead(input: Omit<Lead, "id" | "createdAt" | "status">): Lead {
   ensureSeeded();
   const all = readJSON<Lead[]>(STORAGE_KEYS.leads, []);

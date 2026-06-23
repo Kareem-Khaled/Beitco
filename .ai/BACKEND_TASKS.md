@@ -11,13 +11,21 @@
 
 ## 🟢 In Progress
 
-_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (1) + saved-searches (2) + renter-leads (3) + Q&A (4) + reviews (5) + create/edit listing (6a) + owner-leads & renter-reviews (6b) + admin moderation queue (6c) wired behind the flag. Next: dashboard management/overview (6d — listings pause/unit-status + analytics, needs new mutation endpoints). Then the matching-engine port.)_
+_(Backend B-0→MOD-1 done. **FE wiring pass:** reads (B-1) + saved-listings (1) + saved-searches (2) + renter-leads (3) + Q&A (4) + reviews (5) + create/edit listing (6a) + owner-leads & renter-reviews (6b) + admin moderation (6c) + dashboard management/overview (6d) wired behind the flag. **The whole flag-on app is now interactive against the backend.** Next: the matching-engine port + renter-preferences persistence, then port/retire the `_unported/` modules.)_
 
 > **Known seed-fidelity note (not a wiring bug):** properties carry a hand-set display `reviewsCount` (e.g. 32) larger than their actual seeded review rows. The trust recompute counts real rows, so after the first real review the count snaps to the true value. Fix later by seeding more reviews or setting `reviewsCount = reviews.length` in the seed.
 
 ---
 
 ## ✅ Done
+
+### FE-WIRE (slice 6d) · Dashboard management + overview on the API ✅ (June 23)
+- **New owner-view read:** `GET /properties/mine` now returns **full `Property` objects with owner-only occupant data** (was summaries). `serializeProperty(p, { includeOccupants })` adds bed/room/whole `occupant` blocks **only** for the owner view; an `ownerInclude` (beds+rooms+whole occupant, questions) feeds it. The **public** `/properties/:id` still omits occupant data (privacy verified).
+- **New mutation endpoint:** `PATCH /properties/:id/manage` (`ManageListingDto`) — one concern per call: `listingStatus` (pause/unpause, only on a live listing), `saleStatus`, or `whole`/`room`/`bed` occupancy (status + optional occupant). A private `setOccupant()` upserts/clears the 1:1 occupant (available → clear). Ownership-checked (403).
+- `api.ts`: `apiListMine` now returns `Property[]`; `apiManageListing(id, patch)`. `queries.ts`: `useOwnerProperties` returns `Property[]`; flag-aware `manageListingStatus`/`manageSaleStatus`/`manageWholeOccupancy`/`manageRoomOccupancy`/`manageBedOccupancy` (mock upserts via `saveProperty`, API hits `/manage`).
+- **Analytics decision (no events table yet):** mock keeps `getOwnerAnalytics` (real saves+leads, estimate views). New `ownerAnalyticsFromData(properties, leads)` powers API mode — **leads are real** (from the owner-leads API), views/saves stay deterministic estimates. Documented as the seam where a real analytics/events module slots in later.
+- Wired `dashboard/listings.tsx` (grid + pause + whole/room/bed/sale occupancy via the flag-aware helpers + invalidate `ownerProperties`), `dashboard/index.tsx` (headline stats + analytics from `useOwnerProperties`/`useOwnerLeads`; `responseRate` from the auth user), `dashboard/reviews.tsx` (`useOwnerProperties`).
+- **Verified (curl):** `/properties/mine` returns full bed-level data + occupants; pause→`paused`, unpause→`published`; occupy a bed → `occupied` + Arabic occupant (name/phone/moveIn/notes) persisted; free → `available` + occupant cleared; **public `/properties/2` never leaks occupant data**; cross-owner manage → **403**. Re-seeded. `tsc` both apps + 31 web tests; flag-on `/dashboard`, `/dashboard/listings`, `/dashboard/reviews` render 200. Flag OFF unchanged.
 
 ### FE-WIRE (slice 6c) · Admin moderation queue on the API ✅ (June 22)
 - `api.ts`: `apiListPendingListings`/`apiModerationCount`/`apiApproveListing`/`apiRejectListing` (hit the AdminGuard-protected `/admin/moderation*`). `queries.ts`: `usePendingListings()` (returns full `Property[]` — the card needs landlord/address/description), `useModerationCount()` (nav badge), `approveListing(id)`/`rejectListing(id, reason)` (flag-aware; aliased over the store fns).

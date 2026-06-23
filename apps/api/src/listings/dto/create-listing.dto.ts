@@ -271,3 +271,85 @@ export class RejectListingDto {
   @MaxLength(500)
   reason!: string;
 }
+
+// ── Manage (status + occupancy) ─────────────────────────────────────────────
+// Owner-only granular updates from the dashboard management grid. Each call
+// carries exactly one concern; the service applies whichever field is present.
+class OccupantInputDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  name?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(40)
+  phone?: string;
+
+  @ApiPropertyOptional({ description: 'ISO move-in date' })
+  @IsOptional()
+  @IsString()
+  moveInDate?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  notes?: string;
+}
+
+class WholeOccupancyDto {
+  @ApiProperty({ enum: ['available', 'occupied', 'reserved'] })
+  @IsIn(['available', 'occupied', 'reserved'])
+  status!: string;
+
+  @ApiPropertyOptional({ type: OccupantInputDto })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => OccupantInputDto)
+  occupant?: OccupantInputDto;
+}
+
+class RoomOccupancyDto extends WholeOccupancyDto {
+  @ApiProperty()
+  @IsString()
+  roomId!: string;
+}
+
+class BedOccupancyDto extends WholeOccupancyDto {
+  @ApiProperty()
+  @IsString()
+  bedId!: string;
+}
+
+export class ManageListingDto {
+  @ApiPropertyOptional({ enum: ['published', 'paused'] })
+  @IsOptional()
+  @IsIn(['published', 'paused'])
+  listingStatus?: 'published' | 'paused';
+
+  @ApiPropertyOptional({ enum: ['available', 'sold'] })
+  @IsOptional()
+  @IsIn(['available', 'sold'])
+  saleStatus?: 'available' | 'sold';
+
+  @ApiPropertyOptional({ type: WholeOccupancyDto })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => WholeOccupancyDto)
+  whole?: WholeOccupancyDto;
+
+  @ApiPropertyOptional({ type: RoomOccupancyDto })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => RoomOccupancyDto)
+  room?: RoomOccupancyDto;
+
+  @ApiPropertyOptional({ type: BedOccupancyDto })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => BedOccupancyDto)
+  bed?: BedOccupancyDto;
+}

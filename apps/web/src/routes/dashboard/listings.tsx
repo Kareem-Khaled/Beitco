@@ -1,8 +1,18 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Eye, Pause, Play, Trash2, Plus, ChevronDown, BedDouble, DoorOpen, Home, Pencil, User, Calendar, BadgeCheck, Tag, Clock, AlertCircle } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
-import { getPropertiesByOwner, saveProperty, deleteProperty, timeAgo } from "@/lib/beitco/store";
+import { timeAgo } from "@/lib/beitco/store";
+import {
+  useOwnerProperties,
+  deleteListing,
+  manageListingStatus,
+  manageSaleStatus,
+  manageWholeOccupancy,
+  manageRoomOccupancy,
+  manageBedOccupancy,
+} from "@/lib/beitco/queries";
 import type { Property, BedStatus, Occupant, SaleStatus } from "@/lib/beitco/types";
 import { Button } from "@/components/ui/button";
 import { OccupancyDialog } from "@/components/beitco/OccupancyDialog";
@@ -25,61 +35,47 @@ export const Route = createFileRoute("/dashboard/listings")({
 function DashboardListings() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [, force] = useState(0);
+  const qc = useQueryClient();
   const [expanded, setExpanded] = useState<string | null>(null);
-  const refresh = () => force((x) => x + 1);
+  const { data: properties = [] } = useOwnerProperties(user?.id);
 
   if (!user) return null;
-  const properties = getPropertiesByOwner(user.id);
 
-  const togglePause = (p: Property) => {
-    saveProperty({ ...p, status: p.status === "paused" ? "published" : "paused" });
+  const refresh = () => qc.invalidateQueries({ queryKey: ["ownerProperties", user.id] });
+
+  const togglePause = async (p: Property) => {
+    await manageListingStatus(p, p.status === "paused" ? "published" : "paused");
     refresh();
   };
 
-  const setWholeOccupancy = (p: Property, status: BedStatus, occupant?: Occupant) => {
-    saveProperty({ ...p, wholeStatus: status, wholeOccupant: occupant });
+  const setWholeOccupancy = async (p: Property, status: BedStatus, occupant?: Occupant) => {
+    await manageWholeOccupancy(p, status, occupant);
     refresh();
   };
 
-  const setSaleStatus = (p: Property, saleStatus: SaleStatus) => {
-    saveProperty({ ...p, saleStatus });
+  const setSaleStatus = async (p: Property, saleStatus: SaleStatus) => {
+    await manageSaleStatus(p, saleStatus);
     refresh();
   };
 
-  const setRoomOccupancy = (p: Property, roomId: string, status: BedStatus, occupant?: Occupant) => {
-    saveProperty({
-      ...p,
-      rooms: (p.rooms ?? []).map((r) =>
-        r.id === roomId ? { ...r, status, occupant } : r,
-      ),
-    });
+  const setRoomOccupancy = async (p: Property, roomId: string, status: BedStatus, occupant?: Occupant) => {
+    await manageRoomOccupancy(p, roomId, status, occupant);
     refresh();
   };
 
-  const setBedOccupancy = (
+  const setBedOccupancy = async (
     p: Property,
     roomId: string,
     bedId: string,
     status: BedStatus,
     occupant?: Occupant,
   ) => {
-    saveProperty({
-      ...p,
-      rooms: (p.rooms ?? []).map((r) =>
-        r.id === roomId
-          ? {
-              ...r,
-              beds: r.beds.map((b) => (b.id === bedId ? { ...b, status, occupant } : b)),
-            }
-          : r,
-      ),
-    });
+    await manageBedOccupancy(p, roomId, bedId, status, occupant);
     refresh();
   };
 
-  const onDelete = (id: string) => {
-    deleteProperty(id);
+  const onDelete = async (id: string) => {
+    await deleteListing(id);
     refresh();
   };
 
