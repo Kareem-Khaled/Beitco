@@ -11,13 +11,19 @@
 
 ## 🟢 In Progress
 
-_(Backend B-0→MOD-1 done. **Flag-on app fully interactive** (FE wiring slices 1–6d + T-MATCH). `_unported/` cleaned (CLEANUP-1). **Chat shipped end-to-end** (CHAT-1 REST + CHAT-2 FE wiring) — "كلّم صاحب الشقة" now works against the API. Remaining: notifications (NOTIF-1, saved-search/lead alerts) + an optional Socket.io gateway for live chat delivery.)_
+_(Backend B-0→MOD-1 done. **Flag-on app fully interactive** (FE wiring slices 1–6d + T-MATCH). `_unported/` cleaned (CLEANUP-1). **Chat shipped** (CHAT-1/2) and **notifications shipped** (NOTIF-1). The flag-on app now covers every core surface against the backend. Optional follow-ups: a Socket.io gateway for live chat (CHAT-3) and a BullMQ saved-search "هنبلّغك" matching job (NOTIF-2).)_
 
 > **Known seed-fidelity note (not a wiring bug):** properties carry a hand-set display `reviewsCount` (e.g. 32) larger than their actual seeded review rows. The trust recompute counts real rows, so after the first real review the count snaps to the true value. Fix later by seeding more reviews or setting `reviewsCount = reviews.length` in the seed.
 
 ---
 
 ## ✅ Done
+
+### NOTIF-1 · Notifications (derived feed) ✅ (June 23)
+- New `src/notifications` (ported from the web mock `store.ts getNotificationsForUser` — a **derived** feed, no stored table): `GET /me/notifications` → `{ items, lastSeen }` computed from pending leads (owner), unread threads (both), review-eligible tenancies (≥30 days), and verification status; `GET /me/notifications/unread-count` (bell badge); `POST /me/notifications/seen`. Read-state is a per-user "last seen" epoch-ms marker in **Redis** (mirrors the mock's localStorage marker; auth-style lazy client; degrades gracefully if Redis is down). Em-dash/guillemet/emoji Arabic strings → written via heredoc.
+- `api.ts`: `apiListNotifications`/`apiNotificationsUnreadCount`/`apiMarkNotificationsSeen`. `queries.ts`: `useNotifications(userId)` + `useNotificationUnreadCount(userId)` (flag-aware, zero-flash mock) + `markNotificationsSeen`. Wired `/notifications` (feed + mark-seen-on-view → invalidates the bell) and the header `UserMenu` bell badge (`useNotificationUnreadCount`, hook hoisted above the early returns).
+- **Verified (curl):** create a lead → owner feed shows the "lead" + "verification" items (sorted desc); unread-count **2 → 0** after `POST /seen`; feed persists (seen only affects the count); **401** unauth. Re-seeded. `tsc` both apps + 31 web + 31 Jest; flag-on `/notifications`, `/`, `/me` render 200. Mock path unchanged.
+- **Deferred (NOTIF-2):** a BullMQ job that matches new listings against saved searches and pushes "هنبلّغك" alerts; the occupant-link consent notification (its action flow isn't ported yet).
 
 ### CHAT-2 · Wire chat to the frontend behind the flag ✅ (June 23)
 - `api.ts`: `apiListThreads`/`apiGetThread`/`apiFindOrCreateThread`/`apiSendMessage`. `queries.ts`: `useThreads(userId)` + `useThread(threadId, userId)` (flag-aware, zero-flash mock) + `startThread`/`sendChatMessage` + `threadPropertyOf(thread)` (flag-agnostic property summary: API embeds it, mock derives via `getProperty`). `Thread` type gained the optional embedded `property`.

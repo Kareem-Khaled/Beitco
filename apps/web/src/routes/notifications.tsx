@@ -1,18 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Bell, Inbox, MessageCircle, Star, ShieldCheck, Search, BadgeCheck } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
-import {
-  getNotificationsForUser,
-  markNotificationsSeen,
-  getLastSeenNotifications,
-  type AppNotification,
-} from "@/lib/beitco/store";
+import { type AppNotification, timeAgo } from "@/lib/beitco/store";
+import { useNotifications, markNotificationsSeen } from "@/lib/beitco/queries";
 import { SiteHeader } from "@/components/beitco/SiteHeader";
 import { SiteFooter } from "@/components/beitco/SiteFooter";
 import { EmptyState } from "@/components/beitco/EmptyState";
 import { Button } from "@/components/ui/button";
-import { timeAgo } from "@/lib/beitco/store";
 
 export const Route = createFileRoute("/notifications")({
   component: NotificationsPage,
@@ -32,22 +28,24 @@ const META: Record<
 function NotificationsPage() {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
+  const qc = useQueryClient();
+  const { data } = useNotifications(user?.id);
+  // Captured at fetch time: lastSeen is the PRE-view marker, so items newer than
+  // it render as "new" even though we mark everything seen on view (below).
+  const items = data?.items ?? [];
+  const lastSeen = data?.lastSeen ?? 0;
 
   useEffect(() => {
     if (!isLoading && !user) navigate({ to: "/auth/login" });
   }, [user, isLoading, navigate]);
 
-  const { items, lastSeen } = useMemo(() => {
-    if (!user) return { items: [] as AppNotification[], lastSeen: 0 };
-    const lastSeen = getLastSeenNotifications(user.id);
-    const items = getNotificationsForUser(user.id);
-    return { items, lastSeen };
-  }, [user]);
-
-  // Mark everything seen on view (after we've captured the previous lastSeen).
+  // Mark everything seen on view, then refresh the bell badge.
   useEffect(() => {
-    if (user) markNotificationsSeen(user.id);
-  }, [user]);
+    if (!user) return;
+    void markNotificationsSeen(user.id).then(() => {
+      qc.invalidateQueries({ queryKey: ["notificationsUnread", user.id] });
+    });
+  }, [user, qc]);
 
   if (!user) return null;
 

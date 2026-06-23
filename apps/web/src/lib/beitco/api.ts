@@ -464,3 +464,25 @@ export async function apiSendMessage(
   );
   return body.data;
 }
+
+// ── Notifications (NOTIF-1) ─────────────────────────────────────────────────
+// AppNotification lives in store.ts (the derived-feed type). The API computes
+// the same feed server-side + a Redis-backed last-seen marker.
+export async function apiListNotifications(): Promise<{
+  items: import("./store").AppNotification[];
+  lastSeen: number;
+}> {
+  const body = await getJSON<{ items: import("./store").AppNotification[]; lastSeen: number }>(
+    "/me/notifications",
+  );
+  return body.data;
+}
+
+export async function apiNotificationsUnreadCount(): Promise<number> {
+  const body = await getJSON<{ count: number }>("/me/notifications/unread-count");
+  return body.data.count;
+}
+
+export async function apiMarkNotificationsSeen(): Promise<void> {
+  await postJSON("/me/notifications/seen");
+}

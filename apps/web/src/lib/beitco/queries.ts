@@ -43,6 +43,11 @@ import {
   getThread as storeGetThread,
   findOrCreateThread as storeFindOrCreateThread,
   postMessage as storePostMessage,
+  getNotificationsForUser,
+  getLastSeenNotifications,
+  getUnreadNotificationCount,
+  markNotificationsSeen as storeMarkNotificationsSeen,
+  type AppNotification,
 } from "./store";
 import {
   apiListProperties,
@@ -76,6 +81,9 @@ import {
   apiGetThread,
   apiFindOrCreateThread,
   apiSendMessage,
+  apiListNotifications,
+  apiNotificationsUnreadCount,
+  apiMarkNotificationsSeen,
   USE_API,
 } from "./api";
 import type { Property, PropertySummary, SavedSearch, SavedSearchParams, Lead, Review, Occupant, BedStatus, SaleStatus, Thread, Message } from "./types";
@@ -576,6 +584,46 @@ export function threadPropertyOf(
     area: p.area,
     landlord: { name: p.landlord.name, initials: p.landlord.initials, verified: p.landlord.verified },
   };
+}
+
+// ── Notifications (NOTIF-1) ─────────────────────────────────────────────────
+// A derived feed (+ last-seen marker). Mock computes locally; API hits
+// GET /me/notifications. Both return { items, lastSeen }.
+export function useNotifications(userId: string | undefined) {
+  return useQuery<{ items: AppNotification[]; lastSeen: number }>({
+    queryKey: ["notifications", userId, { source: USE_API ? "api" : "mock" }],
+    enabled: !!userId,
+    queryFn: async () => {
+      if (USE_API) return apiListNotifications();
+      if (!userId) return { items: [], lastSeen: 0 };
+      return { items: getNotificationsForUser(userId), lastSeen: getLastSeenNotifications(userId) };
+    },
+    initialData:
+      USE_API || !userId
+        ? undefined
+        : () => ({ items: getNotificationsForUser(userId), lastSeen: getLastSeenNotifications(userId) }),
+    staleTime: USE_API ? 20_000 : Infinity,
+  });
+}
+
+// Unread count for the bell badge.
+export function useNotificationUnreadCount(userId: string | undefined) {
+  return useQuery<number>({
+    queryKey: ["notificationsUnread", userId, { source: USE_API ? "api" : "mock" }],
+    enabled: !!userId,
+    queryFn: async () => {
+      if (USE_API) return apiNotificationsUnreadCount();
+      if (!userId) return 0;
+      return getUnreadNotificationCount(userId);
+    },
+    initialData: USE_API || !userId ? undefined : () => getUnreadNotificationCount(userId),
+    staleTime: USE_API ? 20_000 : Infinity,
+  });
+}
+
+export async function markNotificationsSeen(userId: string): Promise<void> {
+  if (USE_API) return apiMarkNotificationsSeen();
+  storeMarkNotificationsSeen(userId);
 }
 
 

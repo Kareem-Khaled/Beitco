@@ -10,13 +10,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/lib/beitco/auth";
-import { getUnreadNotificationCount } from "@/lib/beitco/store";
+import { useNotificationUnreadCount } from "@/lib/beitco/queries";
 import { getStoredTheme, resolveTheme, setTheme } from "@/lib/beitco/theme";
 
 export function UserMenu() {
   const { user, logout, isLoading } = useAuth();
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(false);
+  const { data: unread = 0 } = useNotificationUnreadCount(user?.id);
 
   useEffect(() => {
     setIsDark(resolveTheme(getStoredTheme()) === "dark");
@@ -50,7 +51,6 @@ export function UserMenu() {
   };
 
   const isOwner = user.role === "owner" || user.role === "both";
-  const unread = getUnreadNotificationCount(user.id);
 
   const toggleDark = () => {
     const next = resolveTheme(getStoredTheme()) === "dark" ? "light" : "dark";
