@@ -11,6 +11,8 @@ import {
   BookmarkCheck,
   SearchX,
   Moon,
+  LocateFixed,
+  Loader2,
 } from "lucide-react";
 import { z } from "zod";
 import { SiteHeader } from "@/components/beitco/SiteHeader";
@@ -19,7 +21,7 @@ import { BeitcoListingCard } from "@/components/beitco/BeitcoListingCard";
 import { EmptyState } from "@/components/beitco/EmptyState";
 import { EGYPT_AREAS } from "@/lib/beitco/store";
 import {
-  usePublishedProperties,
+  useSearchProperties,
   useSavedSearches,
   createSavedSearch,
   alreadySavedIn,
@@ -49,6 +51,11 @@ const searchSchema = z.object({
   minPrice: z.number().optional(),
   maxPrice: z.number().optional(),
   sort: z.enum(["trust", "price_asc", "price_desc", "newest"]).optional(),
+  // PROD-4: "قريب مني" geo radius. lat+lng come from the browser; radiusKm
+  // defaults to 5. Server (API mode) does PostGIS; mock mode does haversine.
+  lat: z.number().optional(),
+  lng: z.number().optional(),
+  radiusKm: z.number().optional(),
 });
 
 export const Route = createFileRoute("/search")({
@@ -68,6 +75,9 @@ const SORT_OPTIONS = [
 // the "all areas" option and map it back to `undefined` in the URL params.
 const ALL_AREAS = "__all__";
 
+// "قريب مني" radius choices (km).
+const RADIUS_OPTIONS = [2, 5, 10, 25] as const;
+
 function SearchPage() {
   const params = Route.useSearch();
   const navigate = useNavigate({ from: "/search" });
@@ -81,10 +91,17 @@ function SearchPage() {
     navigate({ search: (prev) => ({ ...prev, ...next }) });
   };
 
-  const { data: all = [] } = usePublishedProperties();
+  const { data: result } = useSearchProperties(params);
+  const geoActive = params.lat != null && params.lng != null;
 
   const filtered = useMemo(() => {
-    let list = [...all];
+    if (!result) return [];
+    // API mode: the server already applied text (PROD-3) + filters + sort + geo
+    // (PROD-4), so render its result as-is.
+    if (result.mode === "server") return result.items;
+
+    // Mock mode: filter/sort/rank client-side so the prototype works offline.
+    let list = [...result.items];
     if (params.q) {
       const needle = params.q.trim().toLowerCase();
       list = list.filter(
@@ -104,6 +121,23 @@ function SearchPage() {
     if (params.minPrice != null) list = list.filter((p) => p.price >= params.minPrice!);
     if (params.maxPrice != null) list = list.filter((p) => p.price <= params.maxPrice!);
 
+    // PROD-4 (mock): "قريب مني" — haversine radius filter, ordered by distance
+    // (proximity overrides the sort preference, mirroring the server).
+    if (params.lat != null && params.lng != null) {
+      const r = params.radiusKm ?? 5;
+      return list
+        .map((p) => ({
+          p,
+          d:
+            p.lat != null && p.lng != null
+              ? haversineKm(params.lat!, params.lng!, p.lat, p.lng)
+              : Infinity,
+        }))
+        .filter((x) => x.d <= r)
+        .sort((a, b) => a.d - b.d)
+        .map((x) => x.p);
+    }
+
     const sort = params.sort ?? "trust";
     list.sort((a, b) => {
       if (sort === "trust") return b.trust - a.trust;
@@ -112,7 +146,7 @@ function SearchPage() {
       return +new Date(b.createdAt) - +new Date(a.createdAt);
     });
     return list;
-  }, [all, params]);
+  }, [result, params]);
 
   const hasFilters =
     !!params.q ||
@@ -190,6 +224,13 @@ function SearchPage() {
               </button>
             ) : null}
           </div>
+          <NearMeControl
+            active={geoActive}
+            radiusKm={params.radiusKm ?? 5}
+            onApply={(lat, lng) => submit({ lat, lng, radiusKm: params.radiusKm ?? 5 })}
+            onRadius={(radiusKm) => submit({ radiusKm })}
+            onClear={() => submit({ lat: undefined, lng: undefined, radiusKm: undefined })}
+          />
           <Button type="submit" className="rounded-xl">
             دوّر
           </Button>
@@ -403,22 +444,29 @@ function SearchPage() {
                 </span>{" "}
                 مكان متاح
               </p>
-              <Select
-                dir="rtl"
-                value={params.sort ?? "trust"}
-                onValueChange={(v) => submit({ sort: v as typeof params.sort })}
-              >
-                <SelectTrigger className="h-9 w-auto gap-1.5 bg-surface text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {SORT_OPTIONS.map((o) => (
-                    <SelectItem key={o.id} value={o.id}>
-                      {o.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {geoActive ? (
+                <span className="inline-flex items-center gap-1.5 rounded-lg bg-trust-soft px-2.5 py-2 text-xs font-medium text-trust">
+                  <LocateFixed className="h-3.5 w-3.5" />
+                  مرتّبة بالأقرب ليك
+                </span>
+              ) : (
+                <Select
+                  dir="rtl"
+                  value={params.sort ?? "trust"}
+                  onValueChange={(v) => submit({ sort: v as typeof params.sort })}
+                >
+                  <SelectTrigger className="h-9 w-auto gap-1.5 bg-surface text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SORT_OPTIONS.map((o) => (
+                      <SelectItem key={o.id} value={o.id}>
+                        {o.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
             {filtered.length === 0 ? (
@@ -508,4 +556,104 @@ function Toggle({
       />
     </label>
   );
+}
+
+// "قريب مني": asks the browser for the user's location, then drives a geo
+// radius search. When active it shows the radius selector + a clear button.
+function NearMeControl({
+  active,
+  radiusKm,
+  onApply,
+  onRadius,
+  onClear,
+}: {
+  active: boolean;
+  radiusKm: number;
+  onApply: (lat: number, lng: number) => void;
+  onRadius: (km: number) => void;
+  onClear: () => void;
+}) {
+  const [locating, setLocating] = useState(false);
+
+  const locate = () => {
+    if (!("geolocation" in navigator)) {
+      toast.error("جهازك مش بيدعم تحديد المكان");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocating(false);
+        onApply(pos.coords.latitude, pos.coords.longitude);
+      },
+      (err) => {
+        setLocating(false);
+        toast.error(
+          err.code === err.PERMISSION_DENIED
+            ? "محتاجين إذن المكان عشان نوريك اللي قريب منك"
+            : "مش قادرين نحدد مكانك دلوقتي، جرّب تاني",
+        );
+      },
+      { enableHighAccuracy: true, timeout: 10_000 },
+    );
+  };
+
+  if (active) {
+    return (
+      <div className="flex items-center gap-1 rounded-xl border border-trust/40 bg-trust-soft/50 ps-3 pe-1.5 text-sm text-trust">
+        <LocateFixed className="h-4 w-4 shrink-0" />
+        <span className="font-medium">قريب مني</span>
+        <Select dir="rtl" value={String(radiusKm)} onValueChange={(v) => onRadius(Number(v))}>
+          <SelectTrigger className="h-7 w-auto gap-1 border-0 bg-transparent px-1.5 text-xs text-trust shadow-none">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {RADIUS_OPTIONS.map((r) => (
+              <SelectItem key={r} value={String(r)}>
+                {r.toLocaleString("ar-EG-u-nu-latn")} كم
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <button
+          type="button"
+          onClick={onClear}
+          className="rounded-md p-1 hover:bg-trust/10"
+          aria-label="شيل قريب مني"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      className="gap-1.5 rounded-xl"
+      onClick={locate}
+      disabled={locating}
+    >
+      {locating ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <LocateFixed className="h-4 w-4" />
+      )}
+      قريب مني
+    </Button>
+  );
+}
+
+// Great-circle distance in km — powers the mock-mode "قريب مني" radius filter
+// (the API path uses PostGIS ST_DWithin server-side instead).
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
 }

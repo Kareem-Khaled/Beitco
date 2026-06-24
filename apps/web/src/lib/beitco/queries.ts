@@ -91,6 +91,7 @@ import {
   apiApproveVerification,
   apiRejectVerification,
   type VerificationDocs,
+  type PropertyFilters,
   USE_API,
 } from "./api";
 import type {
@@ -122,6 +123,33 @@ export function usePublishedProperties() {
     // Mock is synchronous -> hydrate immediately (no flash). API -> normal fetch.
     initialData: USE_API ? undefined : () => getPublishedProperties(),
     staleTime: USE_API ? 30_000 : Infinity,
+  });
+}
+
+// Search page (FE-SEARCH): server-side text + geo. In API mode the backend does
+// the filtering/sorting (PROD-3 typo-tolerant `q`, PROD-4 PostGIS `lat/lng/radiusKm`)
+// and returns the final set (`mode: "server"`). In mock mode we return the full
+// published set and the page filters/sorts/ranks client-side (`mode: "client"`),
+// so the prototype keeps working with no backend.
+export type SearchResult =
+  | { items: Property[]; mode: "client" }
+  | { items: PropertySummary[]; mode: "server" };
+
+export function useSearchProperties(params: PropertyFilters) {
+  return useQuery<SearchResult>({
+    // API mode keys by params (each filter set is a distinct server query); mock
+    // mode is param-independent (the page filters in-memory) so it caches once.
+    queryKey: USE_API ? ["search", "api", params] : ["search", "mock"],
+    queryFn: async () => {
+      if (USE_API) {
+        const { items } = await apiListProperties({ ...params, limit: 50 });
+        return { items, mode: "server" };
+      }
+      return { items: getPublishedProperties(), mode: "client" };
+    },
+    // Mock can hydrate synchronously (no flash); API fetches normally.
+    initialData: USE_API ? undefined : () => ({ items: getPublishedProperties(), mode: "client" }),
+    staleTime: USE_API ? 15_000 : Infinity,
   });
 }
 

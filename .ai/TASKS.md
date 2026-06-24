@@ -1,6 +1,6 @@
 # Task Board — Beitco (Frontend)
 
-> Frontend (`apps/web`) board. **Last updated: June 23, 2026.**
+> Frontend (`apps/web`) board. **Last updated: June 24, 2026.**
 >
 > ➡️ **The active backlog for the whole project is now `.ai/NEXT_STEPS.md`** (production hardening — security, testing, deploy, observability). The backend build log is `.ai/BACKEND_TASKS.md`. Current status is `.ai/CURRENT_STATE.md`.
 >
@@ -16,6 +16,7 @@ _(nothing in flight on the frontend — it's feature-complete and wired to the A
 
 ## ✅ Recently shipped (this cycle)
 
+- **Server-side search + "قريب مني" geo (FE wiring for PROD-3/PROD-4)** — the `/search` page now sends `q` + all filters + `lat`/`lng`/`radiusKm` to `GET /properties` in `VITE_USE_API` mode via a new `useSearchProperties` hook (server does typo-tolerant Meili text + PostGIS radius, returns the final set). A **"قريب مني"** control uses the browser geolocation API to drive a radius search (2/5/10/25 كم selector, distance-ordered, "مرتّبة بالأقرب ليك"). Mock mode keeps full client-side filtering + a **haversine** radius fallback (seed properties got real coords), so the prototype works offline. Saved-search params are unaffected (geo keys are whitelisted out by `normalizeSearchParams`).
 - **Trust engine — wedge complete (T-1 → T-5)** — `lib/beitco/trust.ts` + `store.ts`: Bayesian-smoothed listing, owner, **and renter** scores; verification cap; quality from review categories; **real response-rate** from message behavior (`ResponseEvent`); **two-sided renter reputation** (`RenterReview`, owner-side flow, privacy-safe lead badges). Recompute on review/reply/seed, persisted breakdowns. Acceptance verified on the real module. Only the owner "raise your score" checklist remains.
 - **Trust transparency (T-5)** — "ليه الدرجة دي؟" popover shows live computed contributions; owner "بترد بسرعة" dashboard card; renter "سمعتك كساكن" card.
 - **Frontend polish** — role-aware `/me` (FE-1), loading skeletons (FE-2), owner analytics (FE-3), property map (FE-4), review UX (FE-5), saved searches (FE-6), share button, dark mode, dynamic per-listing `<head>`, favicon/OG, dead-code cleanup, and an accessibility pass (FE-7).
@@ -100,8 +101,8 @@ _(nothing in flight on the frontend — it's feature-complete and wired to the A
 - Bulk import / coliving-operator onboarding / "migrate your FB-group listing" flow.
 - Pick a launch beachhead (PRD §9.4) and concentrate supply.
 
-### S-1 · Meilisearch-backed search
-- Index properties; replace in-memory filter (URL filters already shareable).
+### S-1 · Meilisearch-backed search — ✅ Done (PROD-3 + FE wiring)
+- ✅ Index properties; the web search page sends `q`/filters/geo to the API (replaces the in-memory filter in `VITE_USE_API` mode; URL filters already shareable). Mock mode keeps client-side filtering.
 
 ### PAY-1 · Monetization
 - Verified-owner subscription (299 EGP/mo) + 5% success fee on ≥30-day move-ins.

@@ -48,6 +48,11 @@ export type PropertyFilters = {
   minPrice?: number;
   maxPrice?: number;
   sort?: "trust" | "price_asc" | "price_desc" | "newest";
+  // PROD-4: geo radius ("قريب مني"). All three travel together; the server
+  // does a PostGIS ST_DWithin prefilter ordered by distance.
+  lat?: number;
+  lng?: number;
+  radiusKm?: number;
   limit?: number;
   cursor?: string;
 };
@@ -65,6 +70,9 @@ function toQuery(f: PropertyFilters = {}): string {
   if (f.minPrice != null) p.set("minPrice", String(f.minPrice));
   if (f.maxPrice != null) p.set("maxPrice", String(f.maxPrice));
   if (f.sort) p.set("sort", f.sort);
+  if (f.lat != null) p.set("lat", String(f.lat));
+  if (f.lng != null) p.set("lng", String(f.lng));
+  if (f.radiusKm != null) p.set("radiusKm", String(f.radiusKm));
   if (f.limit != null) p.set("limit", String(f.limit));
   if (f.cursor) p.set("cursor", f.cursor);
   const s = p.toString();
