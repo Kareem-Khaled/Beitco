@@ -64,7 +64,7 @@ NestJS — **one module per feature**, services inject `PrismaService`. Cross-cu
 
 ## 5. Data & infra
 
-- **PostgreSQL 16 + PostGIS** via Prisma. 22 models, 21 enums, UUID PKs, snake_case `@map`, soft deletes (`deleted_at`), 30 indexes/uniques. Source of truth: `apps/api/prisma/schema.prisma` (see `.ai/DB_SCHEMA.md`). Dev runs on **port 5433** (gitignored override; native pg holds 5432). PostGIS is provisioned but geo search isn't used yet (PROD-4).
+- **PostgreSQL 16 + PostGIS** via Prisma. 22 models, 21 enums, UUID PKs, snake_case `@map`, soft deletes (`deleted_at`), 30 indexes/uniques. Source of truth: `apps/api/prisma/schema.prisma` (see `.ai/DB_SCHEMA.md`). Dev runs on **port 5433** (gitignored override; native pg holds 5432). **PostGIS geo search is live** — a trigger-maintained, GiST-indexed `geog` column powers `ST_DWithin` radius search (PROD-4).
 - **Redis 7** — OTP store, refresh/blacklist, notification last-seen marker.
 - **Meilisearch v1.11** — provisioned, **not integrated** yet (search is client-side filtering; PROD-3).
 

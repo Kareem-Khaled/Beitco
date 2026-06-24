@@ -85,19 +85,19 @@ Treat this section as the source of truth over any `@RequireTier` references els
 
 ## Infra (`docker-compose.yml`)
 
-- **Postgres 16 + PostGIS** (`beitco-postgres`). Dev runs on **host port 5433** via the gitignored `docker-compose.override.yml` (a native Postgres occupies 5432). `lat`/`lng` are plain floats today — PostGIS geometry/spatial search is not yet used.
+- **Postgres 16 + PostGIS** (`beitco-postgres`). Dev runs on **host port 5433** via the gitignored `docker-compose.override.yml` (a native Postgres occupies 5432). A trigger-maintained, **GiST-indexed `geog` column** (derived from `lat`/`lng`) powers `ST_DWithin` radius search (PROD-4).
 - **Redis 7** (`beitco-redis`) — OTP store + notification last-seen marker.
-- **Meilisearch v1.11** (`beitco-meilisearch`) — running but **not integrated**; search is in-memory client-side filtering today.
+- **Meilisearch v1.11** (`beitco-meilisearch`) — **integrated** (PROD-3): typo-tolerant, Arabic-aware `?q=` with relevance ordering + a DB `contains` fallback when it's unreachable/unset.
 
 ---
 
 ## Known gaps (tracked in `.ai/NEXT_STEPS.md`)
 
-- **Security:** hardcoded `dev-jwt-secret` fallbacks; no `helmet`; OTP is a dev stub (no SMS gateway).
-- **Testing:** only the pure engines are unit-tested; no controller/service/e2e/component tests (the curl smokes aren't codified).
-- **DevOps:** no Dockerfiles for the apps; CI only type-checks/lints/tests (the API has no ESLint config, so its lint step fails); no CD/migrations-on-deploy.
-- **Observability:** no Sentry/metrics/structured logs; health check never pings Postgres/Redis.
-- **Product:** no image-upload pipeline (wizard stores base64 data URLs); payments not built; Meilisearch + PostGIS unused.
+> **The hardening backlog (P0 security → P1 shippable → P2 product) is complete.** What remains is optional polish + the business phases.
+
+- **Security / shippable / observability:** ✅ done — secrets fail-fast + `helmet` + readiness (DB+Redis) + OTP throttle; API ESLint + CI/CD + Dockerfiles; e2e suite (19); structured pino logs + Sentry.
+- **Product:** ✅ image-upload pipeline (PROD-1), real OTP/SMS gateway (PROD-2), Meilisearch (PROD-3), PostGIS geo (PROD-4), verification/KYC (PROD-5).
+- **Still open (optional):** **P3 polish** — decompose the two monolith FE files, resolve the 3 empty shared packages, a shared RedisModule, a BullMQ worker for saved-search alerts, the occupant-link consent flow, a11y automation. **P4 business** — payments (Paymob/Stripe EGP) + Capacitor mobile wrap. A real deploy **host** (the CD pipeline + staging skeleton exist; the target isn't wired).
 
 ---
 

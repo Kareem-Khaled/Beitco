@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsBooleanString, IsIn, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsBooleanString, IsIn, IsInt, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 
 /**
  * Filters for GET /properties. Mirrors the frontend search params
@@ -66,6 +66,31 @@ export class ListPropertiesQueryDto {
   @IsOptional()
   @IsIn(['trust', 'price_asc', 'price_desc', 'newest'])
   sort?: 'trust' | 'price_asc' | 'price_desc' | 'newest';
+
+  // PROD-4: geo radius search ("قريب مني"). All three must be present together.
+  @ApiPropertyOptional({ description: 'Latitude for radius search', minimum: -90, maximum: 90 })
+  @IsOptional()
+  @Transform(({ value }) => (value === '' || value == null ? undefined : Number(value)))
+  @IsNumber()
+  @Min(-90)
+  @Max(90)
+  lat?: number;
+
+  @ApiPropertyOptional({ description: 'Longitude for radius search', minimum: -180, maximum: 180 })
+  @IsOptional()
+  @Transform(({ value }) => (value === '' || value == null ? undefined : Number(value)))
+  @IsNumber()
+  @Min(-180)
+  @Max(180)
+  lng?: number;
+
+  @ApiPropertyOptional({ description: 'Radius in km (default 5, max 50) — requires lat & lng' })
+  @IsOptional()
+  @Transform(({ value }) => (value === '' || value == null ? undefined : Number(value)))
+  @IsNumber()
+  @Min(0.1)
+  @Max(50)
+  radiusKm?: number;
 
   @ApiPropertyOptional({ description: 'Cursor (property id) for pagination' })
   @IsOptional()

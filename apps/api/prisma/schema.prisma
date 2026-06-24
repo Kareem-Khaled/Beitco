@@ -234,6 +234,9 @@ model Property {
   address     String @default("")
   lat         Float?
   lng         Float?
+  // PROD-4: PostGIS point kept in sync from lat/lng by a DB trigger (see the
+  // add_geo_point migration). Prisma doesn't manage it; geo queries use raw SQL.
+  geog        Unsupported("geography(Point, 4326)")?
 
   type        PropertyType
   status      PropertyStatus @default(draft)

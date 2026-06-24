@@ -77,15 +77,47 @@ export class ListingsService {
       }
     }
 
+    // PROD-4: geo radius ("قريب مني"). When lat+lng are present, a PostGIS
+    // ST_DWithin query (GiST-indexed) returns nearby published ids ordered by
+    // distance; we constrain the main query to them and (absent a text query)
+    // order by proximity. Intersects with the q result when both are given.
+    let geoOrder: string[] | null = null;
+    if (query.lat != null && query.lng != null) {
+      const radiusM = (query.radiusKm ?? 5) * 1000;
+      const nearby = await this.prisma.$queryRaw<{ id: string }[]>`
+        SELECT id FROM properties
+        WHERE status = 'published' AND deleted_at IS NULL AND geog IS NOT NULL
+          AND ST_DWithin(geog, ST_SetSRID(ST_MakePoint(${query.lng}, ${query.lat}), 4326)::geography, ${radiusM})
+        ORDER BY geog <-> ST_SetSRID(ST_MakePoint(${query.lng}, ${query.lat}), 4326)::geography
+        LIMIT 300`;
+      let nearbyIds = nearby.map((r) => r.id);
+      if (meiliOrder) {
+        const meiliSet = new Set(meiliOrder);
+        nearbyIds = nearbyIds.filter((id) => meiliSet.has(id));
+        // q already drives ordering; just constrain to the nearby set.
+        where.id = { in: nearbyIds };
+      } else {
+        where.id = { in: nearbyIds };
+        geoOrder = nearbyIds; // order by distance when there's no text query
+      }
+      if (nearbyIds.length === 0) {
+        return { data: [], meta: { cursor: null, hasMore: false } };
+      }
+    }
+
     const orderBy = this.orderFor(query.sort);
+
+    // A relevance ordering (text or proximity) overrides the DB sort + uses
+    // fetch-all-then-slice paging.
+    const relevanceOrder = meiliOrder ?? geoOrder;
 
     const rows = (await this.prisma.property.findMany({
       where,
       orderBy,
       include: detailInclude,
-      // For a Meili search we fetch the whole matched set (<=200) and reorder by
-      // relevance below; otherwise use cursor pagination.
-      ...(meiliOrder
+      // With a relevance order we fetch the whole matched set (bounded above)
+      // and reorder below; otherwise use cursor pagination.
+      ...(relevanceOrder
         ? {}
         : {
             take: limit + 1,
@@ -93,10 +125,10 @@ export class ListingsService {
           }),
     })) as unknown as PropertyRow[];
 
-    // Meili path: reorder by relevance, then paginate by cursor (the id of the
-    // last returned item) over that relevance-ordered list.
-    if (meiliOrder) {
-      const rank = new Map(meiliOrder.map((id, i) => [id, i]));
+    // Relevance path: reorder by the prefilter's order (Meili relevance or geo
+    // distance), then paginate by cursor (the id of the last returned item).
+    if (relevanceOrder) {
+      const rank = new Map(relevanceOrder.map((id, i) => [id, i]));
       rows.sort((a, b) => (rank.get(a.id) ?? 1e9) - (rank.get(b.id) ?? 1e9));
       const start = query.cursor ? rows.findIndex((r) => r.id === query.cursor) + 1 : 0;
       const slice = rows.slice(start, start + limit + 1);

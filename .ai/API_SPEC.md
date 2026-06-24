@@ -29,7 +29,7 @@
 ## Listings — `/properties`
 | Method | Path | Auth | Notes |
 |---|---|---|---|
-| GET | `/properties` | Public | Cursor-paginated; filters: `type`,`purpose`,`gender`,`area`,`minPrice`,`maxPrice`,`verifiedOnly`,`nightly`,`freeOnly`,`sort`. |
+| GET | `/properties` | Public | Cursor-paginated; filters: `type`,`purpose`,`gender`,`area`,`minPrice`,`maxPrice`,`verifiedOnly`,`nightly`,`freeOnly`,`sort`. **Text:** `q` (Meilisearch typo-tolerant, relevance-ordered; DB `contains` fallback). **Geo:** `lat`,`lng`,`radiusKm` (PostGIS `ST_DWithin`, default 5 km / max 50, distance-ordered; composes with `q` + `freeOnly`). |
 | GET | `/properties/:id` | Public | Full property (rooms→beds, nearby, landlord, reviews, Q&A). **No occupant data.** |
 | GET | `/properties/mine` | Auth | Owner's listings (all statuses) **with** occupant data + `rejectionReason`. |
 | POST | `/properties` | Auth | Create (moderation-gated: verified/admin → published, else pending). Fires saved-search alerts on publish. |

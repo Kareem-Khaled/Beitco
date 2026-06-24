@@ -71,5 +71,5 @@ Seed: `apps/api/prisma/seed.ts` — idempotent (children-first reset), 12 users 
 
 ## Notes / planned
 
-- **`lat`/`lng` are plain `Float`s** — no PostGIS geometry column or spatial index yet (PROD-4 adds geo search).
-- **`images String[]`** currently can hold base64 data URLs from the wizard — PROD-1 switches these to object-storage URLs.
+- **`lat`/`lng` are plain `Float`s**, but a **`geog geography(Point,4326)`** column (mapped in Prisma as `Unsupported(...)`) is derived from them by a DB trigger and **GiST-indexed** — `GET /properties?lat&lng&radiusKm` does PostGIS `ST_DWithin` radius search (PROD-4, ✅).
+- **`images String[]`** holds object-storage URLs from the presigned upload pipeline (PROD-1, ✅), with a base64 fallback when uploads aren't configured.
