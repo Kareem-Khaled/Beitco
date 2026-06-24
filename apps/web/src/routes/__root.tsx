@@ -11,7 +11,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
+import { reportError, initSentry } from "@/lib/sentry";
 import { AuthProvider } from "@/lib/beitco/auth";
 import { useChatSocket } from "@/lib/beitco/useChatSocket";
 import { initTheme, themeInitScript } from "@/lib/beitco/theme";
@@ -44,7 +44,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    reportError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
   return (
@@ -161,6 +161,8 @@ function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => initTheme(), []);
+  // OBS-2: init client error tracking once (no-op without VITE_SENTRY_DSN).
+  useEffect(() => initSentry(), []);
 
   // Accessibility: make the active route's <main> the skip-link target and a
   // programmatic focus stop. Runs after each navigation since each route owns

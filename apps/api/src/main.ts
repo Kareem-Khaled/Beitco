@@ -1,3 +1,6 @@
+// OBS-2: Sentry must be the very first import so it can auto-instrument before
+// any other module loads. No-op without SENTRY_DSN.
+import './instrument';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';

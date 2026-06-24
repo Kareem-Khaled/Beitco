@@ -5,7 +5,8 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Request, Response } from 'express';
+import * as Sentry from '@sentry/node';
 
 interface ErrorResponse {
   code: string;
@@ -17,6 +18,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let errorResponse: ErrorResponse = {
@@ -40,6 +42,21 @@ export class AllExceptionsFilter implements ExceptionFilter {
           message: (resp.message as string) ?? (exception as HttpException).message,
         };
       }
+    }
+
+    // OBS-2: report genuine server faults (5xx / non-HTTP throws) to Sentry,
+    // tagged with the correlation id. Expected 4xx (validation/authz) are not
+    // errors, so they're skipped to keep the signal clean. No-op without a DSN.
+    if (status >= 500) {
+      Sentry.withScope((scope) => {
+        const requestId = (request as { id?: string }).id;
+        if (requestId) scope.setTag('request_id', requestId);
+        scope.setContext('request', {
+          method: request?.method,
+          url: request?.url,
+        });
+        Sentry.captureException(exception);
+      });
     }
 
     response.status(status).json({

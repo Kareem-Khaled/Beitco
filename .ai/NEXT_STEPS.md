@@ -20,7 +20,7 @@
 | Security & Auth | 78 → **92** | OTP/JWT solid; **P0 hardening done** (secrets fail-fast, helmet, readiness, OTP throttle) |
 | DevOps / Deployment | 60 → **88** | Linted + containerized (boot-verified) + **full CI/CD pipeline** (quality/e2e/docker/release); real deploy host still TODO |
 | Testing & QA | 55 → **78** | **e2e suite (18) codifies the smokes**; +pure-engine units; component/controller-unit pending |
-| Observability & Ops | 35 → **62** | **structured pino logs + request-id correlation + redaction**; readiness probe; Sentry/metrics still pending |
+| Observability & Ops | 35 → **80** | **structured pino logs + request-id + redaction (OBS-1) + Sentry error tracking (OBS-2)**; readiness probe; metrics/tracing still optional |
 
 The gap to "production-ready" is the bottom four rows. P0/P1 below target them directly.
 
@@ -35,7 +35,9 @@ The gap to "production-ready" is the bottom four rows. P0/P1 below target them d
 
 > Status: `tsc` + `nest build` + **42 Jest** green. Committed in the P0 batch.
 
-## 🟠 P1 — Make it shippable (deploy + catch regressions)
+## 🟠 P1 — Make it shippable (deploy + catch regressions) — ✅ DONE (June 23)
+
+> All P1 shipped: OPS-1 (lint/CI), OPS-2 (Docker), OPS-3 (CI/CD), TEST-2 (e2e), OBS-1 (logging), OBS-2 (Sentry). Remaining TEST-1/TEST-3 are unit/component test depth (the e2e suite already covers the authz matrix end-to-end) — folded into P3. **The app is now secure, linted, e2e-tested, containerized, CI/CD-wired, observable. Next focus: P2 product readiness (images, real OTP, search, geo, KYC).**
 
 - [x] **OPS-1 · Fix API lint + CI.** ✅ (June 23) Added `apps/api/eslint.config.mjs` (ESLint 9 flat, NestJS-tuned) + the ESLint devDeps; fixed the one issue it found (`let`→`const`). Also fixed the **web** lint: `.turbo` was OOMing `eslint .` → scoped to `eslint src` + expanded ignores, and **auto-fixed 504 pre-existing `prettier/prettier` errors** (`--fix`, behavior-preserving — tsc + 31 tests confirm). `pnpm lint` now passes across all 8 turbo tasks.
 - [x] **OPS-2 · Dockerfiles + compose for the apps.** ✅ (June 23) Multi-stage `apps/api/Dockerfile` (node:20-slim + pnpm, `pnpm deploy --prod` flatten, Prisma client generated in the bundle, non-root) — **verified: image builds (817 MB), boots in production mode, serves liveness+readiness, reads real DB data through the container, and runs `prisma migrate deploy`**. Moved the `prisma` CLI to prod deps (containerized-Prisma pattern + enables migrate-on-deploy); fixed the build by copying root `tsconfig.base.json` (was dropping `esModuleInterop`). `apps/web/Dockerfile` = portable node-server fallback (the web's real target is Cloudflare). Root `.dockerignore` + `docker-compose.prod.yml` (api+web+postgres+redis, healthchecks, secret-gated env).
@@ -44,7 +46,7 @@ The gap to "production-ready" is the bottom four rows. P0/P1 below target them d
 - [x] **TEST-2 · e2e suite (codify the curl smokes).** ✅ (June 23) `apps/api/test/app.e2e-spec.ts` — `@nestjs/testing` + Supertest boots the **real `AppModule`** (mirrors `main.ts`: cookie-parser, ValidationPipe, filter, interceptor, versioning) against the dev Postgres/Redis. **18 tests, all green (×2 back-to-back):** health (liveness+readiness), auth (OTP→session, 401), listings reads + **occupant-privacy**, moderation gate (verified→published / unverified→pending / cross-owner 403), leads→tenancy (+403), **reviews-move-trust**, matching (sorted+eligible), saved-search alerts. Self-sufficient (flushes OTP keys in `beforeAll`; overrides `ThrottlerGuard`; cleans up created rows). `npm run test:e2e`. _(Chat WS live path is covered by its own node smoke; folding it into Jest is a follow-up.)_
 - [ ] **TEST-3 · Frontend component tests.** Add React Testing Library tests for the highest-risk surfaces: the flag-aware query hooks (`queries.ts`), `property.$id` actions, and the listing wizard validation.
 - [x] **OBS-1 · Structured logging + request IDs.** ✅ (June 23) Added `nestjs-pino` — `LoggerModule.forRoot(loggerConfig())` + `app.useLogger` with `bufferLogs`. **JSON in prod, pretty in dev**; every request gets a correlation id (honours inbound `x-request-id`, else generates one, echoed on the response); **redacts** cookies/authorization/set-cookie/tokens/passwords/OTP codes; health checks silenced. Replaced the 2 stray `console.log`s with the Nest logger. **Verified:** dev pretty logs, prod JSON logs, `x-request-id: test-req-123` echoed + carried in the request-completed log line, health silenced; 42 unit + 18 e2e still green; image rebuilds + boots with JSON logs.
-- [ ] **OBS-2 · Error tracking.** Wire Sentry (or equivalent) in both apps — the web already has a `lovable-error-reporting` hook to bridge, and the API needs an exception-filter integration.
+- [x] **OBS-2 · Error tracking.** ✅ (June 23) **API:** `@sentry/node` — `src/instrument.ts` imported first in `main.ts` (auto-instrumentation; no-op without `SENTRY_DSN`); the global `AllExceptionsFilter` now reports **5xx / non-HTTP throws** to Sentry tagged with the `request_id` + method/url (expected 4xx skipped to keep the signal clean). **Web:** `@sentry/react` — `src/lib/sentry.ts` `initSentry()` (browser-only, no-op without `VITE_SENTRY_DSN`) called once in the root; the root `errorComponent` + a unified `reportError()` send to **both** Sentry and the existing Lovable host hook. `.env.example` documents `SENTRY_DSN`/`SENTRY_TRACES_SAMPLE_RATE`/`VITE_SENTRY_DSN`/`LOG_LEVEL`. **Verified:** both apps `tsc`+`lint` clean; API boots **with no DSN as a clean no-op**; 42 unit + 18 e2e + 31 web green.
 
 ## 🟡 P2 — Product enhancements (real-world readiness)
 

@@ -19,6 +19,12 @@ _(**Build phase complete.** Backend B-0→MOD-1 + FE wiring (slices 1–6d) + T-
 
 ## ✅ Done
 
+### OBS-2 · Sentry error tracking (API + web) ✅ (June 23)
+- **API:** `@sentry/node`. `src/instrument.ts` is imported **first** in `main.ts` (so Sentry auto-instruments before other modules); no-op without `SENTRY_DSN`. The global `AllExceptionsFilter` now reports **5xx / non-HTTP throws** to Sentry, tagged with the `request_id` (from OBS-1) + request method/url; expected 4xx (validation/authz) are intentionally skipped to keep the error signal clean.
+- **Web:** `@sentry/react`. `src/lib/sentry.ts` — `initSentry()` (browser-only, no-op without `VITE_SENTRY_DSN`) called once in `__root.tsx`; a unified `reportError()` sends to **both** Sentry and the existing Lovable host hook; the root `errorComponent` uses it. `lovable-error-reporting.ts` kept as the `Window.__lovableEvents` type + raw bridge.
+- `.env.example`: documented `SENTRY_DSN`, `SENTRY_TRACES_SAMPLE_RATE`, `VITE_SENTRY_DSN`, `LOG_LEVEL`.
+- **Verified:** both apps `tsc` + `lint` clean; API **boots with no DSN as a clean no-op** (0 sentry log noise, `/health` 200); 42 unit + 18 e2e + 31 web green. Observability 62→80. **P1 complete.**
+
 ### OBS-1 · Structured logging + request IDs ✅ (June 23)
 - Added `nestjs-pino` + `pino` (+ `pino-pretty` dev). `src/config/logger.config.ts` → `LoggerModule.forRoot(loggerConfig())` in `app.module`; `main.ts` uses `NestFactory.create(AppModule, { bufferLogs: true })` + `app.useLogger(app.get(Logger))`.
 - **JSON in production, pretty single-line in dev.** Per-request **correlation id** (`genReqId` honours an inbound `x-request-id`, else generates a UUID, and echoes it on the response header). **Redaction** of `cookie`/`authorization`/`set-cookie`/`*.password`/`code`/`token`/`*.accessToken`/`*.refreshToken`. Health-check requests logged at `silent` (no spam). Trimmed req/res serializers. Replaced the 2 stray `console.log`s in `main.ts`.
