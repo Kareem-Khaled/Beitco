@@ -19,6 +19,15 @@ _(**Build phase complete.** Backend B-0→MOD-1 + FE wiring (slices 1–6d) + T-
 
 ## ✅ Done
 
+### OPS-3 · CI/CD pipeline ✅ (June 23)
+- Rewrote `.github/workflows/ci.yml`. Fixed the trigger branches (`develop` → **`dev`**), added `v*` tag triggers, run-concurrency cancellation, and pnpm caching. Five jobs:
+  - **`quality`** — `prisma generate` → `pnpm type-check` → `pnpm lint` → `pnpm test` (unit). Generates the client first so the API's tsc/jest resolve `@prisma/client`.
+  - **`e2e`** — **Postgres (postgis) + Redis service containers** → `prisma migrate deploy` → `db:seed` → `pnpm --filter @beitco/api test:e2e` (the 18-test suite).
+  - **`docker-build`** — builds the API image on every PR/branch (gha cache) so the Dockerfile can't silently rot.
+  - **`release`** (on `v*` tag, needs quality+e2e+docker) — build & **push the API image to GHCR** (`ghcr.io/<repo>-api:<tag>` + `:latest`) via `GITHUB_TOKEN`.
+  - **`deploy-staging`** (on tag) — documented skeleton (apply image → `prisma migrate deploy` → gate on `/health/ready`).
+- **Verified locally** by simulating the e2e job against a **fresh `beitco_ci_test` DB**: `migrate deploy` applied both migrations on an empty DB → seed (12 users / 7 properties) → **18/18 e2e green**. `ci.yml` parses (5 jobs); `pnpm type-check` 7/7. DevOps 80→88.
+
 ### OPS-2 · Dockerfiles + prod compose ✅ (June 23)
 - **`apps/api/Dockerfile`** (multi-stage, build from repo root): node:20-slim + pnpm 9.15.4; `deps` install scoped via `--filter @beitco/api...`; `prisma generate` + `nest build`; `pnpm deploy --prod /app/out` to flatten into a real (non-symlink) prod `node_modules`; **regenerate the Prisma client inside the bundle**; slim non-root runtime running `node dist/main.js`.
 - **Two fixes found by building:** (1) moved the `prisma` CLI from devDeps → **deps** (so the prod bundle can generate the client + run `migrate deploy`); (2) the build was dropping `esModuleInterop` (→ `cookie_parser_1.default is not a function`) because the root **`tsconfig.base.json` wasn't copied** into the image — now copied in the deps stage.

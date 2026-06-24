@@ -2,36 +2,144 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, dev]
+    tags: ['v*']
   pull_request:
-    branches: [main, develop]
+    branches: [main, dev]
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9.15.4'
 
 jobs:
+  # ---- Type-check, lint, unit tests (no DB needed) ----
   quality:
-    name: Code Quality
+    name: Type-check / Lint / Unit tests
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with:
-          node-version: 20
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
         with:
-          version: 9
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # The API's Prisma client must exist before tsc.
+      - run: pnpm --filter @beitco/api exec prisma generate
+      - run: pnpm type-check
+      - run: pnpm lint
+      - run: pnpm test
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+  # ---- API e2e against real Postgres + Redis service containers ----
+  e2e:
+    name: API e2e (Postgres + Redis)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: beitco
+          POSTGRES_PASSWORD: beitco
+          POSTGRES_DB: beitco_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U beitco"
+          --health-interval 10s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://beitco:beitco@localhost:5432/beitco_test
+      REDIS_URL: redis://localhost:6379
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Prepare DB (generate client, migrate, seed)
+        working-directory: apps/api
+        run: |
+          pnpm exec prisma generate
+          pnpm exec prisma migrate deploy
+          pnpm run db:seed
+      - name: Run e2e suite
+        run: pnpm --filter @beitco/api run test:e2e
 
-      - name: Type check
-        run: pnpm type-check
+  # ---- Build the API image (validates the Dockerfile on every PR/branch) ----
+  docker-build:
+    name: Build API image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          push: false
+          tags: beitco-api:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: Lint
-        run: pnpm lint
+  # ---- Release: build + push the API image to GHCR on a version tag ----
+  release:
+    name: Build & push API image (tag)
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [quality, e2e, docker-build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build & push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}-api:${{ github.ref_name }}
+            ghcr.io/${{ github.repository }}-api:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: Test
-        run: pnpm test
+  # ---- Deploy skeleton (staging). Fill in host/registry/secrets. ----
+  deploy-staging:
+    name: Deploy to staging
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [release]
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Placeholder (OPS-3)
+        run: |
+          echo "TODO: deploy ghcr.io/${{ github.repository }}-api:${{ github.ref_name }}"
+          echo "A real deploy job would:"
+          echo "  1. apply the new image tag (ssh / k8s / Render / Fly)"
+          echo "  2. run 'npx prisma migrate deploy' (the image bundles the prisma CLI)"
+          echo "  3. gate traffic on GET /api/v1/health/ready returning 200"
+
