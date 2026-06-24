@@ -19,6 +19,12 @@ _(**Build phase complete.** Backend B-0→MOD-1 + FE wiring (slices 1–6d) + T-
 
 ## ✅ Done
 
+### PROD-2 · Real OTP / SMS gateway ✅ (June 24)
+- New `auth/sms.service.ts` — a **provider abstraction**: `SMS_PROVIDER=console` (default; dev-only, logs the code, no real SMS) or `=http` (a generic gateway: `POST {to,from,message}` to `SMS_HTTP_URL` with an optional bearer `SMS_HTTP_TOKEN` + `SMS_SENDER_ID`; 8s `AbortSignal.timeout`; returns `{delivered}`). Picking a real Egyptian vendor = config, not code.
+- `AuthService.sendOtp` reworked (the old `// TODO: integrate an SMS gateway` is gone): generates a **random** code when a live provider is configured **or** in prod, the fixed `123456` only for the console provider in non-prod, and **returns `devCode` to the client only when no real SMS carried it** — so live/prod never leaks the OTP. Delivery is best-effort (a gateway failure is logged, not a 500; the code still lives in Redis).
+- Registered `SmsService` in `AuthModule`; documented `SMS_PROVIDER`/`SMS_HTTP_URL`/`SMS_HTTP_TOKEN`/`SMS_SENDER_ID` in `.env.example`.
+- **Verified:** 5 unit tests (provider selection, http 2xx→delivered, gateway-error & missing-url→fail-safe); live API — console boot returns `devCode:123456`, `SMS_PROVIDER=http` boot returns `{expiresIn}` with **no `devCode`** and actually calls the gateway; 52 unit + 18 e2e green (e2e still uses the console `123456`); both apps `tsc`+`lint`+`build` clean.
+
 ### PROD-1 · Image-upload pipeline (presigned S3/R2) ✅ (June 24)
 - **Backend `uploads` module** (`@aws-sdk/client-s3` + `s3-request-presigner`): `POST /uploads/presign` (auth) returns a short-lived (5 min) presigned **PUT** URL + the final **public URL** + the required `Content-Type` header; validates the MIME type (jpeg/png/webp/avif) and size (≤10 MB); object keys are namespaced `listings/<userId>/<ts>-<uuid>.<ext>`. `GET /uploads/config` exposes whether storage is wired. Works with S3 **or** any S3-compatible store (Cloudflare R2 / MinIO via `S3_ENDPOINT`), with an optional CDN base (`S3_PUBLIC_URL`).
 - **Config-gated graceful fallback:** when the S3 env isn't set, `isConfigured=false`, `presign` short-circuits to `{configured:false}`, and the **frontend keeps its existing downscaled-base64 path** — so dev, CI, and the localStorage mock need zero setup and never hard-fail.

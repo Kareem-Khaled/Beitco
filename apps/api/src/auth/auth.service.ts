@@ -12,6 +12,7 @@ import { randomUUID } from 'crypto';
 import Redis from 'ioredis';
 import { PrismaService } from '../prisma/prisma.service';
 import { serializeUser } from './auth.serializer';
+import { SmsService } from './sms.service';
 import type { JwtPayload } from './strategies/jwt.strategy';
 
 const OTP_LENGTH = 6;
@@ -47,6 +48,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
+    private readonly sms: SmsService,
   ) {}
 
   async onModuleInit() {
@@ -82,20 +84,32 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
       });
     }
 
-    const code = this.isProd() ? this.generateOtp() : DEV_OTP;
+    // Use a real random code whenever SMS actually goes out (a live provider),
+    // OR in production. The fixed dev code only applies to the console provider
+    // in non-prod. The code is returned to the client (devCode) ONLY when no
+    // real SMS was sent, so prod/live never leaks it.
+    const liveDelivery = this.sms.isLiveProvider || this.isProd();
+    const code = liveDelivery ? this.generateOtp() : DEV_OTP;
     const pipe = this.redis.pipeline();
     pipe.set(`${OTP_KEY}${phone}`, code, 'EX', OTP_EXPIRY_SECONDS);
     pipe.set(`${OTP_COOLDOWN_KEY}${phone}`, '1', 'EX', OTP_COOLDOWN_SECONDS);
     pipe.del(`${OTP_ATTEMPTS_KEY}${phone}`);
     await pipe.exec();
 
-    if (this.isProd()) {
-      // TODO: integrate an Egyptian SMS gateway here.
-      this.logger.log(`OTP sent to ${phone}`);
-      return { expiresIn: OTP_EXPIRY_SECONDS };
+    // Deliver via the configured SMS provider (console logs in dev; HTTP gateway
+    // in prod). Best-effort: a gateway failure is logged but the OTP still lives
+    // in Redis (the user can retry / contact support) — we don't 500 the login.
+    const result = await this.sms.sendOtp(phone, code);
+    if (!result.delivered) {
+      this.logger.error(`OTP send failed via ${result.provider} for ${phone}`);
+    } else {
+      this.logger.log(`OTP sent to ${phone} via ${result.provider}`);
     }
-    this.logger.debug(`OTP for ${phone}: ${code}`);
-    return { expiresIn: OTP_EXPIRY_SECONDS, devCode: code };
+
+    // Return the code to the client only when no real SMS carried it.
+    return liveDelivery
+      ? { expiresIn: OTP_EXPIRY_SECONDS }
+      : { expiresIn: OTP_EXPIRY_SECONDS, devCode: code };
   }
 
   async verifyOtp(
