@@ -71,6 +71,7 @@ import {
 } from "@/lib/beitco/store";
 import { USE_API, apiGetProperty } from "@/lib/beitco/api";
 import { saveListing } from "@/lib/beitco/queries";
+import { uploadImage } from "@/lib/beitco/uploads";
 import type {
   Property,
   RentalMode,
@@ -1596,14 +1597,21 @@ function StepAmenities({ draft, update }: StepProps) {
 
 function StepPhotos({ draft, update }: StepProps) {
   const images = draft.images ?? [];
+  const [uploading, setUploading] = useState(false);
 
   const handleFiles = async (files: FileList | null) => {
     if (!files) return;
-    const newOnes: string[] = [];
-    for (let i = 0; i < files.length && images.length + newOnes.length < 8; i++) {
-      newOnes.push(await fileToDataUrl(files[i]));
+    setUploading(true);
+    try {
+      const newOnes: string[] = [];
+      for (let i = 0; i < files.length && images.length + newOnes.length < 8; i++) {
+        // PROD-1: presigned upload when configured, else downscaled base64.
+        newOnes.push(await uploadImage(files[i]));
+      }
+      update({ images: [...images, ...newOnes] });
+    } finally {
+      setUploading(false);
     }
-    update({ images: [...images, ...newOnes] });
   };
 
   const remove = (idx: number) => update({ images: images.filter((_, i) => i !== idx) });
@@ -1668,13 +1676,17 @@ function StepPhotos({ draft, update }: StepProps) {
         })}
 
         {images.length < 8 && (
-          <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-surface text-muted-foreground transition-colors hover:border-trust hover:text-trust">
+          <label
+            className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-surface text-muted-foreground transition-colors hover:border-trust hover:text-trust aria-disabled:cursor-wait aria-disabled:opacity-60"
+            aria-disabled={uploading}
+          >
             <ImagePlus className="h-6 w-6" />
-            <span className="text-xs font-medium">حطّ صورة</span>
+            <span className="text-xs font-medium">{uploading ? "بنرفع…" : "حطّ صورة"}</span>
             <input
               type="file"
               accept="image/*"
               multiple
+              disabled={uploading}
               className="hidden"
               onChange={(e) => handleFiles(e.target.files)}
             />
@@ -1687,45 +1699,6 @@ function StepPhotos({ draft, update }: StepProps) {
       )}
     </div>
   );
-}
-
-// Read a file and downscale it so listing photos stay a sane size.
-// Big phone photos (5MB+) become huge base64 strings that bloat localStorage
-// and render inconsistently — cap the longest edge and re-encode as JPEG.
-async function fileToDataUrl(file: File): Promise<string> {
-  const raw = await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-
-  try {
-    return await downscaleDataUrl(raw, 1600, 0.82);
-  } catch {
-    return raw; // fall back to the original if canvas isn't available
-  }
-}
-
-function downscaleDataUrl(dataUrl: string, maxEdge: number, quality: number): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      const { width, height } = img;
-      const scale = Math.min(1, maxEdge / Math.max(width, height));
-      // Already small enough — keep as-is.
-      if (scale === 1) return resolve(dataUrl);
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.round(width * scale);
-      canvas.height = Math.round(height * scale);
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return resolve(dataUrl);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL("image/jpeg", quality));
-    };
-    img.onerror = reject;
-    img.src = dataUrl;
-  });
 }
 
 // ───────────────────────── Step 7: Description ─────────────────────────

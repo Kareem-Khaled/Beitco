@@ -14,8 +14,8 @@
 | Type safety / code quality | 90 | API 0 `any`; web `any` only in generated file |
 | Database (Prisma/PostGIS) | 88 | Clean schema/indexes; PostGIS unused for geo |
 | Architecture / monorepo | 87 | Great flag pattern; 3 dead shared packages |
-| Frontend | 86 | Polished + a11y; monolithic files; no image pipeline |
-| Backend (NestJS) | 85 | Clean modules + guards; shallow health; unlinted |
+| Frontend | 86 → **88** | Polished + a11y + **real image-upload pipeline**; monolithic files remain |
+| Backend (NestJS) | 85 → **90** | Clean modules + guards + **readiness, linted, uploads**; mature |
 | Accessibility / RTL | 82 | RTL-first + aria; no i18n framework, no axe |
 | Security & Auth | 78 → **92** | OTP/JWT solid; **P0 hardening done** (secrets fail-fast, helmet, readiness, OTP throttle) |
 | DevOps / Deployment | 60 → **88** | Linted + containerized (boot-verified) + **full CI/CD pipeline** (quality/e2e/docker/release); real deploy host still TODO |
@@ -50,7 +50,7 @@ The gap to "production-ready" is the bottom four rows. P0/P1 below target them d
 
 ## 🟡 P2 — Product enhancements (real-world readiness)
 
-- [ ] **PROD-1 · Image-upload pipeline.** The wizard stores images as **base64 data URLs** (`FileReader.readAsDataURL` in `list/new.tsx`) — in API mode these inline blobs land in `Property.images String[]`. Wire S3/R2 presigned uploads (env vars already exist) + an image CDN/resizer; store URLs, not blobs.
+- [x] **PROD-1 · Image-upload pipeline.** ✅ (June 24) New `uploads` module: `POST /uploads/presign` (auth) → presigned **S3/R2** PUT URL + final public URL (validates content-type ∈ {jpeg,png,webp,avif} + ≤10 MB; keys namespaced `listings/<userId>/…`; R2 via `S3_ENDPOINT`, CDN via `S3_PUBLIC_URL`), plus `GET /uploads/config`. **Config-gated:** unset S3 → `{configured:false}` and the wizard transparently **falls back to the existing downscaled-base64 path** (zero-setup dev + mock unchanged). Frontend `lib/beitco/uploads.ts` `uploadImage(file)` (downscale → presigned PUT → store the URL, or base64); the `StepPhotos` wizard step uses it (+ an "بنرفع…" uploading state); removed the old inline `fileToDataUrl`/`downscale`. **Verified:** 5 unit tests (presign shape/validation/short-circuit) + live API (`config:false`, auth 401, routes mapped); 47 unit + 18 e2e + 31 web green; `.env.example` documents `S3_ENDPOINT`/`S3_PUBLIC_URL`.
 - [ ] **PROD-2 · Real OTP / SMS gateway.** OTP is a fixed dev code (`123456`). Integrate an Egyptian SMS provider behind the existing `auth.sendOtp` stub; keep the dev code for non-prod.
 - [ ] **PROD-3 · Meilisearch integration.** It runs in compose but is unused (search is in-memory client filtering). Index published listings, back `GET /properties` search with it, and add faceted filters.
 - [ ] **PROD-4 · PostGIS geo search.** `lat`/`lng` are plain floats. Add a geometry column + GiST index and a radius / "قريب مني" search to use the PostGIS image you're already running.

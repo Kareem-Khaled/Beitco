@@ -19,6 +19,12 @@ _(**Build phase complete.** Backend B-0→MOD-1 + FE wiring (slices 1–6d) + T-
 
 ## ✅ Done
 
+### PROD-1 · Image-upload pipeline (presigned S3/R2) ✅ (June 24)
+- **Backend `uploads` module** (`@aws-sdk/client-s3` + `s3-request-presigner`): `POST /uploads/presign` (auth) returns a short-lived (5 min) presigned **PUT** URL + the final **public URL** + the required `Content-Type` header; validates the MIME type (jpeg/png/webp/avif) and size (≤10 MB); object keys are namespaced `listings/<userId>/<ts>-<uuid>.<ext>`. `GET /uploads/config` exposes whether storage is wired. Works with S3 **or** any S3-compatible store (Cloudflare R2 / MinIO via `S3_ENDPOINT`), with an optional CDN base (`S3_PUBLIC_URL`).
+- **Config-gated graceful fallback:** when the S3 env isn't set, `isConfigured=false`, `presign` short-circuits to `{configured:false}`, and the **frontend keeps its existing downscaled-base64 path** — so dev, CI, and the localStorage mock need zero setup and never hard-fail.
+- **Frontend:** `lib/beitco/uploads.ts` `uploadImage(file)` — downscale (canvas, 1600px/JPEG) → (API + configured) presigned PUT → store the public URL; else base64. The wizard's `StepPhotos` calls it with an uploading state; removed the now-dead inline `fileToDataUrl`/`downscaleDataUrl`.
+- **Verified:** 5 new unit tests (presign URL/key/header shape, configured/unconfigured, bad-type & oversized → `BadRequestException`); live API shows `config:false` locally + 401 unauth + routes mapped; **47 unit + 18 e2e + 31 web** green; both apps `tsc`+`lint` clean. `.env.example` updated (`S3_ENDPOINT`, `S3_PUBLIC_URL`).
+
 ### OBS-2 · Sentry error tracking (API + web) ✅ (June 23)
 - **API:** `@sentry/node`. `src/instrument.ts` is imported **first** in `main.ts` (so Sentry auto-instruments before other modules); no-op without `SENTRY_DSN`. The global `AllExceptionsFilter` now reports **5xx / non-HTTP throws** to Sentry, tagged with the `request_id` (from OBS-1) + request method/url; expected 4xx (validation/authz) are intentionally skipped to keep the error signal clean.
 - **Web:** `@sentry/react`. `src/lib/sentry.ts` — `initSentry()` (browser-only, no-op without `VITE_SENTRY_DSN`) called once in `__root.tsx`; a unified `reportError()` sends to **both** Sentry and the existing Lovable host hook; the root `errorComponent` uses it. `lovable-error-reporting.ts` kept as the `Window.__lovableEvents` type + raw bridge.

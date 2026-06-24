@@ -517,3 +517,21 @@ export async function apiNotificationsUnreadCount(): Promise<number> {
 export async function apiMarkNotificationsSeen(): Promise<void> {
   await postJSON("/me/notifications/seen");
 }
+
+// ── Uploads (PROD-1) ────────────────────────────────────────────────────────
+type PresignResult = {
+  configured: boolean;
+  uploadUrl?: string;
+  publicUrl?: string;
+  key?: string;
+  headers?: Record<string, string>;
+  expiresIn?: number;
+};
+
+export async function apiPresignUpload(
+  contentType: string,
+  contentLength: number,
+): Promise<PresignResult> {
+  const body = await postJSON<PresignResult>("/uploads/presign", { contentType, contentLength });
+  return body.data;
+}
