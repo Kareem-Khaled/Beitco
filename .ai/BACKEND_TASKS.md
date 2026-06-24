@@ -19,6 +19,13 @@ _(**Build phase complete.** Backend B-0→MOD-1 + FE wiring (slices 1–6d) + T-
 
 ## ✅ Done
 
+### POLISH-3 · Shared RedisModule ✅ (June 24)
+- **Problem:** `auth.service`, `notifications.service`, and `health.service` each did `new Redis(config.get('REDIS_URL'), {...})` with their own connect/quit lifecycle — the URL read, the options, and the connection were triplicated (a connection-count + drift risk).
+- **New `@Global() RedisModule` + `RedisService`** (`src/redis/`): owns **one** lazily-connected `ioredis` client; attempts an eager connect at boot (logs "Redis connected" / warns + degrades when down); attaches an `error` handler so an outage can't crash the process. Exposes `client` (the raw connection), a **live `ready` getter** (`status === 'ready'`), and `ping()` for the SEC-3 readiness probe (reconnects only from an idle state; never issues a command while not-ready). Registered in `app.module` right after `PrismaModule`.
+- **Consumers:** `auth` + `notifications` inject `RedisService` and keep every OTP/token/read-state call site unchanged via a private `get redis() { return this.redisService.client; }`, gating on `redisService.ready` (replaces the old per-service `redisReady` boot flag). `health` drops its own client and delegates to `redis.ping()`. `ioredis` is now imported in **exactly one file**.
+- **Bonus robustness:** the live `ready` getter is stricter than the old boot flag — a Redis outage *after* boot now reads as not-ready (callers return the friendly `OTP_UNAVAILABLE` instead of throwing a raw ioredis error), and a recovery is auto-detected.
+- **Verified:** `tsc` + `nest build` + `lint` clean; **52 unit + 19 e2e** green (the e2e drives the full OTP send→verify against real Redis). Live: boot logs "Redis connected", `/health/ready` → `{database:up, redis:up}`, and OTP send (`devCode:123456`) + verify (new user created) both work through the shared client.
+
 ### PROD-4 · PostGIS geo radius search ("قريب مني") ✅ (June 24)
 - **Migration `20260624120000_add_geo_point`:** `CREATE EXTENSION IF NOT EXISTS postgis`; adds `properties.geog geography(Point,4326)`; a `properties_sync_geog()` trigger (`BEFORE INSERT OR UPDATE OF lat,lng`) that sets `geog = ST_SetSRID(ST_MakePoint(lng,lat),4326)::geography` whenever coords are present; a backfill `UPDATE` for existing rows; and a **GiST** index `properties_geog_idx`. So the app keeps writing plain `lat`/`lng` and the DB derives the spatial column — no service-layer write changes.
 - **Prisma:** `geog Unsupported("geography(Point, 4326)")?` on `Property` — the column is known to Prisma (so it won't drift) but managed by the trigger, not the ORM.

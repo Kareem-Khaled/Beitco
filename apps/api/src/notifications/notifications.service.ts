@@ -1,7 +1,6 @@
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import Redis from 'ioredis';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { RedisService } from '../redis/redis.service';
 import { serializeProperty, type PropertyRow } from '../listings/listings.serializer';
 import {
   propertyMatchesSavedSearch,
@@ -38,29 +37,18 @@ const matchInclude = {
 };
 
 @Injectable()
-export class NotificationsService implements OnModuleInit, OnModuleDestroy {
+export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);
-  private redis!: Redis;
-  private redisReady = false;
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly config: ConfigService,
+    private readonly redisService: RedisService,
   ) {}
 
-  async onModuleInit() {
-    const url = this.config.get<string>('REDIS_URL', 'redis://localhost:6379');
-    this.redis = new Redis(url, { maxRetriesPerRequest: 3, lazyConnect: true });
-    try {
-      await this.redis.connect();
-      this.redisReady = true;
-    } catch {
-      this.logger.warn('Redis unavailable for notifications read-state.');
-    }
-  }
-
-  async onModuleDestroy() {
-    await this.redis?.quit();
+  // Shared Redis connection (POLISH-3). The getter keeps the read-state call
+  // sites (`this.redis.get/set`) unchanged.
+  private get redis() {
+    return this.redisService.client;
   }
 
   // The full feed for a user, newest first (derived + persisted).
@@ -169,7 +157,7 @@ export class NotificationsService implements OnModuleInit, OnModuleDestroy {
   }
 
   async lastSeen(userId: string): Promise<number> {
-    if (!this.redisReady) return 0;
+    if (!this.redisService.ready) return 0;
     const raw = await this.redis.get(SEEN_KEY(userId));
     return raw ? Number(raw) : 0;
   }
@@ -182,7 +170,7 @@ export class NotificationsService implements OnModuleInit, OnModuleDestroy {
   }
 
   async markSeen(userId: string): Promise<{ ok: true }> {
-    if (this.redisReady) await this.redis.set(SEEN_KEY(userId), String(Date.now()));
+    if (this.redisService.ready) await this.redis.set(SEEN_KEY(userId), String(Date.now()));
     return { ok: true };
   }
 

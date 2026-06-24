@@ -7,6 +7,7 @@ import { validateEnv } from './config/env.validation';
 import { loggerConfig } from './config/logger.config';
 import { HealthModule } from './health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { RedisModule } from './redis/redis.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { ListingsModule } from './listings/listings.module';
@@ -47,6 +48,7 @@ import { SearchModule } from './search/search.module';
       throttlers: [{ ttl: 60000, limit: 120 }],
     }),
     PrismaModule,
+    RedisModule,
     TrustModule,
     SearchModule,
     AuthModule,

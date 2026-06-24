@@ -2,15 +2,13 @@ import {
   BadRequestException,
   Injectable,
   Logger,
-  OnModuleDestroy,
-  OnModuleInit,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { randomUUID } from 'crypto';
-import Redis from 'ioredis';
 import { PrismaService } from '../prisma/prisma.service';
+import { RedisService } from '../redis/redis.service';
 import { serializeUser } from './auth.serializer';
 import { SmsService } from './sms.service';
 import type { JwtPayload } from './strategies/jwt.strategy';
@@ -39,32 +37,21 @@ export interface AuthTokens {
 }
 
 @Injectable()
-export class AuthService implements OnModuleInit, OnModuleDestroy {
+export class AuthService {
   private readonly logger = new Logger(AuthService.name);
-  private redis!: Redis;
-  private redisReady = false;
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly sms: SmsService,
+    private readonly redisService: RedisService,
   ) {}
 
-  async onModuleInit() {
-    const url = this.config.get<string>('REDIS_URL', 'redis://localhost:6379');
-    this.redis = new Redis(url, { maxRetriesPerRequest: 3, lazyConnect: true });
-    try {
-      await this.redis.connect();
-      this.redisReady = true;
-      this.logger.log('Redis connected for auth');
-    } catch {
-      this.logger.warn('Redis unavailable. OTP needs Redis: docker compose up -d redis');
-    }
-  }
-
-  async onModuleDestroy() {
-    await this.redis?.quit();
+  // The shared connection (POLISH-3). The getter keeps the OTP/token call sites
+  // (`this.redis.get/set/del/incr/pipeline/...`) unchanged.
+  private get redis() {
+    return this.redisService.client;
   }
 
   private isProd() {
@@ -189,7 +176,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     }
     if (payload.type !== 'refresh') throw new UnauthorizedException('Invalid token type');
 
-    if (this.redisReady) {
+    if (this.redisService.ready) {
       const black = await this.redis.get(`${BLACKLIST_KEY}${payload.jti}`);
       if (black) throw new UnauthorizedException('Token revoked');
     }
@@ -202,7 +189,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
   }
 
   async logout(userId: string, refreshToken?: string): Promise<void> {
-    if (!refreshToken || !this.redisReady) return;
+    if (!refreshToken || !this.redisService.ready) return;
     try {
       const payload = this.jwt.verify<JwtPayload & { jti: string }>(refreshToken, {
         secret: this.refreshSecret(),
@@ -228,7 +215,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
         expiresIn: REFRESH_TOKEN_EXPIRY,
       },
     );
-    if (this.redisReady) {
+    if (this.redisService.ready) {
       await this.redis.set(`${REFRESH_KEY}${userId}:${jti}`, '1', 'EX', REFRESH_TOKEN_EXPIRY_SECONDS);
     }
     return { accessToken, refreshToken, expiresIn: ACCESS_TOKEN_EXPIRY_SECONDS };
@@ -251,7 +238,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
   }
 
   private assertRedis() {
-    if (!this.redisReady) {
+    if (!this.redisService.ready) {
       throw new BadRequestException({
         code: 'OTP_UNAVAILABLE',
         message: 'خدمة الكود مش متاحة دلوقتي. جرّب تاني بعد شوية.',
