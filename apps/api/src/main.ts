@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { Logger } from 'nestjs-pino';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
@@ -8,7 +9,9 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { ResponseEnvelopeInterceptor } from './common/interceptors/response-envelope.interceptor';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // bufferLogs so early startup logs flush through pino once it's ready.
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  app.useLogger(app.get(Logger));
 
   // ─── Security headers (SEC-2) ──────────────────────
   // HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, etc. The CSP
@@ -77,8 +80,9 @@ async function bootstrap() {
   // ─── Start ─────────────────────────────────────────
   const port = process.env.API_PORT ?? 3001;
   await app.listen(port);
-  console.log(`🏠 Beitco API running on http://localhost:${port}`);
-  console.log(`📚 Swagger docs at http://localhost:${port}/api/docs`);
+  const logger = app.get(Logger);
+  logger.log(`Beitco API running on http://localhost:${port}`);
+  logger.log(`Swagger docs at http://localhost:${port}/api/docs`);
 }
 
 bootstrap();

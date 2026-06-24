@@ -19,6 +19,11 @@ _(**Build phase complete.** Backend B-0→MOD-1 + FE wiring (slices 1–6d) + T-
 
 ## ✅ Done
 
+### OBS-1 · Structured logging + request IDs ✅ (June 23)
+- Added `nestjs-pino` + `pino` (+ `pino-pretty` dev). `src/config/logger.config.ts` → `LoggerModule.forRoot(loggerConfig())` in `app.module`; `main.ts` uses `NestFactory.create(AppModule, { bufferLogs: true })` + `app.useLogger(app.get(Logger))`.
+- **JSON in production, pretty single-line in dev.** Per-request **correlation id** (`genReqId` honours an inbound `x-request-id`, else generates a UUID, and echoes it on the response header). **Redaction** of `cookie`/`authorization`/`set-cookie`/`*.password`/`code`/`token`/`*.accessToken`/`*.refreshToken`. Health-check requests logged at `silent` (no spam). Trimmed req/res serializers. Replaced the 2 stray `console.log`s in `main.ts`.
+- **Verified:** dev pretty logs with `context`; `x-request-id: test-req-123` echoed back **and** carried in the `request completed` line (`{req:{id,method,url},res:{statusCode},responseTime}`); `/health` silenced; prod image emits raw JSON (`{"level":30,...}`). `tsc`+`build`+`lint`; **42 unit + 18 e2e** still green. Observability 35→62.
+
 ### OPS-3 · CI/CD pipeline ✅ (June 23)
 - Rewrote `.github/workflows/ci.yml`. Fixed the trigger branches (`develop` → **`dev`**), added `v*` tag triggers, run-concurrency cancellation, and pnpm caching. Five jobs:
   - **`quality`** — `prisma generate` → `pnpm type-check` → `pnpm lint` → `pnpm test` (unit). Generates the client first so the API's tsc/jest resolve `@prisma/client`.

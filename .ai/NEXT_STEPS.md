@@ -20,7 +20,7 @@
 | Security & Auth | 78 → **92** | OTP/JWT solid; **P0 hardening done** (secrets fail-fast, helmet, readiness, OTP throttle) |
 | DevOps / Deployment | 60 → **88** | Linted + containerized (boot-verified) + **full CI/CD pipeline** (quality/e2e/docker/release); real deploy host still TODO |
 | Testing & QA | 55 → **78** | **e2e suite (18) codifies the smokes**; +pure-engine units; component/controller-unit pending |
-| Observability & Ops | 35 | No Sentry/metrics/structured logs/readiness probe |
+| Observability & Ops | 35 → **62** | **structured pino logs + request-id correlation + redaction**; readiness probe; Sentry/metrics still pending |
 
 The gap to "production-ready" is the bottom four rows. P0/P1 below target them directly.
 
@@ -43,7 +43,7 @@ The gap to "production-ready" is the bottom four rows. P0/P1 below target them d
 - [ ] **TEST-1 · Controller/service tests.** Add NestJS controller tests (mocked services) for the authz matrix (401/403 paths) + service tests with a mocked Prisma for the trust-moving paths. _(Partly covered by TEST-2's e2e authz assertions; unit-level controller tests still pending.)_
 - [x] **TEST-2 · e2e suite (codify the curl smokes).** ✅ (June 23) `apps/api/test/app.e2e-spec.ts` — `@nestjs/testing` + Supertest boots the **real `AppModule`** (mirrors `main.ts`: cookie-parser, ValidationPipe, filter, interceptor, versioning) against the dev Postgres/Redis. **18 tests, all green (×2 back-to-back):** health (liveness+readiness), auth (OTP→session, 401), listings reads + **occupant-privacy**, moderation gate (verified→published / unverified→pending / cross-owner 403), leads→tenancy (+403), **reviews-move-trust**, matching (sorted+eligible), saved-search alerts. Self-sufficient (flushes OTP keys in `beforeAll`; overrides `ThrottlerGuard`; cleans up created rows). `npm run test:e2e`. _(Chat WS live path is covered by its own node smoke; folding it into Jest is a follow-up.)_
 - [ ] **TEST-3 · Frontend component tests.** Add React Testing Library tests for the highest-risk surfaces: the flag-aware query hooks (`queries.ts`), `property.$id` actions, and the listing wizard validation.
-- [ ] **OBS-1 · Structured logging + request IDs.** Replace Nest's default logger with `pino` (JSON, levels, redaction) + a correlation-id middleware. Remove the 2 stray `console.log`s in API src.
+- [x] **OBS-1 · Structured logging + request IDs.** ✅ (June 23) Added `nestjs-pino` — `LoggerModule.forRoot(loggerConfig())` + `app.useLogger` with `bufferLogs`. **JSON in prod, pretty in dev**; every request gets a correlation id (honours inbound `x-request-id`, else generates one, echoed on the response); **redacts** cookies/authorization/set-cookie/tokens/passwords/OTP codes; health checks silenced. Replaced the 2 stray `console.log`s with the Nest logger. **Verified:** dev pretty logs, prod JSON logs, `x-request-id: test-req-123` echoed + carried in the request-completed log line, health silenced; 42 unit + 18 e2e still green; image rebuilds + boots with JSON logs.
 - [ ] **OBS-2 · Error tracking.** Wire Sentry (or equivalent) in both apps — the web already has a `lovable-error-reporting` hook to bridge, and the API needs an exception-filter integration.
 
 ## 🟡 P2 — Product enhancements (real-world readiness)
