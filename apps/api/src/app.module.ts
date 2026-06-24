@@ -20,6 +20,7 @@ import { ChatModule } from './chat/chat.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { VerificationModule } from './verification/verification.module';
+import { SearchModule } from './search/search.module';
 
 // Post-pivot core. After the schema rewrite to the bed-level + trust model, the
 // remaining legacy modules (chat, search, admin, moderation, analytics,
@@ -47,6 +48,7 @@ import { VerificationModule } from './verification/verification.module';
     }),
     PrismaModule,
     TrustModule,
+    SearchModule,
     AuthModule,
     ListingsModule,
     UsersModule,

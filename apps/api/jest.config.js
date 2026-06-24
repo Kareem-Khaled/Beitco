@@ -10,5 +10,8 @@ module.exports = {
   testEnvironment: 'node',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
+    // meilisearch ships pure ESM that ts-jest can't transform; mock it (tests
+    // use the DB search fallback).
+    '^meilisearch$': '<rootDir>/../test/mocks/meilisearch.ts',
   },
 };

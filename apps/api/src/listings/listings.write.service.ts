@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { TrustService } from '../trust/trust.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { SearchService } from '../search/search.service';
 import { serializeProperty, type PropertyRow } from './listings.serializer';
 import { CreateListingDto, ManageListingDto } from './dto/create-listing.dto';
 
@@ -56,6 +57,7 @@ export class ListingsWriteService {
     private readonly prisma: PrismaService,
     private readonly trust: TrustService,
     private readonly notifications: NotificationsService,
+    private readonly search: SearchService,
   ) {}
 
   // Owner's own listings (all statuses) for the dashboard. Full Property shape
@@ -127,6 +129,7 @@ export class ListingsWriteService {
     if (status === 'published') {
       await this.notifications.notifyForNewListing(created.id);
     }
+    await this.search.indexById(created.id); // PROD-3: keep the search index in sync
     const fresh = await this.findRow(created.id);
     return { ...serializeProperty(fresh!), status };
   }
@@ -194,6 +197,7 @@ export class ListingsWriteService {
     });
 
     await this.trust.recomputeListing(id);
+    await this.search.indexById(id); // PROD-3: re-index (or drop if no longer published)
     const fresh = await this.findRow(id);
     return { ...serializeProperty(fresh!), status };
   }
@@ -208,6 +212,7 @@ export class ListingsWriteService {
       throw new ForbiddenException({ code: 'NOT_OWNER', message: 'مش من حقك تمسح الإعلان ده.' });
     }
     await this.prisma.property.update({ where: { id }, data: { deletedAt: new Date(), status: 'paused' } });
+    await this.search.removeOne(id); // PROD-3: drop from the search index
     return { ok: true };
   }
 
@@ -273,6 +278,7 @@ export class ListingsWriteService {
     }
 
     const fresh = await this.findRow(id, true);
+    await this.search.indexById(id); // PROD-3: pause/sale-status changes affect the index
     return { ...serializeProperty(fresh!, { includeOccupants: true }), status: fresh!.status };
   }
 

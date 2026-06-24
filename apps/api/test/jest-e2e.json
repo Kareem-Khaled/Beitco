@@ -7,7 +7,8 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "moduleNameMapper": {
-    "^@/(.*)$": "<rootDir>/src/$1"
+    "^@/(.*)$": "<rootDir>/src/$1",
+    "^meilisearch$": "<rootDir>/test/mocks/meilisearch.ts"
   },
   "testTimeout": 30000
 }

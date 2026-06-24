@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { TrustService } from '../trust/trust.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { SearchService } from '../search/search.service';
 import { serializeProperty, type PropertyRow } from '../listings/listings.serializer';
 
 const detailInclude = {
@@ -18,6 +19,7 @@ export class AdminService {
     private readonly prisma: PrismaService,
     private readonly trust: TrustService,
     private readonly notifications: NotificationsService,
+    private readonly search: SearchService,
   ) {}
 
   // The review queue: listings waiting on approval, oldest first.
@@ -48,6 +50,7 @@ export class AdminService {
     await this.trust.recomputeListing(id);
     // Now public -- alert matching saved searches (best-effort).
     await this.notifications.notifyForNewListing(id);
+    await this.search.indexById(id); // PROD-3: now searchable
     return { ok: true };
   }
 

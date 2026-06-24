@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { SearchService } from '../search/search.service';
 import { ListPropertiesQueryDto } from './dto/list-properties-query.dto';
 import {
   serializeProperty,
@@ -27,7 +28,10 @@ const detailInclude = {
 
 @Injectable()
 export class ListingsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly search: SearchService,
+  ) {}
 
   async list(query: ListPropertiesQueryDto): Promise<{
     data: Record<string, unknown>[];
@@ -50,15 +54,61 @@ export class ListingsService {
       };
     }
 
+    // PROD-3: free-text `q`. Prefer Meilisearch (typo-tolerant, Arabic-aware):
+    // it returns matching ids in relevance order, which we constrain the DB
+    // query to + reorder by. When Meili is disabled, fall back to a DB
+    // `contains` across title/area/address.
+    let meiliOrder: string[] | null = null;
+    if (query.q?.trim()) {
+      if (this.search.enabled) {
+        const ids = await this.search.searchIds(query.q, 200);
+        if (ids.length === 0) {
+          return { data: [], meta: { cursor: null, hasMore: false } };
+        }
+        where.id = { in: ids };
+        meiliOrder = ids;
+      } else {
+        const q = query.q.trim();
+        where.OR = [
+          { title: { contains: q, mode: 'insensitive' } },
+          { area: { contains: q, mode: 'insensitive' } },
+          { address: { contains: q, mode: 'insensitive' } },
+        ];
+      }
+    }
+
     const orderBy = this.orderFor(query.sort);
 
     const rows = (await this.prisma.property.findMany({
       where,
       orderBy,
       include: detailInclude,
-      take: limit + 1,
-      ...(query.cursor ? { cursor: { id: query.cursor }, skip: 1 } : {}),
+      // For a Meili search we fetch the whole matched set (<=200) and reorder by
+      // relevance below; otherwise use cursor pagination.
+      ...(meiliOrder
+        ? {}
+        : {
+            take: limit + 1,
+            ...(query.cursor ? { cursor: { id: query.cursor }, skip: 1 } : {}),
+          }),
     })) as unknown as PropertyRow[];
+
+    // Meili path: reorder by relevance, then paginate by cursor (the id of the
+    // last returned item) over that relevance-ordered list.
+    if (meiliOrder) {
+      const rank = new Map(meiliOrder.map((id, i) => [id, i]));
+      rows.sort((a, b) => (rank.get(a.id) ?? 1e9) - (rank.get(b.id) ?? 1e9));
+      const start = query.cursor ? rows.findIndex((r) => r.id === query.cursor) + 1 : 0;
+      const slice = rows.slice(start, start + limit + 1);
+      const hasMoreM = slice.length > limit;
+      const pageM = hasMoreM ? slice.slice(0, limit) : slice;
+      let summariesM = pageM.map(serializeSummary);
+      if (truthy(query.freeOnly)) {
+        summariesM = summariesM.filter((s) => (s.beds as { available: number }).available > 0);
+      }
+      const cursorM = hasMoreM ? (pageM[pageM.length - 1]?.id ?? null) : null;
+      return { data: summariesM, meta: { cursor: cursorM, hasMore: hasMoreM } };
+    }
 
     const hasMore = rows.length > limit;
     const page = hasMore ? rows.slice(0, limit) : rows;
