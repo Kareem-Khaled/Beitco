@@ -1,6 +1,6 @@
 # Beitco — Database Schema
 
-> **Last updated:** June 23, 2026 · **Source of truth: `apps/api/prisma/schema.prisma`** (always defer to it). This is a navigable map, not a copy.
+> **Last updated:** June 24, 2026 · **Source of truth: `apps/api/prisma/schema.prisma`** (always defer to it). This is a navigable map, not a copy.
 > PostgreSQL 16 + PostGIS via Prisma 6. **22 models, 21 enums.** Migrations in `apps/api/prisma/migrations/`.
 
 ---
@@ -21,7 +21,7 @@
 ### Identity & preferences
 - **User** — phone-identity (no passwords). `isAdmin`, `verified`, `verificationStatus`, `trust`, `trustBreakdown`, `responseRate`, `renterReputation`, `renterReviewsCount`, `notificationPrefs`, `gender`, `role`. Soft-deletable. Hub of most relations.
 - **RenterProfile** — 1:1 with User; the matching inputs (`budgetMin/Max`, `areas[]`, `lookingFor[]`, `nearMetro`, `metroLines[]`, `maxWalkMinutes`, `mustHaveAmenities[]`, `furnishedPref`, `housematesGender`, `occupation`, `intent`, …).
-- **VerificationRequest** — KYC docs + review state (model exists; flow wiring is PROD-5).
+- **VerificationRequest** — KYC docs (`idDocUrl`, `selfieUrl`, optional `ownershipDocUrl`) + review state. Submit → pending → admin approve/reject (PROD-5, ✅).
 
 ### Listings (bed-level model)
 - **Property** — the listing. Card-facing derived fields (`type`, `priceFrom`, `trust`, `verified`, `reviewsCount`) + structured fields (`rentalMode`, `unitType`, `bedrooms`, prices, `wholeStatus`, `saleStatus`, `rentToGender`, `images[]`, `amenities[]`, `costs` JSON, `quality` JSON, `lat`/`lng`, `status`, `rejectionReason`). Soft-deletable.
@@ -64,6 +64,7 @@
 |---|---|
 | `20260621160438_init_bed_level_trust` | The whole bed-level + trust schema (the post-pivot rewrite, task B-0). |
 | `20260623105042_add_saved_search_notification` | `saved_search` value on `NotificationType` (NOTIF-2). |
+| `20260624120000_add_geo_point` | PostGIS `geog geography(Point,4326)` column + GiST index + lat/lng sync trigger + backfill (PROD-4). |
 
 Seed: `apps/api/prisma/seed.ts` — idempotent (children-first reset), 12 users + 7 properties (whole/by-room/by-bed/sale/nightly). Run `pnpm --filter ... db:seed` (or `npm run db:seed` in `apps/api`).
 

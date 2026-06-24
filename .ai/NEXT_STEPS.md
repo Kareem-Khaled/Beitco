@@ -1,28 +1,31 @@
 # Next Steps — Beitco
 
-> **The active backlog. Start here.** · branch: `dev` · created June 23, 2026
-> Derived from the full-codebase audit (June 23). The product is **feature-complete end-to-end** (see `.ai/CURRENT_STATE.md`); what remains is **hardening for production**, then payments and mobile. Items are ordered by priority. Check them off as you go.
+> **The active backlog. Start here.** · branch: `dev` · created June 23, 2026 · updated June 24
+> The product is **feature-complete end-to-end** and the **hardening backlog (P0→P2) is done** (see `.ai/CURRENT_STATE.md`). What remains before launch is **test depth + a real deploy host** (the go-live checklist lives in `.ai/PROD_READINESS.md`), then the optional P3 polish and P4 business phases. Items are ordered by priority — check them off as you go.
 
 ---
 
-## Audit scorecard (June 23, 2026) — overall **79 / 100**
+## Audit scorecard (deep code scan, June 24, 2026) — overall **84 / 100**
+
+> Verified against the actual source (not just the docs). Movement since the June 23 baseline (79).
 
 | Area | Score | Verdict |
 |---|:--:|---|
-| Product completeness / UX | 90 | Every core flow works end-to-end behind the flag |
-| Documentation | 90 | Strong `.ai/` base; some stale pre-pivot docs being fixed |
-| Type safety / code quality | 90 | API 0 `any`; web `any` only in generated file |
-| Database (Prisma/PostGIS) | 88 → **92** | Clean schema/indexes; **PostGIS geo search live** (GiST `ST_DWithin`) |
-| Architecture / monorepo | 87 | Great flag pattern; 3 dead shared packages |
-| Frontend | 86 → **88** | Polished + a11y + **real image-upload pipeline**; monolithic files remain |
-| Backend (NestJS) | 85 → **90** | Clean modules + guards + **readiness, linted, uploads**; mature |
-| Accessibility / RTL | 82 | RTL-first + aria; no i18n framework, no axe |
-| Security & Auth | 78 → **92** | OTP/JWT solid; **P0 hardening done** (secrets fail-fast, helmet, readiness, OTP throttle) |
-| DevOps / Deployment | 60 → **88** | Linted + containerized (boot-verified) + **full CI/CD pipeline** (quality/e2e/docker/release); real deploy host still TODO |
-| Testing & QA | 55 → **78** | **e2e suite (18) codifies the smokes**; +pure-engine units; component/controller-unit pending |
-| Observability & Ops | 35 → **80** | **structured pino logs + request-id + redaction (OBS-1) + Sentry error tracking (OBS-2)**; readiness probe; metrics/tracing still optional |
+| Type safety / code quality | **91** | 0 hand-written `any` (all 32 are in the generated route tree); clean lint |
+| Database (Prisma/PostGIS) | **90** | GiST geo, 30 indexes, soft deletes, trigger-maintained `geog` |
+| Documentation | **89** | 18 structured docs + Swagger; this sync closed the drift |
+| Backend (NestJS) | **89** | 16 modules, consistent envelope, global guards, cursor paging, shared Redis |
+| Security & Auth | **88** | httpOnly cookies, refresh rotation+blacklist, env fail-fast, helmet, throttle |
+| Frontend | **86** | SSR, error boundary+404, RTL-clean, flag-based mock/API; monolith files remain |
+| Architecture / monorepo | **85** | Clean flag pattern; dead weight (3 empty packages + `_unported/` + monoliths) |
+| Product completeness / UX | **84** | Full loop incl. trust wedge; no payments/mobile/email |
+| DevOps / Deployment | **82** | Great CI; **deploy job is still a placeholder** (no live host) |
+| Accessibility / RTL | **80** | RTL-first + 79 aria uses; no a11y automation, no i18n seam |
+| Performance & scale | **79** | Indexes+cache+cursors; synchronous fan-out; no load test |
+| Observability & Ops | **78** | pino + Sentry + readiness; **no metrics/tracing/alerting** |
+| **Testing & QA** | **72** | e2e (19) is excellent; **most services + web components untested**; no coverage gate |
 
-The gap to "production-ready" is the bottom four rows. P0/P1 below target them directly.
+**The two gates to "confidently in production":** raise **Testing** (service unit tests + web component tests + a coverage floor) and stand up a **real deploy host**. Neither is a rewrite. See `.ai/PROD_READINESS.md` for the go/no-go.
 
 ---
 
@@ -58,7 +61,15 @@ The gap to "production-ready" is the bottom four rows. P0/P1 below target them d
 - [x] **PROD-4 · PostGIS geo search.** ✅ (June 24) Migration `add_geo_point` adds a `geog geography(Point,4326)` column (mapped in Prisma as `Unsupported(...)` so the column exists but Prisma doesn't manage it), a **GiST index**, a `BEFORE INSERT/UPDATE` trigger that keeps `geog` in sync from `lat`/`lng`, and a backfill for existing rows. `GET /properties?lat&lng&radiusKm` (radius default 5 km, max 50) runs a PostGIS **`ST_DWithin`** prefilter (GiST-indexed) returning nearby published ids **ordered by distance** (`geog <-> point`, LIMIT 300), then the list query constrains to those ids and orders by proximity — unified with the Meili relevance path into one `relevanceOrder` fetch-all-then-cursor-slice branch (so `q` + geo compose: text drives order, geo constrains). No coords → the existing cursor path is untouched. **Verified live:** Maadi 10 km → property 2 (0 km) then 5 (~10 km) distance-ordered; `radiusKm=2` → only Maadi; Alexandria 5 km → the Smouha listing (geo works in a 2nd city); geo + `freeOnly` composes; **cursor pagination across the geo order** (page 1 → 2, page 2 → 5). 52 unit + 19 e2e green; `tsc`/`build`/`lint` clean. `.ai/API_SPEC.md` documents the params.
 - [x] **PROD-5 · Verification flow (KYC) backend.** ✅ (June 24) New `verification` module: `POST /me/verification` (submit ID/selfie/ownership doc URLs → pending request + `User.verificationStatus=pending`), `GET /me/verification` (my status), admin `GET /admin/verifications` (+`/count`), `POST /admin/verifications/:id/approve` (→ `verified` + `verificationStatus=verified`, **recompute trust** so the T-2 verification bonus applies, + a verification notification) / `:id/reject` (reason + notification). `AdminGuard` + transactional updates. **FE** (flag-aware): `verify.tsx` uploads docs via PROD-1's `uploadImage` then submits; new admin `/dashboard/verifications` queue (doc thumbnails, approve/reject) + a nav badge. **Verified:** an **e2e flow test** (submit → `/me` pending → non-admin 403 → admin approve → `/me` verified + notification) + 52 unit; both apps `tsc`/`lint`/`build` clean. (Also: `ThrottlerModule` now skips under `NODE_ENV=test` so the e2e's many logins don't 429.)
 
-## 🟢 P3 — Polish & scale (nice-to-have)
+## � Launch blockers (do these to actually go live) — see `.ai/PROD_READINESS.md`
+
+> P0→P2 hardening is done, but the app **isn't deployed anywhere** and the deepest business logic is only e2e-covered. These are the gates from "feature-complete + hardened" to "in production."
+
+- [ ] **DEPLOY-1 · Real deploy host.** Wire the `deploy-staging` placeholder to an actual target (Fly/Render/Railway/managed k8s): apply the pushed image tag → `prisma migrate deploy` → gate traffic on `GET /health/ready`. Provision managed Postgres+PostGIS / Redis / Meilisearch / object storage / an SMS provider, and load strong distinct secrets via the host's secret manager. **The last hard blocker.**
+- [ ] **TEST-1 · Service unit tests + coverage floor.** NestJS service tests with a mocked Prisma for the trust-moving + authz paths (`listings`, `engagement`, `reviews`, `verification`, `admin`, `auth`); add a CI coverage threshold. _(The e2e suite covers the happy paths + authz matrix; this adds branch-level safety.)_
+- [ ] **TEST-3 · Web component tests.** `@testing-library/react` for the highest-risk surfaces: the flag-aware `queries.ts` hooks, `property.$id` actions, and the listing-wizard validation.
+
+## �🟢 P3 — Polish & scale (nice-to-have)
 
 - [ ] **POLISH-1 · Decompose monolith files.** `list/new.tsx` (2,290 LOC) and `property.$id.tsx` (1,454 LOC) → step/section components.
 - [ ] **POLISH-2 · Shared packages or delete them.** `@beitco/types|utils|validators` have **0 imports**; types are duplicated between `apps/web/lib/beitco/types.ts` and the API serializers. Either make them the shared contract or remove them.
@@ -74,12 +85,16 @@ The gap to "production-ready" is the bottom four rows. P0/P1 below target them d
 
 ---
 
-## Suggested order
+## What's actually next (post-hardening)
 
-1. **SEC-1 → SEC-3** (an afternoon; biggest risk reduction).
-2. **OPS-1** (unblocks reliable CI) → **TEST-1/TEST-2** (regression safety net).
-3. **OPS-2 → OPS-3** (deployable) + **OBS-1/OBS-2** (you can see prod).
-4. **PROD-1 → PROD-2** (images + real OTP are the two hard blockers for a real beta).
-5. Everything else as capacity allows.
+P0→P2 are done. To move from "feature-complete + hardened" to "confidently in production," in order:
+
+1. **TEST-1 · Service unit tests** (mock Prisma) for the 5–6 heaviest services (`listings`, `engagement`, `reviews`, `verification`, `admin`, `auth`) — the biggest score + safety win. Add a CI coverage floor.
+2. **TEST-3 · Web component tests** (`@testing-library/react`) for the highest-risk surfaces (search, `property.$id` actions, the listing wizard).
+3. **DEPLOY-1 · A real deploy host** — wire `deploy-staging` to an actual target (Fly/Render/Railway/k8s): apply the image tag → `prisma migrate deploy` → gate on `/health/ready`. This is the last hard blocker.
+4. **POLISH-2** (resolve/delete the empty `@beitco/*` packages) + remove `_unported/` — cheap clutter cleanup.
+5. Then **P3** (POLISH-1 monoliths, POLISH-4 BullMQ, POLISH-5 occupant-link, POLISH-6 a11y) and **P4** (payments, mobile) as capacity allows.
+
+See **`.ai/PROD_READINESS.md`** for the full go-live checklist, deploy runbook, and go/no-go.
 
 > When you finish an item, move its one-line outcome into `.ai/BACKEND_TASKS.md` (build log) and tick the box here.

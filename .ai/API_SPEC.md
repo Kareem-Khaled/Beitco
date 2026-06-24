@@ -1,6 +1,6 @@
 # Beitco — API Specification
 
-> **Last updated:** June 23, 2026 · Live endpoint inventory. **Interactive source of truth: Swagger at `http://localhost:3001/api/docs`.**
+> **Last updated:** June 24, 2026 · Live endpoint inventory. **Interactive source of truth: Swagger at `http://localhost:3001/api/docs`.**
 > Base: `/api/v1` (URI versioning). All paths below are relative to it.
 
 ---
@@ -67,6 +67,22 @@
 | GET | `/me/matches` | Auth | Ranked, explainable matches from saved preferences. |
 | PATCH | `/users/me` | Auth | Update name/role/avatar/notifications **and `profile`** (preferences; upserts `RenterProfile`). |
 
+## Verification (KYC) — `/me/verification` + `/admin/verifications`
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| POST | `/me/verification` | Auth | Submit `idDocUrl`/`selfieUrl`/optional `ownershipDocUrl` → pending request (`verificationStatus=pending`). |
+| GET | `/me/verification` | Auth | My latest request + status. |
+| GET | `/admin/verifications` | Admin | Pending KYC queue (oldest first; applicant name/phone/role). |
+| GET | `/admin/verifications/count` | Admin | Nav badge. |
+| POST | `/admin/verifications/:id/approve` | Admin | → `verified` + `verificationStatus=verified` + **trust recompute** (T-2 bonus) + notification. |
+| POST | `/admin/verifications/:id/reject` | Admin | `{ reason }` → `unverified` + notification. |
+
+## Uploads (images) — `/uploads`
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| POST | `/uploads/presign` | Auth | → presigned **S3/R2** PUT URL + final public URL (validates content-type ∈ {jpeg,png,webp,avif} + ≤10 MB; keys namespaced `listings/<userId>/…`). |
+| GET | `/uploads/config` | Auth | `{ configured }` — when `false`, the client falls back to downscaled base64. |
+
 ## Chat — REST + WebSocket
 | Method | Path | Auth | Notes |
 |---|---|---|---|
@@ -94,7 +110,8 @@
 ## Health
 | Method | Path | Auth | Notes |
 |---|---|---|---|
-| GET | `/health` | Public | Liveness (`status`, uptime). **Readiness (DB+Redis) is SEC-3 in NEXT_STEPS.** |
+| GET | `/health` | Public | Liveness (`status`, uptime). |
+| GET | `/health/ready` | Public | Readiness — pings Postgres (`SELECT 1`) + Redis (`PING`); **503** when either is down (for the orchestrator's traffic gate). |
 
 ---
 

@@ -1,7 +1,7 @@
 # Roadmap — Beitco
 
-> **Last updated:** June 23, 2026. Bias toward shipping the smallest thing that proves trust > supply.
-> For the granular, prioritized backlog see **`.ai/NEXT_STEPS.md`**. This file is the high-level phase view.
+> **Last updated:** June 24, 2026. Bias toward shipping the smallest thing that proves trust > supply.
+> For the granular, prioritized backlog see **`.ai/NEXT_STEPS.md`**; for the go-live checklist see **`.ai/PROD_READINESS.md`**. This file is the high-level phase view.
 
 ---
 
@@ -20,7 +20,7 @@ Phases 0–3 are **functionally done** — the trust-first bed-level marketplace
 - ✅ Frontend wired via TanStack Query behind `VITE_USE_API` (mock kept as the default fallback).
 - ✅ Phone-OTP auth + JWT in httpOnly cookies; profile completion.
 - ✅ Post/edit listing (the `حط شقتك` wizard) → DB → moderation gate.
-- ⏳ **Photo upload** — still base64 data URLs; real S3/R2 pipeline is **PROD-1** in NEXT_STEPS.
+- ✅ **Photo upload** — presigned S3/R2 pipeline with a downscaled-base64 fallback (**PROD-1**).
 
 ## Phase 2 · Make It Trustworthy ✅
 **Trust is computed, not hardcoded; reviews are gated by real residency.**
@@ -28,7 +28,7 @@ Phases 0–3 are **functionally done** — the trust-first bed-level marketplace
 - ✅ Resident review posting, gated by a 30-day tenancy — **and it moves the score**.
 - ✅ Trust engine (T-1→T-5): listing/owner/renter scores, Bayesian smoothing, verification cap, real response-rate (T-3 `ResponseEvent`s), two-sided reputation (T-4), transparency popover (T-5). Recompute on the relevant writes.
 - ✅ Q&A on property pages.
-- ⏳ **Verification (KYC) backend** — model + UI exist; wiring is **PROD-5**.
+- ✅ **Verification (KYC)** — submit ID/selfie/ownership docs → admin review → `verified` + trust bonus (**PROD-5**).
 
 ## Phase 3 · Make It Match ✅
 **Search + messaging close the loop from browse to move-in.**

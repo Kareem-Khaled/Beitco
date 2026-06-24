@@ -1,7 +1,7 @@
 # Beitco — Architecture
 
-> **Last updated:** June 23, 2026 · Current system design (post-pivot, full-stack).
-> Companion docs: `.ai/DB_SCHEMA.md` (data), `.ai/API_SPEC.md` (endpoints), `.ai/CURRENT_STATE.md` (status), `.ai/NEXT_STEPS.md` (backlog).
+> **Last updated:** June 24, 2026 · Current system design (post-pivot, full-stack).
+> Companion docs: `.ai/DB_SCHEMA.md` (data), `.ai/API_SPEC.md` (endpoints), `.ai/CURRENT_STATE.md` (status), `.ai/NEXT_STEPS.md` (backlog), `.ai/PROD_READINESS.md` (go-live).
 
 ---
 
@@ -43,7 +43,7 @@ This let the backend be built and verified slice-by-slice without ever breaking 
 
 ## 3. Frontend (`apps/web`)
 
-- **Routing:** TanStack Router file-based routes in `src/routes/` (32 routes); tree auto-generated (`routeTree.gen.ts`).
+- **Routing:** TanStack Router file-based routes in `src/routes/` (33 routes); tree auto-generated (`routeTree.gen.ts`).
 - **Data:** TanStack Query everywhere via `lib/beitco/queries.ts`. Mutations invalidate the relevant query keys.
 - **State of truth for shapes:** `lib/beitco/types.ts` (frontend) — mirrored by the API serializers.
 - **Pure engines (also ported to the API):** `lib/beitco/trust.ts`, `lib/beitco/matching.ts` — framework-free, unit-tested (Vitest).
@@ -60,7 +60,7 @@ NestJS — **one module per feature**, services inject `PrismaService`. Cross-cu
 - **Authz:** ownership checks in services (403); `AdminGuard` (`isAdmin`) for moderation; chat is participant-checked; the WS gateway re-verifies the cookie JWT.
 - **Trust/matching:** pure engines (`trust/trust.engine.ts`, `matching/matching.engine.ts`) + services that read Prisma, compute, and persist. Trust recompute is triggered by the writes that should move a score (review, owner reply via `ResponseEvent`, verification).
 
-**Module map:** `auth · listings · engagement · reviews · trust · matching · chat · notifications · admin · users · common · health`. See `.ai/CURRENT_STATE.md` for each module's responsibility and `.ai/API_SPEC.md` for routes.
+**Module map:** `auth · listings · engagement · reviews · trust · matching · chat · notifications · admin · verification · uploads · search · users · redis · common · health`. See `.ai/CURRENT_STATE.md` for each module's responsibility and `.ai/API_SPEC.md` for routes.
 
 ## 5. Data & infra
 

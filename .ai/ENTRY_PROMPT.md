@@ -111,15 +111,16 @@ See `.ai/CURRENT_STATE.md` for the authoritative description.
 
 ## Reference Files
 
+- `.ai/CURRENT_STATE.md` — what's actually built right now (**start here**)
+- `.ai/NEXT_STEPS.md` — the prioritized backlog + audit scorecard
+- `.ai/PROD_READINESS.md` — go-live checklist + deploy runbook + go/no-go
 - `.ai/PROJECT_OVERVIEW.md` — product vision, personas, MVP scope
-- `.ai/CURRENT_STATE.md` — what's actually built right now (start here)
 - `.ai/PRD.md` — product requirements + feature inventory + roadmap
 - `.ai/TRUST_SPEC.md` — the computed trust system (T-1→T-5)
 - `.ai/BUSINESS_MODEL.md` — monetization & unit economics
-- `.ai/TASKS.md` — frontend task board
-- `.ai/BACKEND_TASKS.md` — **backend task board (current focus)**
-- `.ai/ROADMAP.md` — 90-day plan
+- `.ai/BACKEND_TASKS.md` — backend build log · `.ai/TASKS.md` — frontend board
+- `.ai/ROADMAP.md` — phased plan
 - `.ai/AI_RULES.md` — detailed coding standards
-- `.ai/ARCHITECTURE.md` — system design (⚠️ pre-pivot, see CURRENT_STATE + BACKEND_TASKS)
-- `.ai/DB_SCHEMA.md` — Prisma schema (⚠️ pre-pivot; rewrite tracked as B-0)
-- `.ai/API_SPEC.md` — endpoint contracts (⚠️ pre-pivot; new plan in BACKEND_TASKS)
+- `.ai/ARCHITECTURE.md` — current system design (post-pivot, full-stack)
+- `.ai/DB_SCHEMA.md` — schema map (source of truth: `apps/api/prisma/schema.prisma`)
+- `.ai/API_SPEC.md` — endpoint inventory (Swagger: `/api/docs`)

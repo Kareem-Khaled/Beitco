@@ -1,7 +1,7 @@
 # Current State — Beitco
 
-> **Last updated:** June 23, 2026 · branch: `dev`
-> Honest snapshot of what's actually built and verified. For the prioritized "what's next" read **`.ai/NEXT_STEPS.md`**; for the product vision read `.ai/PRD.md`; for the backend build log read `.ai/BACKEND_TASKS.md`.
+> **Last updated:** June 24, 2026 · branch: `dev`
+> Honest snapshot of what's actually built and verified. For the prioritized "what's next" read **`.ai/NEXT_STEPS.md`**; for the **go-live checklist + deploy runbook** read **`.ai/PROD_READINESS.md`**; for the product vision read `.ai/PRD.md`; for the backend build log read `.ai/BACKEND_TASKS.md`.
 
 ---
 
@@ -10,7 +10,8 @@
 - **Full-stack, end-to-end.** The trust-first bed-level marketplace is real on a server. The frontend talks to a NestJS + Postgres API across **every core surface** — browse, auth, listings CRUD + moderation, leads, Q&A, reviews, matching, the owner dashboard, live chat, and notifications.
 - **Behind a feature flag.** `VITE_USE_API` toggles the data source: **OFF (default)** = the byte-identical localStorage mock; **ON** = the live API. Both paths are kept identical so the prototype still runs with no backend.
 - **The trust wedge is proven, not cosmetic.** Reviews move a listing's computed score (verified 8.3 → 5.2); an owner's first chat reply moves it up via real response-rate tracking (8.1 → 8.6). Nothing buys a higher score; every score is explainable.
-- **What remains is hardening, not features:** automated test depth, deployment/CI, observability, security headers, real OTP/SMS, an image-upload pipeline, and payments. See `.ai/NEXT_STEPS.md`.
+- **Production-hardening is done.** P0 security (secrets fail-fast, helmet, readiness, OTP throttle), P1 shippability (API lint, CI/CD, Docker, e2e, pino logs, Sentry), and P2 product readiness (image uploads, real OTP/SMS, Meilisearch, PostGIS geo, KYC) are all shipped + verified.
+- **What remains before launch:** **test depth** (most services lack isolated unit tests) and **a real deploy host** (the CI/CD pipeline + staging skeleton exist; the target isn't wired). See **`.ai/PROD_READINESS.md`**.
 
 ---
 
@@ -26,17 +27,18 @@
 
 ## ✅ Frontend — `apps/web/` (`tanstack_start_ts`)
 
-**Stack:** TanStack Start (Vite + React 19), TypeScript strict, Tailwind v4, shadcn/ui, Arabic RTL (Egyptian dialect), Leaflet (maps), TanStack Query, socket.io-client, Vitest. Runs on `pnpm web` → http://localhost:8080. 32 routes, 69 components.
+**Stack:** TanStack Start (Vite + React 19), TypeScript strict, Tailwind v4, shadcn/ui, Arabic RTL (Egyptian dialect), Leaflet (maps), TanStack Query, socket.io-client, Vitest. Runs on `pnpm web` → http://localhost:8080. 33 routes, 69 components.
 
 **Built and wired (flag-aware via `lib/beitco/queries.ts`):**
-- **Browse:** home, search (filters + URL state + sort), property detail (gallery, trust section, quality scores, amenities, bed/room/whole occupancy, reviews, Q&A, map, nearby).
+- **Browse:** home, search (filters + URL state + sort + **server-side `q`** and **"قريب مني" geo radius** in API mode), property detail (gallery, trust section, quality scores, amenities, bed/room/whole occupancy, reviews, Q&A, map, nearby).
 - **Auth:** phone-OTP login → profile completion; session via httpOnly cookie; `useAuth` branches mock/API.
-- **Listings:** the `حط شقتك` multi-step wizard (create + edit), owner dashboard (listings grid + pause/occupancy/sale-status, overview analytics, reviews, leads).
+- **Listings:** the `حط شقتك` multi-step wizard (create + edit, photos via the presigned-upload pipeline), owner dashboard (listings grid + pause/occupancy/sale-status, overview analytics, reviews, leads).
 - **Engagement:** save listing, save search, request viewing / book specific beds-rooms, Q&A ask + owner answer, post review + helpful + owner reply, owner→renter review.
 - **Matching:** renter preferences page → `/me/matches` (ranked, explainable).
 - **Chat:** `/messages` + thread view, "كلّم صاحب الشقة", live updates via Socket.io.
 - **Notifications:** bell badge + `/notifications` feed (leads, messages, review-eligibility, verification, saved-search alerts).
-- **Admin:** moderation queue (`/dashboard/moderation`) gated on `isPlatformAdmin`.
+- **Verification (KYC):** `dashboard/verify` (upload ID/selfie/ownership docs → pending) + admin `dashboard/verifications` queue (approve/reject).
+- **Admin:** moderation queue (`/dashboard/moderation`) + verifications queue, gated on `isPlatformAdmin`.
 - **Platform:** dark mode, PWA manifest, mobile bottom-nav, accessibility pass (skip link, aria, focus management), maps (Leaflet pin-drop + Google embeds), public profiles.
 
 **Tests:** 31 Vitest (trust + matching pure engines). `tsc` clean.
@@ -45,7 +47,7 @@
 
 ## ✅ Backend — `apps/api/` (NestJS 11)
 
-**Stack:** NestJS 11, Prisma 6, PostgreSQL 16 + PostGIS, Redis (OTP + read-state), JWT/Passport (httpOnly cookies), Socket.io, class-validator, Swagger. Runs on `pnpm api` → http://localhost:3001 (`/api/v1`, Swagger at `/api/docs`).
+**Stack:** NestJS 11, Prisma 6, PostgreSQL 16 + PostGIS, Redis (OTP + read-state), Meilisearch (search), S3/R2 (uploads), JWT/Passport (httpOnly cookies), Socket.io, class-validator, pino logs, Sentry, Swagger. Runs on `pnpm api` → http://localhost:3001 (`/api/v1`, Swagger at `/api/docs`).
 
 **Modules (all built, type-check + build clean):**
 
@@ -59,14 +61,18 @@
 | `matching` | Pure engine (`matching.engine.ts`) + `GET /me/matches`; renter-preferences persistence via `PATCH /users/me`. |
 | `chat` | REST threads/messages (find-or-create, mark-read) + Socket.io gateway (`/ws/chat`, cookie-JWT auth) for live delivery. T-3 response events feed owner trust. |
 | `notifications` | Derived feed (leads/messages/reviews/verification) + Redis last-seen marker + persisted **saved-search alerts** on publish/approve. |
-| `admin` | Moderation queue (`AdminGuard`): pending list/count, approve (→ publish + alerts), reject (reason). |
+| `admin` | Moderation queue + KYC review (`AdminGuard`): pending list/count, approve (→ publish + alerts), reject (reason); verification approve/reject. |
+| `verification` | KYC (PROD-5): `POST/GET /me/verification` (submit ID/selfie/ownership docs → pending), admin queue + approve (→ `verified` + trust recompute + notification) / reject. |
+| `uploads` | Image pipeline (PROD-1): `POST /uploads/presign` → presigned S3/R2 PUT + public URL (content-type/size validated); `GET /uploads/config`. Config-gated; base64 fallback when unset. |
+| `search` | Meilisearch (PROD-3): config-gated client; indexes published listings on boot + keeps them in sync; powers typo-tolerant Arabic `?q=` with a DB `contains` fallback. |
 | `users` | `PATCH /users/me` (profile + preferences). |
-| `common` | Global response-envelope interceptor + all-exceptions filter. |
-| `health` | Liveness check (shallow — see NEXT_STEPS). |
+| `redis` | Shared `RedisService` (POLISH-3): one `ioredis` client injected by auth/notifications/health; live `ready` getter + `ping()`. |
+| `common` | Global response-envelope interceptor + all-exceptions filter (Sentry-reporting). |
+| `health` | Liveness (`GET /health`) + **readiness** (`GET /health/ready`, pings Postgres + Redis, 503 when either is down). |
 
-**Tests:** 41 Jest (17 trust + 13 matching + 10 saved-search matcher + 1 health). 0 `any`. Strict `ValidationPipe` (whitelist + forbidNonWhitelisted).
+**Tests:** 52 Jest (17 trust + 13 matching + 10 saved-search matcher + 5 uploads + 5 sms + 2 health) + **19 e2e** (Supertest, real Postgres/Redis). 0 hand-written `any`. Strict `ValidationPipe` (whitelist + forbidNonWhitelisted).
 
-**Schema:** 22 models, 21 enums, UUID PKs, snake_case `@map`, soft deletes, 30 indexes/uniques. 2 migrations applied. Idempotent seed (12 users, 7 properties).
+**Schema:** 22 models, 21 enums, UUID PKs, snake_case `@map`, soft deletes, 30 indexes/uniques. 3 migrations applied (bed-level/trust, saved-search-notification, geo-point). Idempotent seed (12 users, 7 properties).
 
 ---
 
@@ -97,7 +103,7 @@ Treat this section as the source of truth over any `@RequireTier` references els
 
 - **Security / shippable / observability:** ✅ done — secrets fail-fast + `helmet` + readiness (DB+Redis) + OTP throttle; API ESLint + CI/CD + Dockerfiles; e2e suite (19); structured pino logs + Sentry.
 - **Product:** ✅ image-upload pipeline (PROD-1), real OTP/SMS gateway (PROD-2), Meilisearch (PROD-3), PostGIS geo (PROD-4), verification/KYC (PROD-5).
-- **Still open (optional):** **P3 polish** — decompose the two monolith FE files, resolve the 3 empty shared packages, a shared RedisModule, a BullMQ worker for saved-search alerts, the occupant-link consent flow, a11y automation. **P4 business** — payments (Paymob/Stripe EGP) + Capacitor mobile wrap. A real deploy **host** (the CD pipeline + staging skeleton exist; the target isn't wired).
+- **Still open (optional):** **Launch blockers** — a real deploy host (DEPLOY-1) + service/web test depth (TEST-1/TEST-3); see `.ai/PROD_READINESS.md`. **P3 polish** — decompose the two monolith FE files, resolve the 3 empty shared packages, a BullMQ worker for saved-search alerts, the occupant-link consent flow, a11y automation. **P4 business** — payments (Paymob/Stripe EGP) + Capacitor mobile wrap.
 
 ---
 
@@ -106,10 +112,11 @@ Treat this section as the source of truth over any `@RequireTier` references els
 | Doc | Purpose |
 |---|---|
 | `NEXT_STEPS.md` | **The active backlog — what's next, prioritized.** |
+| `PROD_READINESS.md` | **Go-live checklist + deploy runbook + go/no-go.** |
 | `ROADMAP.md` | Phased plan (what's done / what's next). |
 | `PRD.md` | Product vision, personas, scope. |
 | `TRUST_SPEC.md` | Trust engine (T-1→T-5). |
-| `BACKEND_TASKS.md` | Backend build log (B-0 → CHAT-3/NOTIF-2). |
+| `BACKEND_TASKS.md` | Backend build log (B-0 → POLISH-3). |
 | `ARCHITECTURE.md` | Current system design. |
 | `DB_SCHEMA.md` | Schema reference (source of truth: `apps/api/prisma/schema.prisma`). |
 | `API_SPEC.md` | Current endpoint inventory. |

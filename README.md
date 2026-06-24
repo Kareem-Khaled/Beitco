@@ -21,24 +21,29 @@ Beitco changes that:
 ### Prerequisites
 - Node.js ≥20
 - pnpm ≥9.15
-- Docker (for Postgres, Redis, Meilisearch)
+- Docker (for Postgres + PostGIS, Redis, Meilisearch)
 
 ### Install
 ```bash
 pnpm install
 ```
 
+### Start the data services
+```bash
+docker compose up -d        # Postgres + PostGIS · Redis · Meilisearch
+```
+
+### Start the backend
+```bash
+pnpm api                    # NestJS on http://localhost:3001 (Swagger at /api/docs)
+```
+First run: `pnpm --filter @beitco/api exec prisma migrate deploy && pnpm --filter @beitco/api db:seed` (12 users, 7 properties).
+
 ### Start the frontend
 ```bash
-pnpm web
+pnpm web                    # http://localhost:8080
 ```
-Opens on http://localhost:8080
-
-### Start the backend (optional, currently scaffold)
-```bash
-docker compose up -d        # Postgres + PostGIS + Redis + Meilisearch
-pnpm api                    # NestJS on port 3001
-```
+By default the web app runs on a **localStorage mock** (no backend needed). To read/write the live API, set `VITE_USE_API=true` in `apps/web/.env.local`.
 
 ### Run everything (Turbo)
 ```bash
@@ -52,12 +57,13 @@ pnpm dev
 ```
 Beitco/
 ├── apps/
-│   ├── web/              ← TanStack Start frontend (live)
-│   └── api/              ← NestJS backend (scaffold)
-├── packages/             ← shared types & utils
-├── .ai/                  ← strategy docs (source of truth)
-├── docs/                 ← legacy long-form docs
-└── docker-compose.yml    ← local services
+│   ├── web/              ← TanStack Start frontend (live, fully wired)
+│   └── api/              ← NestJS backend (live, 16 modules)
+├── packages/             ← shared type/util/validator stubs (unused — see POLISH-2)
+├── .ai/                  ← strategy + engineering docs (source of truth)
+├── .github/workflows/    ← CI/CD (quality · e2e · docker · release)
+├── docker-compose.yml    ← local services
+└── docker-compose.prod.yml ← prod-parity build (api · web · postgres · redis)
 ```
 
 ---
@@ -66,11 +72,13 @@ Beitco/
 
 | Layer | Choice |
 |---|---|
-| Frontend | TanStack Start (Vite + React 19) · Tailwind v4 · shadcn/ui |
-| Backend | NestJS 11 · TypeScript · Prisma |
-| Database | PostgreSQL 16 + PostGIS |
-| Search | Meilisearch |
-| Cache / Jobs | Redis · BullMQ |
+| Frontend | TanStack Start (Vite + React 19) · Tailwind v4 · shadcn/ui · TanStack Query |
+| Backend | NestJS 11 · TypeScript strict · Prisma 6 |
+| Database | PostgreSQL 16 + PostGIS (GiST geo search) |
+| Search | Meilisearch (typo-tolerant Arabic) |
+| Cache / Realtime | Redis · Socket.io |
+| Auth | Phone OTP + JWT in httpOnly cookies |
+| Observability | pino structured logs · Sentry |
 | Video | Mux (deferred) |
 | Mobile | Capacitor 6.x (deferred) |
 | Monorepo | Turborepo + pnpm |
@@ -84,18 +92,19 @@ The `.ai/` folder is the source of truth for product, business, and engineering 
 - **[.ai/ENTRY_PROMPT.md](./.ai/ENTRY_PROMPT.md)** — start here, canonical context
 - **[.ai/PROJECT_OVERVIEW.md](./.ai/PROJECT_OVERVIEW.md)** — product vision, personas, MVP scope
 - **[.ai/CURRENT_STATE.md](./.ai/CURRENT_STATE.md)** — what's actually built today
+- **[.ai/PROD_READINESS.md](./.ai/PROD_READINESS.md)** — **go-live checklist + deploy runbook**
+- **[.ai/NEXT_STEPS.md](./.ai/NEXT_STEPS.md)** — the prioritized backlog
 - **[.ai/BUSINESS_MODEL.md](./.ai/BUSINESS_MODEL.md)** — how Beitco makes money
 - **[.ai/ROADMAP.md](./.ai/ROADMAP.md)** — phased plan
-- **[.ai/TASKS.md](./.ai/TASKS.md)** — active task board
 - **[.ai/AI_RULES.md](./.ai/AI_RULES.md)** — coding standards
 
 ---
 
 ## Status
 
-Currently in **Phase 1: Make It Real** — wiring frontend to API, adding auth, building the post-a-listing flow.
+**Full-stack and hardened.** The trust-first bed-level marketplace works end-to-end against a real NestJS + Postgres API — browse, phone-OTP auth, the `حط شقتك` listing wizard + moderation, leads → tenancy, gated reviews that move a computed trust score, matching, owner dashboard, live chat, notifications + saved-search alerts, image uploads, real OTP/SMS, Meilisearch + PostGIS geo search, and KYC verification.
 
-The frontend is fully designed (Arabic RTL, Egyptian dialect) but consumes mock data. The backend exists as a scaffold but isn't wired up yet.
+The production-hardening backlog (security, CI/CD, Docker, e2e, structured logging, Sentry, readiness probes) is **complete**. What remains before launch is **test depth + a real deploy host** — see **[.ai/PROD_READINESS.md](./.ai/PROD_READINESS.md)**.
 
 See [`.ai/CURRENT_STATE.md`](./.ai/CURRENT_STATE.md) for the honest breakdown.
 
