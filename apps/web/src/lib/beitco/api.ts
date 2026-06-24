@@ -535,3 +535,62 @@ export async function apiPresignUpload(
   const body = await postJSON<PresignResult>("/uploads/presign", { contentType, contentLength });
   return body.data;
 }
+
+// ── Verification / KYC (PROD-5) ─────────────────────────────────────────────
+export type VerificationDocs = {
+  idDocUrl: string;
+  selfieUrl: string;
+  ownershipDocUrl?: string;
+};
+
+export async function apiSubmitVerification(docs: VerificationDocs): Promise<void> {
+  await postJSON("/me/verification", docs);
+}
+
+export async function apiGetMyVerification(): Promise<{
+  status: string;
+  rejectionReason?: string;
+} | null> {
+  const body = await getJSON<{ status: string; rejectionReason?: string } | null>(
+    "/me/verification",
+  );
+  return body.data;
+}
+
+export async function apiListPendingVerifications(): Promise<
+  Array<{
+    id: string;
+    userId: string;
+    idDocUrl?: string;
+    selfieUrl?: string;
+    ownershipDocUrl?: string;
+    submittedAt: string;
+    user?: { name: string; phone: string; role: string };
+  }>
+> {
+  const body = await getJSON<
+    Array<{
+      id: string;
+      userId: string;
+      idDocUrl?: string;
+      selfieUrl?: string;
+      ownershipDocUrl?: string;
+      submittedAt: string;
+      user?: { name: string; phone: string; role: string };
+    }>
+  >("/admin/verifications");
+  return body.data;
+}
+
+export async function apiVerificationCount(): Promise<number> {
+  const body = await getJSON<{ count: number }>("/admin/verifications/count");
+  return body.data.count;
+}
+
+export async function apiApproveVerification(id: string): Promise<void> {
+  await postJSON(`/admin/verifications/${encodeURIComponent(id)}/approve`);
+}
+
+export async function apiRejectVerification(id: string, reason: string): Promise<void> {
+  await postJSON(`/admin/verifications/${encodeURIComponent(id)}/reject`, { reason });
+}

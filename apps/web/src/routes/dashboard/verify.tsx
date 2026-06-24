@@ -11,7 +11,9 @@ import {
   ScanFace,
 } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
-import { getVerificationStatus, submitVerification } from "@/lib/beitco/store";
+import { getVerificationStatus } from "@/lib/beitco/store";
+import { submitVerification } from "@/lib/beitco/queries";
+import { uploadImage } from "@/lib/beitco/uploads";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -36,13 +38,23 @@ function VerifyPage() {
   // Proof of ownership only applies to owners; renters just verify identity.
   const isOwner = user.role === "owner" || user.role === "both";
 
-  const submit = () => {
+  const submit = async () => {
+    if (!idDoc || !selfieDoc || (isOwner && !ownershipDoc)) return;
     setSubmitting(true);
-    submitVerification(user.id);
-    // Keep the session user in sync so the badge/status updates everywhere.
-    updateUser({ verificationStatus: "pending" });
-    setSubmitting(false);
-    toast.success("اتبعت طلب التوثيق — هنراجعه ونبلّغك");
+    try {
+      await submitVerification(user.id, {
+        idDocUrl: idDoc,
+        selfieUrl: selfieDoc,
+        ...(ownershipDoc ? { ownershipDocUrl: ownershipDoc } : {}),
+      });
+      // Keep the session user in sync so the badge/status updates everywhere.
+      updateUser({ verificationStatus: "pending" });
+      toast.success("اتبعت طلب التوثيق — هنراجعه ونبلّغك");
+    } catch {
+      toast.error("مقدرناش نبعت الطلب دلوقتي. جرّب تاني.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -180,9 +192,9 @@ function DocUpload({
 }) {
   const onFile = (file: File | undefined) => {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => onChange(typeof reader.result === "string" ? reader.result : null);
-    reader.readAsDataURL(file);
+    // PROD-1/5: upload to storage (or downscaled base64 fallback) and store the
+    // returned URL, so KYC docs aren't raw blobs in the request.
+    void uploadImage(file).then((url) => onChange(url));
   };
 
   return (

@@ -19,6 +19,7 @@ import { MatchingModule } from './matching/matching.module';
 import { ChatModule } from './chat/chat.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { UploadsModule } from './uploads/uploads.module';
+import { VerificationModule } from './verification/verification.module';
 
 // Post-pivot core. After the schema rewrite to the bed-level + trust model, the
 // remaining legacy modules (chat, search, admin, moderation, analytics,
@@ -38,12 +39,12 @@ import { UploadsModule } from './uploads/uploads.module';
     }),
     // OBS-1: structured (pino) logging + per-request correlation ids.
     LoggerModule.forRoot(loggerConfig()),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 120,
-      },
-    ]),
+    ThrottlerModule.forRoot({
+      // Disable rate-limiting under tests (the e2e logs in many times from one
+      // IP); SEC-4's throttle is covered by the live API + its own boundaries.
+      skipIf: () => process.env.NODE_ENV === 'test',
+      throttlers: [{ ttl: 60000, limit: 120 }],
+    }),
     PrismaModule,
     TrustModule,
     AuthModule,
@@ -56,6 +57,7 @@ import { UploadsModule } from './uploads/uploads.module';
     ChatModule,
     NotificationsModule,
     UploadsModule,
+    VerificationModule,
     HealthModule,
   ],
   providers: [

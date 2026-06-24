@@ -47,6 +47,7 @@ import {
   getLastSeenNotifications,
   getUnreadNotificationCount,
   markNotificationsSeen as storeMarkNotificationsSeen,
+  submitVerification as storeSubmitVerification,
   type AppNotification,
 } from "./store";
 import {
@@ -84,6 +85,12 @@ import {
   apiListNotifications,
   apiNotificationsUnreadCount,
   apiMarkNotificationsSeen,
+  apiSubmitVerification,
+  apiListPendingVerifications,
+  apiVerificationCount,
+  apiApproveVerification,
+  apiRejectVerification,
+  type VerificationDocs,
   USE_API,
 } from "./api";
 import type {
@@ -649,4 +656,52 @@ export function useNotificationUnreadCount(userId: string | undefined) {
 export async function markNotificationsSeen(userId: string): Promise<void> {
   if (USE_API) return apiMarkNotificationsSeen();
   storeMarkNotificationsSeen(userId);
+}
+
+// ── Verification / KYC (PROD-5) ─────────────────────────────────────────────
+// Submit docs for review. API stores the doc URLs + flips status to pending;
+// the mock just flips status (it doesn't persist docs). Callers also
+// optimistically set the session user's verificationStatus to "pending".
+export async function submitVerification(userId: string, docs: VerificationDocs): Promise<void> {
+  if (USE_API) return apiSubmitVerification(docs);
+  storeSubmitVerification(userId);
+}
+
+// Admin verification queue (flag-aware). Mock has no queue, so it returns [].
+export function usePendingVerifications(enabled: boolean) {
+  return useQuery<
+    Array<{
+      id: string;
+      userId: string;
+      idDocUrl?: string;
+      selfieUrl?: string;
+      ownershipDocUrl?: string;
+      submittedAt: string;
+      user?: { name: string; phone: string; role: string };
+    }>
+  >({
+    queryKey: ["pendingVerifications", { source: USE_API ? "api" : "mock" }],
+    enabled,
+    queryFn: async () => (USE_API ? apiListPendingVerifications() : []),
+    initialData: USE_API ? undefined : () => [],
+    staleTime: USE_API ? 15_000 : Infinity,
+  });
+}
+
+export function useVerificationCount(enabled: boolean) {
+  return useQuery<number>({
+    queryKey: ["verificationCount", { source: USE_API ? "api" : "mock" }],
+    enabled,
+    queryFn: async () => (USE_API ? apiVerificationCount() : 0),
+    initialData: USE_API ? undefined : () => 0,
+    staleTime: USE_API ? 30_000 : Infinity,
+  });
+}
+
+export async function approveVerification(id: string): Promise<void> {
+  if (USE_API) return apiApproveVerification(id);
+}
+
+export async function rejectVerification(id: string, reason: string): Promise<void> {
+  if (USE_API) return apiRejectVerification(id, reason);
 }

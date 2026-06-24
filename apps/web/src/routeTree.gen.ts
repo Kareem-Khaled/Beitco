@@ -33,6 +33,7 @@ import { Route as MeMatchesRouteImport } from './routes/me/matches'
 import { Route as MeApplicationsRouteImport } from './routes/me/applications'
 import { Route as ListNewRouteImport } from './routes/list/new'
 import { Route as DashboardVerifyRouteImport } from './routes/dashboard/verify'
+import { Route as DashboardVerificationsRouteImport } from './routes/dashboard/verifications'
 import { Route as DashboardReviewsRouteImport } from './routes/dashboard/reviews'
 import { Route as DashboardModerationRouteImport } from './routes/dashboard/moderation'
 import { Route as DashboardListingsRouteImport } from './routes/dashboard/listings'
@@ -161,6 +162,11 @@ const DashboardVerifyRoute = DashboardVerifyRouteImport.update({
   path: '/verify',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardVerificationsRoute = DashboardVerificationsRouteImport.update({
+  id: '/verifications',
+  path: '/verifications',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const DashboardReviewsRoute = DashboardReviewsRouteImport.update({
   id: '/reviews',
   path: '/reviews',
@@ -215,6 +221,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/listings': typeof DashboardListingsRoute
   '/dashboard/moderation': typeof DashboardModerationRoute
   '/dashboard/reviews': typeof DashboardReviewsRoute
+  '/dashboard/verifications': typeof DashboardVerificationsRoute
   '/dashboard/verify': typeof DashboardVerifyRoute
   '/list/new': typeof ListNewRoute
   '/me/applications': typeof MeApplicationsRoute
@@ -246,6 +253,7 @@ export interface FileRoutesByTo {
   '/dashboard/listings': typeof DashboardListingsRoute
   '/dashboard/moderation': typeof DashboardModerationRoute
   '/dashboard/reviews': typeof DashboardReviewsRoute
+  '/dashboard/verifications': typeof DashboardVerificationsRoute
   '/dashboard/verify': typeof DashboardVerifyRoute
   '/list/new': typeof ListNewRoute
   '/me/applications': typeof MeApplicationsRoute
@@ -280,6 +288,7 @@ export interface FileRoutesById {
   '/dashboard/listings': typeof DashboardListingsRoute
   '/dashboard/moderation': typeof DashboardModerationRoute
   '/dashboard/reviews': typeof DashboardReviewsRoute
+  '/dashboard/verifications': typeof DashboardVerificationsRoute
   '/dashboard/verify': typeof DashboardVerifyRoute
   '/list/new': typeof ListNewRoute
   '/me/applications': typeof MeApplicationsRoute
@@ -315,6 +324,7 @@ export interface FileRouteTypes {
     | '/dashboard/listings'
     | '/dashboard/moderation'
     | '/dashboard/reviews'
+    | '/dashboard/verifications'
     | '/dashboard/verify'
     | '/list/new'
     | '/me/applications'
@@ -346,6 +356,7 @@ export interface FileRouteTypes {
     | '/dashboard/listings'
     | '/dashboard/moderation'
     | '/dashboard/reviews'
+    | '/dashboard/verifications'
     | '/dashboard/verify'
     | '/list/new'
     | '/me/applications'
@@ -379,6 +390,7 @@ export interface FileRouteTypes {
     | '/dashboard/listings'
     | '/dashboard/moderation'
     | '/dashboard/reviews'
+    | '/dashboard/verifications'
     | '/dashboard/verify'
     | '/list/new'
     | '/me/applications'
@@ -586,6 +598,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardVerifyRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/verifications': {
+      id: '/dashboard/verifications'
+      path: '/verifications'
+      fullPath: '/dashboard/verifications'
+      preLoaderRoute: typeof DashboardVerificationsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/reviews': {
       id: '/dashboard/reviews'
       path: '/reviews'
@@ -643,6 +662,7 @@ interface DashboardRouteRouteChildren {
   DashboardListingsRoute: typeof DashboardListingsRoute
   DashboardModerationRoute: typeof DashboardModerationRoute
   DashboardReviewsRoute: typeof DashboardReviewsRoute
+  DashboardVerificationsRoute: typeof DashboardVerificationsRoute
   DashboardVerifyRoute: typeof DashboardVerifyRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
@@ -652,6 +672,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardListingsRoute: DashboardListingsRoute,
   DashboardModerationRoute: DashboardModerationRoute,
   DashboardReviewsRoute: DashboardReviewsRoute,
+  DashboardVerificationsRoute: DashboardVerificationsRoute,
   DashboardVerifyRoute: DashboardVerifyRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }

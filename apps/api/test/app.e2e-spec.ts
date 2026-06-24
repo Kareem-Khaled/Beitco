@@ -113,6 +113,7 @@ describe('Beitco API (e2e)', () => {
         await prisma.savedSearch.deleteMany({ where: { userId: { in: ids } } });
         await prisma.tenancy.deleteMany({ where: { userId: { in: ids } } });
         await prisma.lead.deleteMany({ where: { renterId: { in: ids } } });
+        await prisma.verificationRequest.deleteMany({ where: { userId: { in: ids } } });
       }
     } catch {
       /* ignore cleanup errors */
@@ -368,6 +369,50 @@ describe('Beitco API (e2e)', () => {
         (n) => n.type === 'saved_search',
       );
       expect(alerts.some((a) => a.propertyId === created.body.data.id)).toBe(true);
+    });
+  });
+
+  describe('Verification / KYC (PROD-5)', () => {
+    const ADMIN = '+201000000000'; // u-admin (isAdmin)
+    const kycPhone = `0100${(Date.now() + 5).toString().slice(-7)}`;
+
+    it('submit -> pending; admin approves -> user becomes verified + notified', async () => {
+      const { agent: applicant, userId: applicantId } = await login(kycPhone);
+
+      // Submit docs.
+      const submit = await applicant
+        .post('/api/v1/me/verification')
+        .send({ idDocUrl: 'https://cdn.test/id.jpg', selfieUrl: 'https://cdn.test/selfie.jpg' })
+        .expect(201);
+      expect(submit.body.data.status).toBe('pending');
+
+      // /me reflects pending.
+      const me1 = await applicant.get('/api/v1/auth/me').expect(200);
+      expect(me1.body.data.verificationStatus).toBe('pending');
+
+      // Non-admin can't see the queue.
+      await applicant.get('/api/v1/admin/verifications').expect(403);
+
+      // Admin sees it + approves.
+      const { agent: admin } = await login(ADMIN);
+      const queue = await admin.get('/api/v1/admin/verifications').expect(200);
+      const mine = (queue.body.data as { id: string; userId: string }[]).find(
+        (r) => r.userId === applicantId,
+      );
+      expect(mine).toBeTruthy();
+      await admin.post(`/api/v1/admin/verifications/${mine!.id}/approve`).expect(201);
+
+      // Applicant is now verified.
+      const me2 = await applicant.get('/api/v1/auth/me').expect(200);
+      expect(me2.body.data.verificationStatus).toBe('verified');
+      expect(me2.body.data.verified).toBe(true);
+
+      // …and got a verification notification.
+      const feed = await applicant.get('/api/v1/me/notifications').expect(200);
+      const verifNote = (feed.body.data.items as { type: string }[]).some(
+        (n) => n.type === 'verification',
+      );
+      expect(verifNote).toBe(true);
     });
   });
 });

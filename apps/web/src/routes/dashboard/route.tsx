@@ -1,9 +1,18 @@
 import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Home, ListChecks, Inbox, Star, Plus, ShieldCheck, ShieldAlert } from "lucide-react";
+import {
+  Home,
+  ListChecks,
+  Inbox,
+  Star,
+  Plus,
+  ShieldCheck,
+  ShieldAlert,
+  ScanFace,
+} from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
 import { getVerificationStatus, isPlatformAdmin } from "@/lib/beitco/store";
-import { useModerationCount } from "@/lib/beitco/queries";
+import { useModerationCount, useVerificationCount } from "@/lib/beitco/queries";
 import { SiteHeader } from "@/components/beitco/SiteHeader";
 import { SiteFooter } from "@/components/beitco/SiteFooter";
 import { Button } from "@/components/ui/button";
@@ -95,6 +104,8 @@ function DashboardLayout() {
 
               {/* Admin-only: moderation queue */}
               {isPlatformAdmin(user) && <ModerationNavLink />}
+              {/* Admin-only: verification queue */}
+              {isPlatformAdmin(user) && <VerificationNavLink />}
             </nav>
             <div className="mt-3 border-t border-border pt-3">
               <Button asChild className="w-full">
@@ -132,6 +143,31 @@ function ModerationNavLink() {
     >
       <ShieldAlert className="h-4 w-4" />
       <span>مراجعة الإعلانات</span>
+      {pending > 0 ? (
+        <span className="ms-auto rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">
+          {pending.toLocaleString("ar-EG-u-nu-latn")}
+        </span>
+      ) : null}
+    </Link>
+  );
+}
+
+// Admin-only nav link to the verification (KYC) queue, with a pending-count badge.
+function VerificationNavLink() {
+  const location = useLocation();
+  const active = location.pathname.startsWith("/dashboard/verifications");
+  const { data: pending = 0 } = useVerificationCount(true);
+  return (
+    <Link
+      to="/dashboard/verifications"
+      className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
+        active
+          ? "bg-primary/10 text-primary font-medium"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+      }`}
+    >
+      <ScanFace className="h-4 w-4" />
+      <span>توثيق الحسابات</span>
       {pending > 0 ? (
         <span className="ms-auto rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">
           {pending.toLocaleString("ar-EG-u-nu-latn")}
