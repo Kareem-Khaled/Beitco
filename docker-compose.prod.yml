@@ -1,0 +1,82 @@
+# Production-style compose (OPS-2): builds + runs the apps alongside the data
+# services. For local prod-parity: `docker compose -f docker-compose.prod.yml up --build`.
+# Secrets come from a `.env` next to this file (NEVER commit it) — see .env.example.
+# In real prod these run on managed Postgres/Redis + a deployed API/web; this file
+# is the single-host reference wiring.
+
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-beitco}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-beitco}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-beitco}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ['redis-server', '--appendonly', 'yes']
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      API_PORT: 3001
+      DATABASE_URL: postgresql://${POSTGRES_USER:-beitco}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-beitco}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET (>=32 chars)}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?set JWT_REFRESH_SECRET (>=32 chars, != JWT_SECRET)}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - '3001:3001'
+    healthcheck:
+      test:
+        ['CMD', 'node', '-e', "fetch('http://localhost:3001/api/v1/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_USE_API: 'true'
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3001/api/v1}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - '8080:8080'
+
+volumes:
+  postgres_data:
+  redis_data:

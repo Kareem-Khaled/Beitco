@@ -1,0 +1,32 @@
+# Build-context excludes for the API/web image builds (OPS-2).
+# Context is the repo root; keep it lean.
+**/node_modules
+**/dist
+**/.output
+**/.vinxi
+**/.nitro
+**/.tanstack
+**/.turbo
+**/coverage
+**/.git
+**/.github
+**/*.log
+
+# Local env + secrets (never bake into an image)
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Editor / OS cruft
+**/.DS_Store
+**/.vscode
+**/.idea
+
+# Docs / non-build assets
+.ai
+**/*.md
+!apps/api/README.md
+
+# Web build caches (api build doesn't need the web app at all, but keep lean)
+apps/web/.output
+apps/web/.nitro
