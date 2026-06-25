@@ -41,8 +41,8 @@ Operator portal + platform-overview dashboard. Remaining polish: migrate the mod
 - **API:** `GET /admin/users` (search/filter/paginate), `GET /admin/users/:id` (detail), `PATCH /admin/users/:id` (role/verify/trust), `POST /admin/users/:id/ban` + `/reinstate`, `POST /admin/users/:id/make-admin` + `/revoke-admin`.
 - **New model:** add `bannedAt`/`banReason` to `User` (or a `status` enum). Every action → audit log (ADMIN-12).
 
-### ADMIN-3 · Listing management 🔴
-**Goal:** manage **all** listings, not just the pending queue.
+### ADMIN-3 · Listing management 🔴 — ✅ done (June 25)
+**Goal:** manage **all** listings, not just the pending queue. — **Shipped:** `/admin/listings` search/filter (all statuses) + detail; **force-takedown** (pause + drop from search + notify owner), restore, verified toggle, soft-delete; all audited.
 - **Browse/search/filter** every property — any status (draft/pending/published/paused/rejected), type, area, owner, verified; sort by created/trust/price.
 - **Listing detail (admin view)** — full record incl. occupants + owner + moderation history.
 - **Actions:** **force-unpublish / take-down** a published listing · pause/unpause · toggle `verified` · re-run trust · edit (fix/redact) · soft-delete · (later) feature/boost. Take-downs notify the owner with a reason + drop it from search.

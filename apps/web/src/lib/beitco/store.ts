@@ -25,6 +25,7 @@ import type {
   PlatformStats,
   AdminUser,
   AdminUserDetail,
+  AdminListing,
 } from "./types";
 import {
   computeListingTrust,
@@ -641,6 +642,79 @@ export function adminUserAction(
       u.isAdmin = false;
     }
   });
+}
+
+// ---------- Admin: listing management (ADMIN-3, mock) ----------
+const AR_TYPE: Record<string, PropertyType> = { شقة: "شقة", أوضة: "أوضة", سرير: "سرير" };
+
+export function getAdminListings(params: {
+  q?: string;
+  status?: string;
+  type?: string;
+  purpose?: string;
+  verified?: string;
+}): AdminListing[] {
+  ensureSeeded();
+  let list = getAllProperties();
+  const q = params.q?.trim().toLowerCase();
+  if (q)
+    list = list.filter(
+      (p) =>
+        p.title.toLowerCase().includes(q) ||
+        p.area.toLowerCase().includes(q) ||
+        p.address.toLowerCase().includes(q),
+    );
+  if (params.status) list = list.filter((p) => p.status === params.status);
+  const arType = params.type ? AR_TYPE[params.type] : undefined;
+  if (arType) list = list.filter((p) => p.type === arType);
+  if (params.purpose) list = list.filter((p) => (p.listingType ?? "rent") === params.purpose);
+  if (params.verified === "true") list = list.filter((p) => p.verified);
+  if (params.verified === "false") list = list.filter((p) => !p.verified);
+  return list
+    .slice()
+    .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
+    .map((p) => ({ ...p, status: p.status, ownerId: p.ownerId }) as unknown as AdminListing);
+}
+
+export function getAdminListing(id: string): Property | undefined {
+  ensureSeeded();
+  return getAllProperties().find((p) => p.id === id);
+}
+
+function mutateAdminListing(id: string, fn: (p: Property) => void): Property | undefined {
+  const all = getAllProperties();
+  const idx = all.findIndex((p) => p.id === id);
+  if (idx < 0) return undefined;
+  fn(all[idx]);
+  writeJSON(STORAGE_KEYS.properties, all);
+  return all[idx];
+}
+
+export function adminTakedownListing(id: string, reason: string): Property | undefined {
+  return mutateAdminListing(id, (p) => {
+    p.status = "paused";
+    p.rejectionReason = reason.trim() || "مخالف لشروط النشر.";
+    p.moderatedAt = new Date().toISOString();
+  });
+}
+
+export function adminRestoreListing(id: string): Property | undefined {
+  return mutateAdminListing(id, (p) => {
+    p.status = "published";
+    p.rejectionReason = undefined;
+    p.moderatedAt = new Date().toISOString();
+  });
+}
+
+export function adminSetListingVerified(id: string, verified: boolean): Property | undefined {
+  return mutateAdminListing(id, (p) => {
+    p.verified = verified;
+  });
+}
+
+export function adminDeleteListing(id: string): void {
+  const all = getAllProperties().filter((p) => p.id !== id);
+  writeJSON(STORAGE_KEYS.properties, all);
 }
 
 // ---------- Threads ----------

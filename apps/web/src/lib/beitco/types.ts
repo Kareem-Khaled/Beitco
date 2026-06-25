@@ -527,3 +527,9 @@ export type AdminAuditEntry = {
   meta?: Record<string, unknown>;
   createdAt: string;
 };
+
+// ADMIN-3: a row in the operator listing table (PropertySummary + admin fields).
+export type AdminListing = PropertySummary & {
+  status: string;
+  ownerId: string;
+};

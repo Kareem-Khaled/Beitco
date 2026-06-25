@@ -1,6 +1,14 @@
 import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { LayoutDashboard, ShieldAlert, ScanFace, ArrowRight, Building2, Users } from "lucide-react";
+import {
+  LayoutDashboard,
+  ShieldAlert,
+  ScanFace,
+  ArrowRight,
+  Building2,
+  Users,
+  Home,
+} from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
 import { isPlatformAdmin } from "@/lib/beitco/store";
 import { useModerationCount, useVerificationCount } from "@/lib/beitco/queries";
@@ -62,6 +70,7 @@ function AdminLayout() {
           <nav className="flex flex-col gap-1 rounded-2xl border border-border bg-card p-3">
             <AdminNavLink to="/admin" label="نظرة عامة" icon={LayoutDashboard} exact />
             <AdminNavLink to="/admin/users" label="المستخدمين" icon={Users} />
+            <AdminNavLink to="/admin/listings" label="الإعلانات" icon={Home} />
             <AdminNavLink
               to="/dashboard/moderation"
               label="مراجعة الإعلانات"
@@ -92,7 +101,12 @@ function AdminNavLink({
   exact,
   badgeHook,
 }: {
-  to: "/admin" | "/admin/users" | "/dashboard/moderation" | "/dashboard/verifications";
+  to:
+    | "/admin"
+    | "/admin/users"
+    | "/admin/listings"
+    | "/dashboard/moderation"
+    | "/dashboard/verifications";
   label: string;
   icon: typeof LayoutDashboard;
   exact?: boolean;

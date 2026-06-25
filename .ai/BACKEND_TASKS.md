@@ -19,6 +19,12 @@ _(**Build phase complete.** Backend B-0→MOD-1 + FE wiring (slices 1–6d) + T-
 
 ## ✅ Done
 
+### ADMIN-3 · Listing management ✅ (June 25)
+- **`AdminListingsService`:** `list` (search title/area/address + filter status[any]/type→Latin/purpose/verified/ownerId, cursor paginate — reuses `serializeSummary`), `detail` (full admin view incl. occupants + moderation fields, `LISTING_NOT_FOUND`), **`takedown`** (published→`paused` + reason + `moderatedAt`, **`search.removeOne`** so it leaves Meili immediately, notifies the owner in Arabic, audits with `previousStatus`), **`restore`** (→ `published` + `search.indexById` + notify + audit), **`update`** (toggle `verified` → `trust.recomputeListing` + reindex + audit), **`remove`** (soft-delete `deletedAt` + `removeOne` + audit). `AdminListingsController` under `/admin/listings` (`AdminGuard`); DELETE reads its reason from body or `?reason=`.
+- **Frontend (flag-aware):** `AdminListing` type; api clients (`apiAdminListings/apiAdminListing/apiAdminListingTakedown/apiAdminListingRestore/apiAdminUpdateListing/apiAdminDeleteListing`) + mock store fns + `useAdminListings`/`useAdminListing` hooks. New **`/admin/listings`** page — search + status/type filter chips + a colour-coded status list, and a **detail sheet** (status badge, link to the public page, moderation reason, stats, action buttons) with **takedown-reason** + **delete-confirm** dialogs. "الإعلانات" added to the admin sidebar.
+- **Verified:** API **120 unit** (was 112; +8) + 19 e2e; web `tsc`/`lint`/`build` + 31 vitest green. **Live** (admin): list published → **takedown → it leaves the published filter → restore → both in `/admin/audit`** (`listing.takedown` + `listing.restore`).
+- **Next:** ADMIN-4/5 (content moderation: remove fake reviews/Q&A → recompute trust; a reports/abuse queue).
+
 ### ADMIN-2 · User management + ADMIN-12 audit log ✅ (June 25)
 - **Migration `add_admin_audit_and_ban`:** new **`AdminAuditLog`** model (adminId/adminName/action/targetType/targetId/meta Json/createdAt, indexed) + **`bannedAt`/`banReason`** on `User`.
 - **`AdminAuditService` (ADMIN-12):** `log(admin, action, targetType, targetId, meta)` — append-only, **best-effort (never throws** so a logging failure can't break the action it records); `list()` filterable (admin/target/action) + cursor-paginated. `GET /admin/audit`. Exported from `AdminModule` so future admin modules log too.

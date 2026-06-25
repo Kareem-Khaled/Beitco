@@ -534,6 +534,87 @@ export async function apiAdminUserAction(
   return body.data;
 }
 
+// ── Admin: listing management (ADMIN-3) ─────────────────────────────────────
+export type AdminListingsParams = {
+  q?: string;
+  status?: string;
+  type?: string;
+  purpose?: string;
+  verified?: string;
+  ownerId?: string;
+  cursor?: string;
+  limit?: number;
+};
+
+function adminListingsQuery(p: AdminListingsParams): string {
+  const s = new URLSearchParams();
+  if (p.q) s.set("q", p.q);
+  if (p.status) s.set("status", p.status);
+  if (p.type) s.set("type", p.type);
+  if (p.purpose) s.set("purpose", p.purpose);
+  if (p.verified) s.set("verified", p.verified);
+  if (p.ownerId) s.set("ownerId", p.ownerId);
+  if (p.cursor) s.set("cursor", p.cursor);
+  if (p.limit != null) s.set("limit", String(p.limit));
+  const q = s.toString();
+  return q ? `?${q}` : "";
+}
+
+export async function apiAdminListings(
+  params: AdminListingsParams = {},
+): Promise<{ items: import("./types").AdminListing[]; cursor: string | null; hasMore: boolean }> {
+  const body = await getJSON<import("./types").AdminListing[]>(
+    `/admin/listings${adminListingsQuery(params)}`,
+  );
+  return {
+    items: body.data,
+    cursor: body.meta?.cursor ?? null,
+    hasMore: body.meta?.hasMore ?? false,
+  };
+}
+
+export async function apiAdminListing(id: string): Promise<import("./types").Property> {
+  const body = await getJSON<import("./types").Property>(
+    `/admin/listings/${encodeURIComponent(id)}`,
+  );
+  return body.data;
+}
+
+export async function apiAdminListingTakedown(
+  id: string,
+  reason: string,
+): Promise<import("./types").Property> {
+  const body = await postJSON<import("./types").Property>(
+    `/admin/listings/${encodeURIComponent(id)}/takedown`,
+    { reason },
+  );
+  return body.data;
+}
+
+export async function apiAdminListingRestore(id: string): Promise<import("./types").Property> {
+  const body = await postJSON<import("./types").Property>(
+    `/admin/listings/${encodeURIComponent(id)}/restore`,
+  );
+  return body.data;
+}
+
+export async function apiAdminUpdateListing(
+  id: string,
+  verified: boolean,
+  reason?: string,
+): Promise<import("./types").Property> {
+  const body = await patchJSON<import("./types").Property>(
+    `/admin/listings/${encodeURIComponent(id)}`,
+    { verified, reason },
+  );
+  return body.data;
+}
+
+export async function apiAdminDeleteListing(id: string, reason?: string): Promise<void> {
+  const qs = reason ? `?reason=${encodeURIComponent(reason)}` : "";
+  await delJSON(`/admin/listings/${encodeURIComponent(id)}${qs}`);
+}
+
 // ── Matching (T-MATCH) ──────────────────────────────────────────────────────
 export async function apiGetMatches(): Promise<
   { property: import("./types").PropertySummary; match: import("./matching").MatchResult }[]

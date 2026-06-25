@@ -41,6 +41,12 @@ import {
   getAdminUser,
   adminUpdateUser as storeAdminUpdateUser,
   adminUserAction as storeAdminUserAction,
+  getAdminListings,
+  getAdminListing,
+  adminTakedownListing as storeAdminTakedownListing,
+  adminRestoreListing as storeAdminRestoreListing,
+  adminSetListingVerified as storeAdminSetListingVerified,
+  adminDeleteListing as storeAdminDeleteListing,
   approveListing as storeApproveListing,
   rejectListing as storeRejectListing,
   getMatchesForUser,
@@ -86,6 +92,13 @@ import {
   apiAdminUpdateUser,
   apiAdminUserAction,
   type AdminUsersParams,
+  apiAdminListings,
+  apiAdminListing,
+  apiAdminListingTakedown,
+  apiAdminListingRestore,
+  apiAdminUpdateListing,
+  apiAdminDeleteListing,
+  type AdminListingsParams,
   apiApproveListing,
   apiRejectListing,
   apiGetMatches,
@@ -120,6 +133,7 @@ import type {
   PlatformStats,
   AdminUser,
   AdminUserDetail,
+  AdminListing,
 } from "./types";
 import type { MatchResult } from "./matching";
 
@@ -607,6 +621,67 @@ export async function adminUserAction(
 ): Promise<AdminUserDetail | undefined> {
   if (USE_API) return apiAdminUserAction(id, action, reason ? { reason } : undefined);
   return storeAdminUserAction(id, action, reason);
+}
+
+// ADMIN-3: operator listing management.
+export function useAdminListings(params: AdminListingsParams) {
+  return useQuery<AdminListing[]>({
+    queryKey: ["adminListings", params, { source: USE_API ? "api" : "mock" }],
+    queryFn: async () => {
+      if (USE_API) {
+        const { items } = await apiAdminListings(params);
+        return items;
+      }
+      return getAdminListings(params);
+    },
+    initialData: USE_API ? undefined : () => getAdminListings(params),
+    staleTime: USE_API ? 15_000 : Infinity,
+  });
+}
+
+export function useAdminListing(id: string | undefined) {
+  return useQuery<Property | undefined>({
+    queryKey: ["adminListing", id, { source: USE_API ? "api" : "mock" }],
+    enabled: !!id,
+    queryFn: async () => {
+      if (!id) return undefined;
+      return USE_API ? apiAdminListing(id) : getAdminListing(id);
+    },
+    initialData: USE_API || !id ? undefined : () => getAdminListing(id),
+    staleTime: USE_API ? 10_000 : Infinity,
+  });
+}
+
+export async function adminTakedownListing(id: string, reason: string): Promise<void> {
+  if (USE_API) {
+    await apiAdminListingTakedown(id, reason);
+    return;
+  }
+  storeAdminTakedownListing(id, reason);
+}
+
+export async function adminRestoreListing(id: string): Promise<void> {
+  if (USE_API) {
+    await apiAdminListingRestore(id);
+    return;
+  }
+  storeAdminRestoreListing(id);
+}
+
+export async function adminSetListingVerified(id: string, verified: boolean): Promise<void> {
+  if (USE_API) {
+    await apiAdminUpdateListing(id, verified);
+    return;
+  }
+  storeAdminSetListingVerified(id, verified);
+}
+
+export async function adminDeleteListing(id: string, reason?: string): Promise<void> {
+  if (USE_API) {
+    await apiAdminDeleteListing(id, reason);
+    return;
+  }
+  storeAdminDeleteListing(id);
 }
 
 export async function approveListing(id: string): Promise<void> {
