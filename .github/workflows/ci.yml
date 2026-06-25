@@ -36,6 +36,11 @@ jobs:
       - run: pnpm type-check
       - run: pnpm lint
       - run: pnpm test
+      # Enforce the API coverage floor (jest.config.js coverageThreshold) — a
+      # ratchet that blocks regressions in the logic files (services/serializers/
+      # engines/mappers).
+      - name: API coverage floor
+        run: pnpm --filter @beitco/api run test:cov
 
   # ---- API e2e against real Postgres + Redis service containers ----
   e2e:
