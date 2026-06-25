@@ -32,7 +32,7 @@ const detailInclude = {
   rooms: { include: { beds: true }, orderBy: { createdAt: 'asc' as const } },
   nearby: true,
   customSpecs: true,
-  reviews: { orderBy: { createdAt: 'desc' as const } },
+  reviews: { where: { removedAt: null }, orderBy: { createdAt: 'desc' as const } },
 };
 
 // Owner-facing include: like detailInclude but WITH occupant data (beds, rooms,
@@ -46,8 +46,8 @@ const ownerInclude = {
   },
   nearby: true,
   customSpecs: true,
-  reviews: { orderBy: { createdAt: 'desc' as const } },
-  questions: { orderBy: { createdAt: 'desc' as const } },
+  reviews: { where: { removedAt: null }, orderBy: { createdAt: 'desc' as const } },
+  questions: { where: { removedAt: null }, orderBy: { createdAt: 'desc' as const } },
   wholeOccupant: true,
 };
 

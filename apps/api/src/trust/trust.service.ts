@@ -37,7 +37,12 @@ export class TrustService {
   async recomputeListing(propertyId: string): Promise<void> {
     const property = await this.prisma.property.findUnique({
       where: { id: propertyId },
-      include: { reviews: { select: { rating: true, monthsLived: true, createdAt: true, scores: true } } },
+      include: {
+        reviews: {
+          where: { removedAt: null }, // ADMIN-4: removed reviews don't count toward trust
+          select: { rating: true, monthsLived: true, createdAt: true, scores: true },
+        },
+      },
     });
     if (!property) return;
 
@@ -102,7 +107,14 @@ export class TrustService {
   async listingBreakdown(propertyId: string): Promise<TrustBreakdown | null> {
     const p = await this.prisma.property.findUnique({
       where: { id: propertyId },
-      select: { verified: true, ownerId: true, reviews: { select: { rating: true, monthsLived: true, createdAt: true } } },
+      select: {
+        verified: true,
+        ownerId: true,
+        reviews: {
+          where: { removedAt: null },
+          select: { rating: true, monthsLived: true, createdAt: true },
+        },
+      },
     });
     if (!p) return null;
     const responseRate = await this.ownerResponseRate(p.ownerId);

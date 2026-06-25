@@ -29,6 +29,8 @@ import type {
   Report,
   AdminReport,
   ReportStatus,
+  Review,
+  AdminReviewRow,
 } from "./types";
 import {
   computeListingTrust,
@@ -793,6 +795,77 @@ export function adminUpdateReport(
   writeJSON(STORAGE_KEYS.reports, reports);
   const r = reports[idx];
   return { ...r, targetLabel: targetLabel(r) };
+}
+
+// ---------- Content moderation (ADMIN-4, mock) ----------
+function toAdminReviewRow(r: Review, propertyTitle?: string): AdminReviewRow {
+  return {
+    id: r.id,
+    propertyId: r.propertyId,
+    propertyTitle,
+    author: r.author,
+    rating: r.rating,
+    body: r.body,
+    helpful: r.helpful ?? 0,
+    removed: !!r.removedAt,
+    removedAt: r.removedAt,
+    removedReason: r.removedReason,
+    createdAt: r.createdAtISO ?? new Date().toISOString(),
+  };
+}
+
+export function getAdminReviews(params: {
+  q?: string;
+  propertyId?: string;
+  removed?: string;
+}): AdminReviewRow[] {
+  ensureSeeded();
+  const props = getAllProperties();
+  let rows: AdminReviewRow[] = [];
+  for (const p of props) {
+    if (params.propertyId && p.id !== params.propertyId) continue;
+    for (const r of p.reviews ?? []) rows.push(toAdminReviewRow(r, p.title));
+  }
+  if (params.removed === "true") rows = rows.filter((r) => r.removed);
+  else if (params.removed === "false") rows = rows.filter((r) => !r.removed);
+  const q = params.q?.trim().toLowerCase();
+  if (q)
+    rows = rows.filter(
+      (r) => r.body.toLowerCase().includes(q) || r.author.toLowerCase().includes(q),
+    );
+  return rows.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+}
+
+function mutateReview(
+  id: string,
+  fn: (r: Review, p: Property) => void,
+): AdminReviewRow | undefined {
+  const all = getAllProperties();
+  for (const p of all) {
+    const r = (p.reviews ?? []).find((x) => x.id === id);
+    if (r) {
+      fn(r, p);
+      writeJSON(STORAGE_KEYS.properties, all);
+      // Recompute the listing's trust so a removed review stops counting.
+      recomputeListingTrust(p.id);
+      return toAdminReviewRow(r, p.title);
+    }
+  }
+  return undefined;
+}
+
+export function adminRemoveReview(id: string, reason: string): AdminReviewRow | undefined {
+  return mutateReview(id, (r) => {
+    r.removedAt = new Date().toISOString();
+    r.removedReason = reason.trim() || "مخالف لشروط النشر.";
+  });
+}
+
+export function adminRestoreReview(id: string): AdminReviewRow | undefined {
+  return mutateReview(id, (r) => {
+    r.removedAt = undefined;
+    r.removedReason = undefined;
+  });
 }
 
 // ---------- Threads ----------

@@ -33,7 +33,7 @@ const matchInclude = {
   rooms: { include: { beds: true } },
   nearby: true,
   customSpecs: true,
-  reviews: true,
+  reviews: { where: { removedAt: null } },
 };
 
 @Injectable()

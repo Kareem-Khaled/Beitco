@@ -51,6 +51,9 @@ import {
   getAdminReports,
   getReportsCount,
   adminUpdateReport as storeAdminUpdateReport,
+  getAdminReviews,
+  adminRemoveReview as storeAdminRemoveReview,
+  adminRestoreReview as storeAdminRestoreReview,
   approveListing as storeApproveListing,
   rejectListing as storeRejectListing,
   getMatchesForUser,
@@ -107,6 +110,9 @@ import {
   apiAdminReports,
   apiAdminReportsCount,
   apiAdminUpdateReport,
+  apiAdminReviews,
+  apiAdminRemoveReview,
+  apiAdminRestoreReview,
   apiApproveListing,
   apiRejectListing,
   apiGetMatches,
@@ -145,6 +151,7 @@ import type {
   AdminReport,
   ReportTargetType,
   ReportStatus,
+  AdminReviewRow,
 } from "./types";
 import type { MatchResult } from "./matching";
 
@@ -742,6 +749,38 @@ export async function adminUpdateReport(
     return;
   }
   storeAdminUpdateReport(adminId, id, status as ReportStatus, resolution);
+}
+
+// ADMIN-4: content moderation.
+export function useAdminReviews(params: { q?: string; propertyId?: string; removed?: string }) {
+  return useQuery<AdminReviewRow[]>({
+    queryKey: ["adminReviews", params, { source: USE_API ? "api" : "mock" }],
+    queryFn: async () => {
+      if (USE_API) {
+        const { items } = await apiAdminReviews(params);
+        return items;
+      }
+      return getAdminReviews(params);
+    },
+    initialData: USE_API ? undefined : () => getAdminReviews(params),
+    staleTime: USE_API ? 15_000 : Infinity,
+  });
+}
+
+export async function adminRemoveReview(id: string, reason: string): Promise<void> {
+  if (USE_API) {
+    await apiAdminRemoveReview(id, reason);
+    return;
+  }
+  storeAdminRemoveReview(id, reason);
+}
+
+export async function adminRestoreReview(id: string): Promise<void> {
+  if (USE_API) {
+    await apiAdminRestoreReview(id);
+    return;
+  }
+  storeAdminRestoreReview(id);
 }
 
 export async function approveListing(id: string): Promise<void> {

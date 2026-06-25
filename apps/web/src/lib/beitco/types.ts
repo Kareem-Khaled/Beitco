@@ -173,6 +173,8 @@ export type Review = {
     maintenance: number;
     cleanliness: number;
   };
+  removedAt?: string; // ADMIN-4: soft content-moderation
+  removedReason?: string;
 };
 
 export type QA = {
@@ -556,4 +558,20 @@ export type Report = {
 export type AdminReport = Report & {
   reporterName?: string;
   targetLabel?: string;
+};
+
+// ADMIN-4: a review row in the content-moderation table.
+export type AdminReviewRow = {
+  id: string;
+  propertyId: string;
+  propertyTitle?: string;
+  authorId?: string;
+  author: string;
+  rating: number;
+  body: string;
+  helpful: number;
+  removed: boolean;
+  removedAt?: string;
+  removedReason?: string;
+  createdAt: string;
 };

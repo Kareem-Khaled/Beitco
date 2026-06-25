@@ -20,8 +20,8 @@ const detailInclude = {
   wholeOccupant: true,
   nearby: true,
   customSpecs: true,
-  reviews: { orderBy: { createdAt: 'desc' as const } },
-  questions: { orderBy: { createdAt: 'desc' as const } },
+  reviews: { where: { removedAt: null }, orderBy: { createdAt: 'desc' as const } },
+  questions: { where: { removedAt: null }, orderBy: { createdAt: 'desc' as const } },
 };
 
 @Injectable()

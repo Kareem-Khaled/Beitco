@@ -665,6 +665,53 @@ export async function apiAdminUpdateReport(
   return body.data;
 }
 
+// ── Admin: content moderation (ADMIN-4) ─────────────────────────────────────
+export async function apiAdminReviews(params: {
+  q?: string;
+  propertyId?: string;
+  removed?: string;
+  cursor?: string;
+  limit?: number;
+}): Promise<{
+  items: import("./types").AdminReviewRow[];
+  cursor: string | null;
+  hasMore: boolean;
+}> {
+  const s = new URLSearchParams();
+  if (params.q) s.set("q", params.q);
+  if (params.propertyId) s.set("propertyId", params.propertyId);
+  if (params.removed) s.set("removed", params.removed);
+  if (params.cursor) s.set("cursor", params.cursor);
+  if (params.limit != null) s.set("limit", String(params.limit));
+  const qs = s.toString();
+  const body = await getJSON<import("./types").AdminReviewRow[]>(
+    `/admin/reviews${qs ? `?${qs}` : ""}`,
+  );
+  return {
+    items: body.data,
+    cursor: body.meta?.cursor ?? null,
+    hasMore: body.meta?.hasMore ?? false,
+  };
+}
+
+export async function apiAdminRemoveReview(
+  id: string,
+  reason: string,
+): Promise<import("./types").AdminReviewRow> {
+  const body = await postJSON<import("./types").AdminReviewRow>(
+    `/admin/reviews/${encodeURIComponent(id)}/remove`,
+    { reason },
+  );
+  return body.data;
+}
+
+export async function apiAdminRestoreReview(id: string): Promise<import("./types").AdminReviewRow> {
+  const body = await postJSON<import("./types").AdminReviewRow>(
+    `/admin/reviews/${encodeURIComponent(id)}/restore`,
+  );
+  return body.data;
+}
+
 // ── Matching (T-MATCH) ──────────────────────────────────────────────────────
 export async function apiGetMatches(): Promise<
   { property: import("./types").PropertySummary; match: import("./matching").MatchResult }[]

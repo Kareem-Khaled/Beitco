@@ -48,8 +48,8 @@ Operator portal + platform-overview dashboard. Remaining polish: migrate the mod
 - **Actions:** **force-unpublish / take-down** a published listing · pause/unpause · toggle `verified` · re-run trust · edit (fix/redact) · soft-delete · (later) feature/boost. Take-downs notify the owner with a reason + drop it from search.
 - **API:** `GET /admin/listings` (search/filter), `GET /admin/listings/:id`, `PATCH /admin/listings/:id` (status/verified), `POST /admin/listings/:id/takedown` (reason), `DELETE /admin/listings/:id`.
 
-### ADMIN-4 · Content moderation 🟠
-**Goal:** remove fake/abusive content (the trust wedge depends on clean reviews).
+### ADMIN-4 · Content moderation 🟠 — ✅ done (June 25)
+**Goal:** remove fake/abusive content (the trust wedge depends on clean reviews). — **Shipped:** soft-remove reviews + Q&A (`removedAt`), excluded from trust + hidden everywhere (recompute on remove/restore); `/admin/reviews` page; audited. _Renter-review removal: deferred._
 - **Reviews** — list/search across all listings; **remove** a review (with reason → recompute the listing's trust); see helpful-vote counts; spot self/duplicate reviews.
 - **Q&A** — remove inappropriate questions/answers.
 - **Renter reviews** (owner→renter) — remove if abusive.

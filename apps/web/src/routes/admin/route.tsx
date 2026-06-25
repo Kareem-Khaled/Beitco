@@ -9,6 +9,7 @@ import {
   Users,
   Home,
   Flag,
+  Star,
 } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
 import { isPlatformAdmin } from "@/lib/beitco/store";
@@ -72,6 +73,7 @@ function AdminLayout() {
             <AdminNavLink to="/admin" label="نظرة عامة" icon={LayoutDashboard} exact />
             <AdminNavLink to="/admin/users" label="المستخدمين" icon={Users} />
             <AdminNavLink to="/admin/listings" label="الإعلانات" icon={Home} />
+            <AdminNavLink to="/admin/reviews" label="التقييمات" icon={Star} />
             <AdminNavLink to="/admin/reports" label="البلاغات" icon={Flag} badgeHook="reports" />
             <AdminNavLink
               to="/dashboard/moderation"
@@ -107,6 +109,7 @@ function AdminNavLink({
     | "/admin"
     | "/admin/users"
     | "/admin/listings"
+    | "/admin/reviews"
     | "/admin/reports"
     | "/dashboard/moderation"
     | "/dashboard/verifications";

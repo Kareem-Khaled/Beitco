@@ -419,6 +419,12 @@ model Review {
   helpful     Int    @default(0)
   ownerReply  Json?  @map("owner_reply")
 
+  // ADMIN-4: soft content-moderation. A removed review is hidden everywhere and
+  // excluded from trust; restorable. removedAt drives all the filters.
+  removedAt     DateTime? @map("removed_at")
+  removedReason String?   @map("removed_reason")
+  removedById   String?   @map("removed_by_id")
+
   createdAt DateTime @default(now()) @map("created_at")
 
   helpfulVotes ReviewHelpfulVote[]
@@ -489,6 +495,11 @@ model Question {
   answerer     User?     @relation("QuestionAnswerer", fields: [answererId], references: [id])
   answererName String?   @map("answerer_name")
   answeredAt   DateTime? @map("answered_at")
+
+  // ADMIN-4: soft content-moderation (see Review).
+  removedAt     DateTime? @map("removed_at")
+  removedReason String?   @map("removed_reason")
+  removedById   String?   @map("removed_by_id")
 
   createdAt DateTime @default(now()) @map("created_at")
 
