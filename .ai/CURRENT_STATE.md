@@ -62,6 +62,7 @@
 | `chat` | REST threads/messages (find-or-create, mark-read) + Socket.io gateway (`/ws/chat`, cookie-JWT auth) for live delivery. T-3 response events feed owner trust. |
 | `notifications` | Derived feed (leads/messages/reviews/verification) + Redis last-seen marker + persisted **saved-search alerts** on publish/approve. |
 | `admin` | Moderation queue + KYC review + **operator portal** (`AdminGuard`): listing approve/reject; verification approve/reject; **`GET /admin/stats`** (overview KPIs); **`/admin/users`** (search/filter, ban/reinstate, verify, make/revoke admin, trust override); **`/admin/listings`** (search all statuses, force-takedown/restore, verify, delete); **`GET /admin/audit`** (append-only admin action log). |
+| `reports` | Abuse reports (ADMIN-5): `POST /reports` (any user, target-validated + dedup), `GET/PATCH /admin/reports` (+`/count`) triage queue (`AdminGuard`), audit-logged. |
 | `verification` | KYC (PROD-5): `POST/GET /me/verification` (submit ID/selfie/ownership docs → pending), admin queue + approve (→ `verified` + trust recompute + notification) / reject. |
 | `uploads` | Image pipeline (PROD-1): `POST /uploads/presign` → presigned S3/R2 PUT + public URL (content-type/size validated); `GET /uploads/config`. Config-gated; base64 fallback when unset. |
 | `search` | Meilisearch (PROD-3): config-gated client; indexes published listings on boot + keeps them in sync; powers typo-tolerant Arabic `?q=` with a DB `contains` fallback. |
@@ -70,9 +71,9 @@
 | `common` | Global response-envelope interceptor + all-exceptions filter (Sentry-reporting). |
 | `health` | Liveness (`GET /health`) + **readiness** (`GET /health/ready`, pings Postgres + Redis, 503 when either is down). |
 
-**Tests:** 120 Jest (17 trust + 13 matching + 10 saved-search matcher + 13 verification + 16 reviews + 11 engagement + 5 admin-stats + 8 admin-users + 4 admin-audit + 8 admin-listings + 5 uploads + 5 sms + 2 health) + **19 e2e** (Supertest, real Postgres/Redis). 0 hand-written `any`. Strict `ValidationPipe` (whitelist + forbidNonWhitelisted).
+**Tests:** 130 Jest (17 trust + 13 matching + 10 saved-search matcher + 13 verification + 16 reviews + 11 engagement + 5 admin-stats + 8 admin-users + 4 admin-audit + 8 admin-listings + 10 reports + 5 uploads + 5 sms + 2 health) + **19 e2e** (Supertest, real Postgres/Redis). 0 hand-written `any`. Strict `ValidationPipe` (whitelist + forbidNonWhitelisted).
 
-**Schema:** 23 models, 21 enums, UUID PKs, snake_case `@map`, soft deletes, 30+ indexes/uniques. 4 migrations applied (bed-level/trust, saved-search-notification, geo-point, admin-audit-and-ban). Idempotent seed (12 users, 7 properties).
+**Schema:** 24 models, 23 enums, UUID PKs, snake_case `@map`, soft deletes, 30+ indexes/uniques. 5 migrations applied (bed-level/trust, saved-search-notification, geo-point, admin-audit-and-ban, reports). Idempotent seed (12 users, 7 properties).
 
 ---
 

@@ -8,10 +8,11 @@ import {
   Building2,
   Users,
   Home,
+  Flag,
 } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
 import { isPlatformAdmin } from "@/lib/beitco/store";
-import { useModerationCount, useVerificationCount } from "@/lib/beitco/queries";
+import { useModerationCount, useVerificationCount, useReportsCount } from "@/lib/beitco/queries";
 
 // ADMIN-1: the platform-operator portal (Beitco staff only). Separate from the
 // landlord dashboard at /dashboard. Bounces anyone without isAdmin.
@@ -71,6 +72,7 @@ function AdminLayout() {
             <AdminNavLink to="/admin" label="نظرة عامة" icon={LayoutDashboard} exact />
             <AdminNavLink to="/admin/users" label="المستخدمين" icon={Users} />
             <AdminNavLink to="/admin/listings" label="الإعلانات" icon={Home} />
+            <AdminNavLink to="/admin/reports" label="البلاغات" icon={Flag} badgeHook="reports" />
             <AdminNavLink
               to="/dashboard/moderation"
               label="مراجعة الإعلانات"
@@ -105,12 +107,13 @@ function AdminNavLink({
     | "/admin"
     | "/admin/users"
     | "/admin/listings"
+    | "/admin/reports"
     | "/dashboard/moderation"
     | "/dashboard/verifications";
   label: string;
   icon: typeof LayoutDashboard;
   exact?: boolean;
-  badgeHook?: "moderation" | "verification";
+  badgeHook?: "moderation" | "verification" | "reports";
 }) {
   const location = useLocation();
   const active = exact ? location.pathname === to : location.pathname.startsWith(to);
@@ -130,10 +133,16 @@ function AdminNavLink({
   );
 }
 
-function NavBadge({ hook }: { hook: "moderation" | "verification" }) {
+function NavBadge({ hook }: { hook: "moderation" | "verification" | "reports" }) {
   const moderation = useModerationCount();
   const verification = useVerificationCount(true);
-  const count = hook === "moderation" ? (moderation.data ?? 0) : (verification.data ?? 0);
+  const reports = useReportsCount();
+  const count =
+    hook === "moderation"
+      ? (moderation.data ?? 0)
+      : hook === "verification"
+        ? (verification.data ?? 0)
+        : (reports.data ?? 0);
   if (!count) return null;
   return (
     <span className="ms-auto rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">

@@ -44,6 +44,7 @@ import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
 import { Route as AuthProfileRouteImport } from './routes/auth/profile'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminReportsRouteImport } from './routes/admin/reports'
 import { Route as AdminListingsRouteImport } from './routes/admin/listings'
 
 const TrustRoute = TrustRouteImport.update({
@@ -221,6 +222,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminListingsRoute = AdminListingsRouteImport.update({
   id: '/listings',
   path: '/listings',
@@ -240,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/trust': typeof TrustRoute
   '/admin/listings': typeof AdminListingsRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/profile': typeof AuthProfileRoute
@@ -275,6 +282,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/trust': typeof TrustRoute
   '/admin/listings': typeof AdminListingsRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/profile': typeof AuthProfileRoute
@@ -314,6 +322,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/trust': typeof TrustRoute
   '/admin/listings': typeof AdminListingsRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/profile': typeof AuthProfileRoute
@@ -354,6 +363,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/trust'
     | '/admin/listings'
+    | '/admin/reports'
     | '/admin/users'
     | '/auth/login'
     | '/auth/profile'
@@ -389,6 +399,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/trust'
     | '/admin/listings'
+    | '/admin/reports'
     | '/admin/users'
     | '/auth/login'
     | '/auth/profile'
@@ -427,6 +438,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/trust'
     | '/admin/listings'
+    | '/admin/reports'
     | '/admin/users'
     | '/auth/login'
     | '/auth/profile'
@@ -722,6 +734,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/listings': {
       id: '/admin/listings'
       path: '/listings'
@@ -734,12 +753,14 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteRouteChildren {
   AdminListingsRoute: typeof AdminListingsRoute
+  AdminReportsRoute: typeof AdminReportsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminListingsRoute: AdminListingsRoute,
+  AdminReportsRoute: AdminReportsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }

@@ -148,6 +148,20 @@ enum NotificationType {
   saved_search
 }
 
+enum ReportTargetType {
+  listing
+  review
+  user
+  question
+}
+
+enum ReportStatus {
+  open
+  reviewing
+  resolved
+  dismissed
+}
+
 model User {
   id     String   @id @default(uuid())
   phone  String   @unique
@@ -195,6 +209,7 @@ model User {
   savedSearches      SavedSearch[]
   notifications      Notification[]
   verificationReqs   VerificationRequest[]
+  reportsMade        Report[]              @relation("ReportReporter")
 
   @@index([role])
   @@index([verificationStatus])
@@ -652,4 +667,28 @@ model AdminAuditLog {
   @@index([targetType, targetId])
   @@index([createdAt])
   @@map("admin_audit_logs")
+}
+
+// ADMIN-5: a user-submitted report against a listing/review/user/question.
+// Operators triage these (open -> reviewing -> resolved/dismissed) and act via
+// the existing user-ban / listing-takedown / review-removal powers.
+model Report {
+  id         String           @id @default(uuid())
+  reporterId String           @map("reporter_id")
+  reporter   User             @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  targetType ReportTargetType @map("target_type")
+  targetId   String           @map("target_id")
+  reason     String
+  details    String?
+  status     ReportStatus     @default(open)
+  resolution String?
+  resolvedById String?        @map("resolved_by_id")
+  resolvedAt   DateTime?      @map("resolved_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([status])
+  @@index([targetType, targetId])
+  @@index([reporterId])
+  @@map("reports")
 }

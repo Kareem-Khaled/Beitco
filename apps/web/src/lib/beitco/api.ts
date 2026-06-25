@@ -615,6 +615,56 @@ export async function apiAdminDeleteListing(id: string, reason?: string): Promis
   await delJSON(`/admin/listings/${encodeURIComponent(id)}${qs}`);
 }
 
+// ── Reports (ADMIN-5) ───────────────────────────────────────────────────────
+export async function apiCreateReport(input: {
+  targetType: import("./types").ReportTargetType;
+  targetId: string;
+  reason: string;
+  details?: string;
+}): Promise<import("./types").Report> {
+  const body = await postJSON<import("./types").Report>("/reports", input);
+  return body.data;
+}
+
+export async function apiAdminReports(params: {
+  status?: string;
+  targetType?: string;
+  cursor?: string;
+  limit?: number;
+}): Promise<{ items: import("./types").AdminReport[]; cursor: string | null; hasMore: boolean }> {
+  const s = new URLSearchParams();
+  if (params.status) s.set("status", params.status);
+  if (params.targetType) s.set("targetType", params.targetType);
+  if (params.cursor) s.set("cursor", params.cursor);
+  if (params.limit != null) s.set("limit", String(params.limit));
+  const qs = s.toString();
+  const body = await getJSON<import("./types").AdminReport[]>(
+    `/admin/reports${qs ? `?${qs}` : ""}`,
+  );
+  return {
+    items: body.data,
+    cursor: body.meta?.cursor ?? null,
+    hasMore: body.meta?.hasMore ?? false,
+  };
+}
+
+export async function apiAdminReportsCount(): Promise<number> {
+  const body = await getJSON<{ count: number }>("/admin/reports/count");
+  return body.data.count;
+}
+
+export async function apiAdminUpdateReport(
+  id: string,
+  status: string,
+  resolution?: string,
+): Promise<import("./types").AdminReport> {
+  const body = await patchJSON<import("./types").AdminReport>(
+    `/admin/reports/${encodeURIComponent(id)}`,
+    { status, resolution },
+  );
+  return body.data;
+}
+
 // ── Matching (T-MATCH) ──────────────────────────────────────────────────────
 export async function apiGetMatches(): Promise<
   { property: import("./types").PropertySummary; match: import("./matching").MatchResult }[]

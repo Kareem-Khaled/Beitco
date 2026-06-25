@@ -533,3 +533,27 @@ export type AdminListing = PropertySummary & {
   status: string;
   ownerId: string;
 };
+
+// ADMIN-5: a user-submitted report.
+export type ReportTargetType = "listing" | "review" | "user" | "question";
+export type ReportStatus = "open" | "reviewing" | "resolved" | "dismissed";
+
+export type Report = {
+  id: string;
+  reporterId: string;
+  targetType: ReportTargetType;
+  targetId: string;
+  reason: string;
+  details?: string;
+  status: ReportStatus;
+  resolution?: string;
+  resolvedById?: string;
+  resolvedAt?: string;
+  createdAt: string;
+};
+
+// In the admin queue, enriched with display labels.
+export type AdminReport = Report & {
+  reporterName?: string;
+  targetLabel?: string;
+};

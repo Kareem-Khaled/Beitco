@@ -26,6 +26,9 @@ import type {
   AdminUser,
   AdminUserDetail,
   AdminListing,
+  Report,
+  AdminReport,
+  ReportStatus,
 } from "./types";
 import {
   computeListingTrust,
@@ -51,6 +54,7 @@ const STORAGE_KEYS = {
   savedSearches: "beitco:savedSearches",
   responseEvents: "beitco:responseEvents",
   renterReviews: "beitco:renterReviews",
+  reports: "beitco:reports",
 } as const;
 
 // Bump this whenever the seed data shape/content changes so existing browsers
@@ -715,6 +719,80 @@ export function adminSetListingVerified(id: string, verified: boolean): Property
 export function adminDeleteListing(id: string): void {
   const all = getAllProperties().filter((p) => p.id !== id);
   writeJSON(STORAGE_KEYS.properties, all);
+}
+
+// ---------- Reports (ADMIN-5, mock) ----------
+export function createReport(
+  reporterId: string,
+  input: { targetType: Report["targetType"]; targetId: string; reason: string; details?: string },
+): Report {
+  ensureSeeded();
+  const reports = readJSON<Report[]>(STORAGE_KEYS.reports, []);
+  const report: Report = {
+    id: `rep-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    reporterId,
+    targetType: input.targetType,
+    targetId: input.targetId,
+    reason: input.reason,
+    details: input.details,
+    status: "open",
+    createdAt: new Date().toISOString(),
+  };
+  reports.unshift(report);
+  writeJSON(STORAGE_KEYS.reports, reports);
+  return report;
+}
+
+function targetLabel(r: Report): string | undefined {
+  if (r.targetType === "listing") return getProperty(r.targetId)?.title;
+  if (r.targetType === "user") {
+    const u = readJSON<User[]>(STORAGE_KEYS.users, seedUsers).find((x) => x.id === r.targetId);
+    return u?.name;
+  }
+  return undefined;
+}
+
+export function getAdminReports(params: { status?: string; targetType?: string }): AdminReport[] {
+  ensureSeeded();
+  let reports = readJSON<Report[]>(STORAGE_KEYS.reports, []);
+  const status = params.status;
+  reports = status
+    ? reports.filter((r) => r.status === status)
+    : reports.filter((r) => r.status === "open" || r.status === "reviewing");
+  if (params.targetType) reports = reports.filter((r) => r.targetType === params.targetType);
+  const users = readJSON<User[]>(STORAGE_KEYS.users, seedUsers);
+  const nameOf = (id: string) => users.find((u) => u.id === id)?.name;
+  return reports
+    .slice()
+    .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
+    .map((r) => ({ ...r, reporterName: nameOf(r.reporterId), targetLabel: targetLabel(r) }));
+}
+
+export function getReportsCount(): number {
+  ensureSeeded();
+  return readJSON<Report[]>(STORAGE_KEYS.reports, []).filter(
+    (r) => r.status === "open" || r.status === "reviewing",
+  ).length;
+}
+
+export function adminUpdateReport(
+  adminId: string,
+  id: string,
+  status: ReportStatus,
+  resolution?: string,
+): AdminReport | undefined {
+  const reports = readJSON<Report[]>(STORAGE_KEYS.reports, []);
+  const idx = reports.findIndex((r) => r.id === id);
+  if (idx < 0) return undefined;
+  reports[idx].status = status;
+  if (resolution != null) reports[idx].resolution = resolution;
+  if (status === "resolved" || status === "dismissed") {
+    reports[idx].resolvedById = adminId;
+    reports[idx].resolvedAt = new Date().toISOString();
+  }
+  writeJSON(STORAGE_KEYS.reports, reports);
+  const r = reports[idx];
+  return { ...r, targetLabel: targetLabel(r) };
 }
 
 // ---------- Threads ----------

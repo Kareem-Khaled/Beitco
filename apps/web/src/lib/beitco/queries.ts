@@ -47,6 +47,10 @@ import {
   adminRestoreListing as storeAdminRestoreListing,
   adminSetListingVerified as storeAdminSetListingVerified,
   adminDeleteListing as storeAdminDeleteListing,
+  createReport as storeCreateReport,
+  getAdminReports,
+  getReportsCount,
+  adminUpdateReport as storeAdminUpdateReport,
   approveListing as storeApproveListing,
   rejectListing as storeRejectListing,
   getMatchesForUser,
@@ -99,6 +103,10 @@ import {
   apiAdminUpdateListing,
   apiAdminDeleteListing,
   type AdminListingsParams,
+  apiCreateReport,
+  apiAdminReports,
+  apiAdminReportsCount,
+  apiAdminUpdateReport,
   apiApproveListing,
   apiRejectListing,
   apiGetMatches,
@@ -134,6 +142,9 @@ import type {
   AdminUser,
   AdminUserDetail,
   AdminListing,
+  AdminReport,
+  ReportTargetType,
+  ReportStatus,
 } from "./types";
 import type { MatchResult } from "./matching";
 
@@ -682,6 +693,55 @@ export async function adminDeleteListing(id: string, reason?: string): Promise<v
     return;
   }
   storeAdminDeleteListing(id);
+}
+
+// ADMIN-5: reports.
+export async function createReport(
+  reporterId: string,
+  input: { targetType: ReportTargetType; targetId: string; reason: string; details?: string },
+): Promise<void> {
+  if (USE_API) {
+    await apiCreateReport(input);
+    return;
+  }
+  storeCreateReport(reporterId, input);
+}
+
+export function useAdminReports(params: { status?: string; targetType?: string }) {
+  return useQuery<AdminReport[]>({
+    queryKey: ["adminReports", params, { source: USE_API ? "api" : "mock" }],
+    queryFn: async () => {
+      if (USE_API) {
+        const { items } = await apiAdminReports(params);
+        return items;
+      }
+      return getAdminReports(params);
+    },
+    initialData: USE_API ? undefined : () => getAdminReports(params),
+    staleTime: USE_API ? 15_000 : Infinity,
+  });
+}
+
+export function useReportsCount() {
+  return useQuery<number>({
+    queryKey: ["reportsCount", { source: USE_API ? "api" : "mock" }],
+    queryFn: async () => (USE_API ? apiAdminReportsCount() : getReportsCount()),
+    initialData: USE_API ? undefined : () => getReportsCount(),
+    staleTime: USE_API ? 30_000 : Infinity,
+  });
+}
+
+export async function adminUpdateReport(
+  adminId: string,
+  id: string,
+  status: string,
+  resolution?: string,
+): Promise<void> {
+  if (USE_API) {
+    await apiAdminUpdateReport(id, status, resolution);
+    return;
+  }
+  storeAdminUpdateReport(adminId, id, status as ReportStatus, resolution);
 }
 
 export async function approveListing(id: string): Promise<void> {

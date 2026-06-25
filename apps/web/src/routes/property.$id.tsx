@@ -51,6 +51,7 @@ import { TrustBadgeExplained } from "@/components/beitco/TrustBadgeExplained";
 import { ScoreBar } from "@/components/beitco/ScoreBar";
 import { PropertyGallery } from "@/components/beitco/PropertyGallery";
 import { PageSkeleton } from "@/components/beitco/PageSkeleton";
+import { ReportButton } from "@/components/beitco/ReportButton";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { getProperty, timeAgo, formatDate } from "@/lib/beitco/store";
@@ -846,6 +847,12 @@ function PropertyDetail() {
                   <Heart className={`h-4 w-4 ${saved ? "fill-red-500 text-red-500" : ""}`} />
                   {saved ? "محفوظة" : "احفظها"}
                 </Button>
+                <ReportButton
+                  targetType="listing"
+                  targetId={p.id}
+                  className="w-full gap-2 text-muted-foreground hover:text-destructive"
+                  label="بلّغ عن الإعلان"
+                />
               </div>
 
               {/* Cost breakdown — monthly bills only apply to rentals */}
@@ -1540,6 +1547,13 @@ function ReviewCard({
             ردّ
           </button>
         )}
+
+        <ReportButton
+          targetType="review"
+          targetId={review.id}
+          size="sm"
+          className="ms-auto h-auto gap-1 px-2 py-1 text-xs text-muted-foreground hover:text-destructive"
+        />
       </div>
 
       {replying && (

@@ -56,8 +56,8 @@ Operator portal + platform-overview dashboard. Remaining polish: migrate the mod
 - **API:** `GET /admin/reviews` (filter by property/author/rating), `DELETE /admin/reviews/:id` (reason → recompute), `DELETE /admin/questions/:id`, `DELETE /admin/renter-reviews/:id`.
 - **New field:** `Review.removedAt`/`removedReason` (soft-remove so trust history is auditable).
 
-### ADMIN-5 · Reports & abuse queue 🟠
-**Goal:** let users flag bad actors; give operators a triage queue.
+### ADMIN-5 · Reports & abuse queue 🟠 — ✅ done (June 25)
+**Goal:** let users flag bad actors; give operators a triage queue. — **Shipped:** a `ReportButton` across the app (listing + reviews) → `POST /reports` (target-validated, duplicate-guarded); new `Report` model; `/admin/reports` triage (filter/enrich/deep-link/resolve), audit-logged + a sidebar badge.
 - **"Report" button** across the app (a listing, a review, a user, a message) → creates a report.
 - **Triage queue** — open/under-review/resolved/dismissed; filter by target type + reason; bulk action; link straight to the target's admin view.
 - **API:** `POST /reports` (any authed user), `GET /admin/reports` (+count), `PATCH /admin/reports/:id` (status + resolution note).

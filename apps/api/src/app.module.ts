@@ -22,7 +22,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { VerificationModule } from './verification/verification.module';
 import { SearchModule } from './search/search.module';
-
+import { ReportsModule } from './reports/reports.module';
 // Post-pivot core. After the schema rewrite to the bed-level + trust model, the
 // remaining legacy modules (chat, search, admin, moderation, analytics,
 // notifications, payments) target the OLD social schema and live in
@@ -62,6 +62,7 @@ import { SearchModule } from './search/search.module';
     NotificationsModule,
     UploadsModule,
     VerificationModule,
+    ReportsModule,
     HealthModule,
   ],
   providers: [
