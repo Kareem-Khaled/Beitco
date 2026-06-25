@@ -41,7 +41,7 @@
 - **Admin:** moderation queue (`/dashboard/moderation`) + verifications queue, gated on `isPlatformAdmin`. **Operator portal** (`/admin`) — a 7-section control room for the Beitco team: overview/KPIs, analytics (time-series/funnel/supply-demand), users (ban/verify/make-admin), listings (force-takedown), reviews (remove→recompute trust), reports triage; every action audit-logged.
 - **Platform:** dark mode, PWA manifest, mobile bottom-nav, accessibility pass (skip link, aria, focus management), maps (Leaflet pin-drop + Google embeds), public profiles.
 
-**Tests:** 31 Vitest (trust + matching pure engines). `tsc` clean.
+**Tests:** 52 Vitest — pure engines (trust + matching) + the **flag-aware mock data layer** (browse + admin users/listings/content/analytics) + **component render tests** (Testing Library + jsdom: TrustBadge, EmptyState). `tsc` clean.
 
 ---
 
