@@ -1,7 +1,7 @@
 # Beitco — Database Schema
 
-> **Last updated:** June 24, 2026 · **Source of truth: `apps/api/prisma/schema.prisma`** (always defer to it). This is a navigable map, not a copy.
-> PostgreSQL 16 + PostGIS via Prisma 6. **22 models, 21 enums.** Migrations in `apps/api/prisma/migrations/`.
+> **Last updated:** June 25, 2026 · **Source of truth: `apps/api/prisma/schema.prisma`** (always defer to it). This is a navigable map, not a copy.
+> PostgreSQL 16 + PostGIS via Prisma 6. **24 models, 23 enums.** Migrations in `apps/api/prisma/migrations/`.
 
 ---
 
@@ -19,7 +19,7 @@
 ## Models by domain
 
 ### Identity & preferences
-- **User** — phone-identity (no passwords). `isAdmin`, `verified`, `verificationStatus`, `trust`, `trustBreakdown`, `responseRate`, `renterReputation`, `renterReviewsCount`, `notificationPrefs`, `gender`, `role`. Soft-deletable. Hub of most relations.
+- **User** — phone-identity (no passwords). `isAdmin`, `verified`, `verificationStatus`, `trust`, `trustBreakdown`, `responseRate`, `renterReputation`, `renterReviewsCount`, `notificationPrefs`, `gender`, `role`, **`bannedAt`/`banReason`** (ADMIN-2 suspension). Soft-deletable. Hub of most relations.
 - **RenterProfile** — 1:1 with User; the matching inputs (`budgetMin/Max`, `areas[]`, `lookingFor[]`, `nearMetro`, `metroLines[]`, `maxWalkMinutes`, `mustHaveAmenities[]`, `furnishedPref`, `housematesGender`, `occupation`, `intent`, …).
 - **VerificationRequest** — KYC docs (`idDocUrl`, `selfieUrl`, optional `ownershipDocUrl`) + review state. Submit → pending → admin approve/reject (PROD-5, ✅).
 
@@ -48,11 +48,16 @@
 - **Message** — `body`, `type` (`text` | `viewing_request`), sender.
 - **Notification** — persisted rows (currently the **saved-search alerts**); merged with the derived feed (leads/messages/reviews/verification) at read time.
 
+### Admin / operator (ADMIN epics)
+- **AdminAuditLog** — append-only record of every operator action: `adminId`/`adminName`, `action` (e.g. `user.ban`, `listing.takedown`, `review.remove`), `targetType`/`targetId`, `meta` JSON. Read at `GET /admin/audit` (ADMIN-12).
+- **Report** — a user-filed abuse report: `reporterId`, `targetType` (`listing`|`review`|`user`|`question`), `targetId`, `reason`, `details?`, `status` (`open`→`reviewing`→`resolved`/`dismissed`), `resolution`/`resolvedById`. Triage at `/admin/reports` (ADMIN-5).
+- **Content moderation (ADMIN-4):** `Review` + `Question` carry `removedAt`/`removedReason`/`removedById` — soft, restorable. **A `removedAt: null` filter is applied to every review read** (trust recompute, public/owner/admin includes, matching) so a removed review is hidden everywhere AND excluded from the trust score.
+
 ---
 
-## Enums (21)
+## Enums (23)
 
-`UserRole · Gender · GenderPref · RentalGenderPolicy · VerificationStatus · PropertyType · UnitType · PropertyStatus · RentalMode · ListingType · SaleStatus · BedStatus · FurnishedPref · Occupation · NearbyType · LinkStatus · LeadStatus · LeadIntent · LeadUnitKind · MessageType · NotificationType`
+`UserRole · Gender · GenderPref · RentalGenderPolicy · VerificationStatus · PropertyType · UnitType · PropertyStatus · RentalMode · ListingType · SaleStatus · BedStatus · FurnishedPref · Occupation · NearbyType · LinkStatus · LeadStatus · LeadIntent · LeadUnitKind · MessageType · NotificationType · ReportTargetType · ReportStatus`
 
 > **Latin enum values in the DB; Arabic at the UI edge.** The frontend uses Arabic enums (`شقة`/`أوضة`/`سرير`, occupations, gender prefs); the API stores Latin (`apartment`/`room`/`bed`, …) and translates at the serializer / mapper boundary (`listings.serializer.ts`, `matching/renter-profile.mapper.ts`). Keep that translation in one place.
 
@@ -65,6 +70,9 @@
 | `20260621160438_init_bed_level_trust` | The whole bed-level + trust schema (the post-pivot rewrite, task B-0). |
 | `20260623105042_add_saved_search_notification` | `saved_search` value on `NotificationType` (NOTIF-2). |
 | `20260624120000_add_geo_point` | PostGIS `geog geography(Point,4326)` column + GiST index + lat/lng sync trigger + backfill (PROD-4). |
+| `20260625104809_add_admin_audit_and_ban` | `AdminAuditLog` model + `User.bannedAt`/`banReason` (ADMIN-2/12). |
+| `20260625114530_add_reports` | `Report` model + `ReportStatus`/`ReportTargetType` enums (ADMIN-5). |
+| `20260625123416_add_content_moderation` | `removedAt`/`removedReason`/`removedById` on `Review` + `Question` (ADMIN-4). |
 
 Seed: `apps/api/prisma/seed.ts` — idempotent (children-first reset), 12 users + 7 properties (whole/by-room/by-bed/sale/nightly). Run `pnpm --filter ... db:seed` (or `npm run db:seed` in `apps/api`).
 

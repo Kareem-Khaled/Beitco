@@ -27,7 +27,7 @@
 
 ## ✅ Frontend — `apps/web/` (`tanstack_start_ts`)
 
-**Stack:** TanStack Start (Vite + React 19), TypeScript strict, Tailwind v4, shadcn/ui, Arabic RTL (Egyptian dialect), Leaflet (maps), TanStack Query, socket.io-client, Vitest. Runs on `pnpm web` → http://localhost:8080. 33 routes, 69 components.
+**Stack:** TanStack Start (Vite + React 19), TypeScript strict, Tailwind v4, shadcn/ui, Arabic RTL (Egyptian dialect), Leaflet (maps), TanStack Query, socket.io-client, Vitest. Runs on `pnpm web` → http://localhost:8080. 40 routes, 70+ components.
 
 **Built and wired (flag-aware via `lib/beitco/queries.ts`):**
 - **Browse:** home, search (filters + URL state + sort + **server-side `q`** and **"قريب مني" geo radius** in API mode), property detail (gallery, trust section, quality scores, amenities, bed/room/whole occupancy, reviews, Q&A, map, nearby).
@@ -38,7 +38,7 @@
 - **Chat:** `/messages` + thread view, "كلّم صاحب الشقة", live updates via Socket.io.
 - **Notifications:** bell badge + `/notifications` feed (leads, messages, review-eligibility, verification, saved-search alerts).
 - **Verification (KYC):** `dashboard/verify` (upload ID/selfie/ownership docs → pending) + admin `dashboard/verifications` queue (approve/reject).
-- **Admin:** moderation queue (`/dashboard/moderation`) + verifications queue, gated on `isPlatformAdmin`. **Operator portal** (`/admin`) — a platform-overview dashboard (KPIs, queues, recent activity) for the Beitco team.
+- **Admin:** moderation queue (`/dashboard/moderation`) + verifications queue, gated on `isPlatformAdmin`. **Operator portal** (`/admin`) — a 7-section control room for the Beitco team: overview/KPIs, analytics (time-series/funnel/supply-demand), users (ban/verify/make-admin), listings (force-takedown), reviews (remove→recompute trust), reports triage; every action audit-logged.
 - **Platform:** dark mode, PWA manifest, mobile bottom-nav, accessibility pass (skip link, aria, focus management), maps (Leaflet pin-drop + Google embeds), public profiles.
 
 **Tests:** 31 Vitest (trust + matching pure engines). `tsc` clean.

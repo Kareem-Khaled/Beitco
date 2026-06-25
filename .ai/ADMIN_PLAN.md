@@ -1,26 +1,31 @@
 # Admin / Operator Portal — Feature Plan
 
-> **What the Beitco team (platform operators) needs to run the marketplace.** · created June 25, 2026 · branch: `dev`
-> Companion to `.ai/NEXT_STEPS.md` (backlog) + `.ai/BUSINESS_MODEL.md` (revenue) + `.ai/CURRENT_STATE.md` (built). Derived from a full scan of the schema (22 models), services, and business model.
+> **What the Beitco team (platform operators) needs to run the marketplace.** · created June 25, 2026 · updated June 25 · branch: `dev`
+> Companion to `.ai/NEXT_STEPS.md` (backlog) + `.ai/BUSINESS_MODEL.md` (revenue) + `.ai/CURRENT_STATE.md` (built). Derived from a full scan of the schema (24 models), services, and business model.
 >
 > **Scope:** the `/admin` portal is **operators only** (`User.isAdmin`), separate from the *landlord* dashboard (`/dashboard`). It is the control room for moderation, trust, users, listings, money, and analytics.
 
 ---
 
-## Where we are
+## Where we are (June 25)
 
-**Built (ADMIN-1, slice 1):**
-- `/admin` portal shell (admin-only layout, own header + sidebar).
-- **Overview dashboard** — platform KPIs (users/listings/engagement/inventory/trust), action queues, recent activity (`GET /admin/stats`).
-- Two existing queues linked in: **listing moderation** (`/dashboard/moderation` → `admin/moderation`) and **KYC verification** (`/dashboard/verifications` → `admin/verifications`) — approve/reject each.
+**Built — a 7-section `/admin` portal, ~3,900 LOC, every mutation audit-logged:**
+- **Overview** (`/admin`, ADMIN-1) — platform KPIs + action queues + recent activity (`GET /admin/stats`).
+- **Analytics** (`/admin/analytics`, ADMIN-9) — growth time-series, conversion funnel, supply/demand by area.
+- **Users** (`/admin/users`, ADMIN-2) — search/filter; verify, **ban/reinstate**, make/revoke admin, trust override; self-guards.
+- **Listings** (`/admin/listings`, ADMIN-3) — search all statuses; **force-takedown**/restore, verify, delete.
+- **Reviews** (`/admin/reviews`, ADMIN-4) — soft-remove/restore reviews + Q&A → **recompute trust**.
+- **Reports** (`/admin/reports`, ADMIN-5) — user "report" button → triage queue; deep-links to users/listings.
+- **Moderation + KYC** queues (linked in from `/dashboard`).
+- **Audit log** (ADMIN-12, partial) — `AdminAuditLog` + `GET /admin/audit`; every operator mutation records who/what/target/reason.
 
-**The model today:** a single `User.isAdmin` boolean + `AdminGuard`. No admin roles, no audit log, no destructive-action coverage beyond the two queues.
+**The model today:** a single `User.isAdmin` boolean + `AdminGuard` (×8 controllers). **Audit log: done.** Still missing: **admin RBAC roles** (super_admin/moderator/support/finance), billing, broadcast, config, trust-override-anomaly tooling, support timeline.
 
 ---
 
 ## The gap (what operators still can't do)
 
-Today an operator **cannot**: find/search a user, ban a scammer, take down a *published* bad listing, remove a fake review, see who reported what, override a trust score, see revenue, send an announcement, or know which admin did what. The epics below close that, in priority order.
+Operators now can find/ban users, take down listings, remove fake reviews, and triage reports. **Still missing:** real admin **roles** (everyone with `isAdmin` can do everything — ADMIN-12 roles), **revenue/billing** (ADMIN-8, needs PAY-1), **trust override + fraud signals** (ADMIN-6), **leads/tenancies oversight** (ADMIN-7), **broadcast/announcements** (ADMIN-10), **platform config/feature-flags** (ADMIN-11), and a **support/dispute timeline** (ADMIN-13). The epics below track these.
 
 ---
 
@@ -28,8 +33,8 @@ Today an operator **cannot**: find/search a user, ban a scammer, take down a *pu
 
 > Legend: 🔴 core-ops (run the platform safely) · 🟠 trust/safety · 🟡 growth/money · 🟢 nice-to-have. Each lists the **features**, the **API** it needs, and any **new models**.
 
-### ADMIN-1 · Portal shell + overview — ✅ slice 1 done
-Operator portal + platform-overview dashboard. Remaining polish: migrate the moderation + KYC queues to live **under** `/admin` (they currently render in the `/dashboard` frame), and add a tiny time-range filter to the overview.
+### ADMIN-1 · Portal shell + overview — ✅ done
+Operator portal + platform-overview dashboard (`/admin`, `GET /admin/stats`). _Remaining polish: migrate the moderation + KYC queues to live fully under `/admin` (they link in from the `/dashboard` frame today)._
 
 ---
 

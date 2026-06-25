@@ -1,31 +1,32 @@
 # Next Steps — Beitco
 
-> **The active backlog. Start here.** · branch: `dev` · created June 23, 2026 · updated June 24
-> The product is **feature-complete end-to-end** and the **hardening backlog (P0→P2) is done** (see `.ai/CURRENT_STATE.md`). What remains before launch is **test depth + a real deploy host** (the go-live checklist lives in `.ai/PROD_READINESS.md`), then the optional P3 polish and P4 business phases. Items are ordered by priority — check them off as you go.
+> **The active backlog. Start here.** · branch: `dev` · created June 23, 2026 · updated June 25
+> The product is **feature-complete end-to-end**, the **hardening backlog (P0→P2) is done**, and a full **operator portal** is built (ADMIN-1…5, 9, 12). What remains before launch is **test depth + a real deploy host** (go-live checklist: `.ai/PROD_READINESS.md`; operator portal: `.ai/ADMIN_PLAN.md`). Items are ordered by priority — check them off as you go.
 
 ---
 
-## Audit scorecard (deep code scan, June 24, 2026) — overall **85 / 100**
+## Audit scorecard (deep code scan, June 25, 2026) — overall **87 / 100**
 
-> Verified against the actual source (not just the docs). Movement since the June 23 baseline (79). _Testing 72→78 after TEST-1's first batch (June 25)._
+> Verified against the actual source. Movement since the June 24 scan (84). The operator portal (~3,900 LOC) is the headline gain; Testing is now the main gate.
 
 | Area | Score | Verdict |
 |---|:--:|---|
-| Type safety / code quality | **91** | 0 hand-written `any` (all 32 are in the generated route tree); clean lint |
-| Database (Prisma/PostGIS) | **90** | GiST geo, 30 indexes, soft deletes, trigger-maintained `geog` |
-| Documentation | **89** | 18 structured docs + Swagger; this sync closed the drift |
-| Backend (NestJS) | **89** | 16 modules, consistent envelope, global guards, cursor paging, shared Redis |
-| Security & Auth | **88** | httpOnly cookies, refresh rotation+blacklist, env fail-fast, helmet, throttle |
-| Frontend | **86** | SSR, error boundary+404, RTL-clean, flag-based mock/API; monolith files remain |
+| Type safety / code quality | **92** | **0 hand-written `any`** in ~35k LOC; 0 real TODOs; clean lint |
+| Database (Prisma/PostGIS) | **91** | 24 models, GiST geo, audit log, careful trust-filter on soft-removed reviews |
+| Documentation | **90** | 20 synced docs + Swagger + ADMIN_PLAN + PROD_READINESS |
+| Backend (NestJS) | **90** | 16 modules, 93 endpoints, consistent envelope, global guards, cursor paging |
+| Admin / operator portal | **88** | 7 sections, **audit-log on every mutation**, `AdminGuard` ×8, self-guards |
+| Security & Auth | **88** | httpOnly+rotation, env fail-fast, helmet, throttle; no CSRF token yet |
+| Product completeness / UX | **87** | Full loop + trust wedge + real operator tooling |
+| Frontend | **86** | SSR, error boundary+404, **RTL logical-CSS clean**; monolith files remain |
 | Architecture / monorepo | **85** | Clean flag pattern; dead weight (3 empty packages + `_unported/` + monoliths) |
-| Product completeness / UX | **84** | Full loop incl. trust wedge; no payments/mobile/email |
 | DevOps / Deployment | **82** | Great CI; **deploy job is still a placeholder** (no live host) |
-| Accessibility / RTL | **80** | RTL-first + 79 aria uses; no a11y automation, no i18n seam |
-| Performance & scale | **79** | Indexes+cache+cursors; synchronous fan-out; no load test |
+| Accessibility / RTL | **80** | 83 aria uses, logical-CSS clean; no a11y automation, no i18n seam |
+| Performance & scale | **79** | Indexes+cache+cursors+GiST; synchronous fan-out; no load test |
 | Observability & Ops | **78** | pino + Sentry + readiness; **no metrics/tracing/alerting** |
-| **Testing & QA** | **78** | e2e (19) + **92 unit** (3 core services now branch-covered); web component tests + coverage gate still pending |
+| **Testing & QA** | **76** | e2e (19) + **141 unit**; **12 services + all web components untested**; no coverage gate |
 
-**The two gates to "confidently in production":** raise **Testing** (service unit tests + web component tests + a coverage floor) and stand up a **real deploy host**. Neither is a rewrite. See `.ai/PROD_READINESS.md` for the go/no-go.
+**The two gates to "confidently in production":** raise **Testing** (≈9 heavy service specs + web component tests + a coverage floor) and stand up a **real deploy host**. Neither is a rewrite. See `.ai/PROD_READINESS.md`.
 
 ---
 
@@ -105,16 +106,17 @@
 
 ---
 
-## What's actually next (post-hardening)
+## What's actually next (June 25)
 
-P0→P2 are done. To move from "feature-complete + hardened" to "confidently in production," in order:
+P0→P2 hardening is done; the operator portal is built (ADMIN-1…5, 9, 12). To move from "feature-complete + hardened" to "confidently in production," in order:
 
-1. **TEST-1 · Service unit tests** (mock Prisma) for the 5–6 heaviest services (`listings`, `engagement`, `reviews`, `verification`, `admin`, `auth`) — the biggest score + safety win. Add a CI coverage floor.
-2. **TEST-3 · Web component tests** (`@testing-library/react`) for the highest-risk surfaces (search, `property.$id` actions, the listing wizard).
-3. **DEPLOY-1 · A real deploy host** — wire `deploy-staging` to an actual target (Fly/Render/Railway/k8s): apply the image tag → `prisma migrate deploy` → gate on `/health/ready`. This is the last hard blocker.
-4. **POLISH-2** (resolve/delete the empty `@beitco/*` packages) + remove `_unported/` — cheap clutter cleanup.
-5. Then **P3** (POLISH-1 monoliths, POLISH-4 BullMQ, POLISH-5 occupant-link, POLISH-6 a11y) and **P4** (payments, mobile) as capacity allows.
+1. **TEST-1 (finish) · Service unit tests.** Done so far: `verification`, `reviews`, `engagement`, `admin-*` (users/listings/content/stats/analytics), `reports`, `uploads`, `sms` (141 unit). **Still untested (mock Prisma):** the 9 heavy ones — `auth`, `listings`, `listings.write`, `trust`, `notifications`, `matching`, `chat`, `search`, `users`. Add a **CI coverage floor**.
+2. **TEST-3 · Web component tests** (`@testing-library/react`) — **0 today**. Cover the flag-aware `queries.ts` hooks, `search`, `property.$id` actions, the listing wizard.
+3. **DEPLOY-1 · A real deploy host** — `deploy-staging` is still 6 placeholder lines. Wire it to an actual target (Fly/Render/Railway/k8s): apply the image tag → `prisma migrate deploy` → gate on `/health/ready`. **The last hard blocker.**
+4. **POLISH-2** (resolve/delete the 3 empty `@beitco/*` packages) + remove **`_unported/`** (1,082 LOC dead) — cheap clutter cleanup.
+5. **Admin tail** (optional, by value): **ADMIN-12 RBAC roles** (split `isAdmin` → super_admin/moderator/support/finance so the audit log ties to roles), **ADMIN-6** (trust override + fraud signals), **ADMIN-7** (leads/tenancies oversight), **ADMIN-8** (billing, needs PAY-1), ADMIN-10/11/13.
+6. Then **P3** (POLISH-1 monoliths, POLISH-4 BullMQ, POLISH-5 occupant-link, POLISH-6 a11y) and **P4** (payments, mobile) as capacity allows.
 
-See **`.ai/PROD_READINESS.md`** for the full go-live checklist, deploy runbook, and go/no-go.
+See **`.ai/PROD_READINESS.md`** for the go-live checklist + runbook, and **`.ai/ADMIN_PLAN.md`** for the operator-portal epics.
 
 > When you finish an item, move its one-line outcome into `.ai/BACKEND_TASKS.md` (build log) and tick the box here.

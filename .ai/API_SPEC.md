@@ -1,6 +1,6 @@
 # Beitco — API Specification
 
-> **Last updated:** June 24, 2026 · Live endpoint inventory. **Interactive source of truth: Swagger at `http://localhost:3001/api/docs`.**
+> **Last updated:** June 25, 2026 · Live endpoint inventory (~93 routes across 18 controllers). **Interactive source of truth: Swagger at `http://localhost:3001/api/docs`.**
 > Base: `/api/v1` (URI versioning). All paths below are relative to it.
 
 ---
@@ -99,13 +99,62 @@
 | GET | `/me/notifications/unread-count` | Auth | Bell badge count. |
 | POST | `/me/notifications/seen` | Auth | Set the last-seen marker. |
 
-## Admin moderation — `/admin/moderation` (`AdminGuard`)
+## Admin / operator portal — `/admin/*` (`AdminGuard`)
+
+> The Beitco-team control room. All routes are `AdminGuard`-gated (after the global `JwtAuthGuard`); **every mutation is written to the audit log**.
+
+**Overview & audit**
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/admin/stats` | Platform KPIs (users/listings/engagement/inventory/trust/queues + recent). |
+| GET | `/admin/audit` | Append-only admin action log (filter `adminId`/`targetType`/`targetId`/`action`, cursor). |
+
+**Moderation queue (listings) & KYC**
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/admin/moderation` (+`/count`) | Pending-approval listings queue + nav badge. |
+| POST | `/admin/moderation/:id/approve` \| `/reject` | Publish (+trust recompute +alerts) / reject `{reason}`. |
+| GET | `/admin/verifications` (+`/count`) | Pending KYC queue + badge. |
+| POST | `/admin/verifications/:id/approve` \| `/reject` | Verify (+trust) / reject `{reason}`. |
+
+**Users (ADMIN-2)**
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/admin/users` | Search (`q` name/phone) + filter (role/status/verified/admins), cursor. |
+| GET | `/admin/users/:id` | Detail + activity counts + KYC history. |
+| PATCH | `/admin/users/:id` | Role / manual verify (recomputes trust) / trust override `{reason}`. |
+| POST | `/admin/users/:id/ban` \| `/reinstate` | Suspend `{reason}` (notifies) / lift. Guards: `SELF_BAN`, `CANNOT_BAN_ADMIN`. |
+| POST | `/admin/users/:id/make-admin` \| `/revoke-admin` | Grant / revoke admin (guard: `SELF_ADMIN`). |
+
+**Listings (ADMIN-3)**
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/admin/listings` | Search + filter **all** statuses, cursor. |
+| GET | `/admin/listings/:id` | Full admin detail (incl. occupants + moderation fields). |
+| POST | `/admin/listings/:id/takedown` \| `/restore` | Force-pause `{reason}` (drops from search, notifies) / republish. |
+| PATCH | `/admin/listings/:id` | Toggle `verified` (recompute trust + reindex). |
+| DELETE | `/admin/listings/:id` | Soft-delete (`?reason=`). |
+
+**Content moderation (ADMIN-4)**
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/admin/reviews` | Search + `removed=true\|false` filter, cursor. |
+| POST | `/admin/reviews/:id/remove` \| `/restore` | Soft-remove `{reason}` → **recompute trust** / restore. |
+| POST | `/admin/questions/:id/remove` \| `/restore` | Soft-remove / restore a Q&A. |
+
+**Analytics (ADMIN-9)**
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/admin/analytics/timeseries` | Daily counts (`metric=signups\|listings\|leads\|tenancies`, `days`), zero-filled. |
+| GET | `/admin/analytics/funnel` | Browse→lead→approved→move-in + conversion rates. |
+| GET | `/admin/analytics/areas` | Supply vs demand per area (gap-sorted). |
+
+## Reports & abuse (ADMIN-5) — `/reports` + `/admin/reports`
 | Method | Path | Auth | Notes |
 |---|---|---|---|
-| GET | `/admin/moderation` | Admin | Pending queue (oldest first). |
-| GET | `/admin/moderation/count` | Admin | Nav badge. |
-| POST | `/admin/moderation/:id/approve` | Admin | → published + trust recompute + saved-search alerts. |
-| POST | `/admin/moderation/:id/reject` | Admin | `{ reason }`. |
+| POST | `/reports` | Auth | File a report `{targetType, targetId, reason, details?}` (target-validated; dedup → `ALREADY_REPORTED`). |
+| GET | `/admin/reports` (+`/count`) | Admin | Triage queue (defaults to open+reviewing) + open-count badge. |
+| PATCH | `/admin/reports/:id` | Admin | Set status `reviewing\|resolved\|dismissed` `{resolution?}` (resolving stamps the resolver). |
 
 ## Health
 | Method | Path | Auth | Notes |

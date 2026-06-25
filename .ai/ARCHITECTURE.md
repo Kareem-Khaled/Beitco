@@ -1,7 +1,7 @@
 # Beitco — Architecture
 
-> **Last updated:** June 24, 2026 · Current system design (post-pivot, full-stack).
-> Companion docs: `.ai/DB_SCHEMA.md` (data), `.ai/API_SPEC.md` (endpoints), `.ai/CURRENT_STATE.md` (status), `.ai/NEXT_STEPS.md` (backlog), `.ai/PROD_READINESS.md` (go-live).
+> **Last updated:** June 25, 2026 · Current system design (post-pivot, full-stack + operator portal).
+> Companion docs: `.ai/DB_SCHEMA.md` (data), `.ai/API_SPEC.md` (endpoints), `.ai/CURRENT_STATE.md` (status), `.ai/NEXT_STEPS.md` (backlog), `.ai/ADMIN_PLAN.md` (operator portal), `.ai/PROD_READINESS.md` (go-live).
 
 ---
 
@@ -60,11 +60,11 @@ NestJS — **one module per feature**, services inject `PrismaService`. Cross-cu
 - **Authz:** ownership checks in services (403); `AdminGuard` (`isAdmin`) for moderation; chat is participant-checked; the WS gateway re-verifies the cookie JWT.
 - **Trust/matching:** pure engines (`trust/trust.engine.ts`, `matching/matching.engine.ts`) + services that read Prisma, compute, and persist. Trust recompute is triggered by the writes that should move a score (review, owner reply via `ResponseEvent`, verification).
 
-**Module map:** `auth · listings · engagement · reviews · trust · matching · chat · notifications · admin · verification · uploads · search · users · redis · common · health`. See `.ai/CURRENT_STATE.md` for each module's responsibility and `.ai/API_SPEC.md` for routes.
+**Module map:** `auth · listings · engagement · reviews · trust · matching · chat · notifications · admin · reports · verification · uploads · search · users · redis · common · health`. The **`admin` module** is the operator portal (overview/stats, audit log, users, listings, content moderation, analytics) — every mutation writes an `AdminAuditLog` row. See `.ai/CURRENT_STATE.md` for each module's responsibility and `.ai/API_SPEC.md` for routes.
 
 ## 5. Data & infra
 
-- **PostgreSQL 16 + PostGIS** via Prisma. 22 models, 21 enums, UUID PKs, snake_case `@map`, soft deletes (`deleted_at`), 30 indexes/uniques. Source of truth: `apps/api/prisma/schema.prisma` (see `.ai/DB_SCHEMA.md`). Dev runs on **port 5433** (gitignored override; native pg holds 5432). **PostGIS geo search is live** — a trigger-maintained, GiST-indexed `geog` column powers `ST_DWithin` radius search (PROD-4).
+- **PostgreSQL 16 + PostGIS** via Prisma. 24 models, 23 enums, UUID PKs, snake_case `@map`, soft deletes (`deleted_at` + content-moderation `removed_at`), 30+ indexes/uniques. Source of truth: `apps/api/prisma/schema.prisma` (see `.ai/DB_SCHEMA.md`). Dev runs on **port 5433** (gitignored override; native pg holds 5432). **PostGIS geo search is live** — a trigger-maintained, GiST-indexed `geog` column powers `ST_DWithin` radius search (PROD-4). An append-only **`AdminAuditLog`** records operator actions; **`Report`** backs the abuse queue.
 - **Redis 7** — OTP store, refresh/blacklist, notification last-seen marker.
 - **Meilisearch v1.11** — **integrated** (PROD-3): typo-tolerant, Arabic-aware `?q=` with relevance ordering + a DB `contains` fallback. The web search page sends `q` + filters + geo to the API in `VITE_USE_API` mode (mock mode filters client-side).
 
