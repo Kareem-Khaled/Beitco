@@ -70,7 +70,7 @@
 | `common` | Global response-envelope interceptor + all-exceptions filter (Sentry-reporting). |
 | `health` | Liveness (`GET /health`) + **readiness** (`GET /health/ready`, pings Postgres + Redis, 503 when either is down). |
 
-**Tests:** 52 Jest (17 trust + 13 matching + 10 saved-search matcher + 5 uploads + 5 sms + 2 health) + **19 e2e** (Supertest, real Postgres/Redis). 0 hand-written `any`. Strict `ValidationPipe` (whitelist + forbidNonWhitelisted).
+**Tests:** 92 Jest (17 trust + 13 matching + 10 saved-search matcher + 13 verification + 16 reviews + 11 engagement + 5 uploads + 5 sms + 2 health) + **19 e2e** (Supertest, real Postgres/Redis). 0 hand-written `any`. Strict `ValidationPipe` (whitelist + forbidNonWhitelisted).
 
 **Schema:** 22 models, 21 enums, UUID PKs, snake_case `@map`, soft deletes, 30 indexes/uniques. 3 migrations applied (bed-level/trust, saved-search-notification, geo-point). Idempotent seed (12 users, 7 properties).
 

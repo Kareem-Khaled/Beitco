@@ -5,9 +5,9 @@
 
 ---
 
-## Audit scorecard (deep code scan, June 24, 2026) — overall **84 / 100**
+## Audit scorecard (deep code scan, June 24, 2026) — overall **85 / 100**
 
-> Verified against the actual source (not just the docs). Movement since the June 23 baseline (79).
+> Verified against the actual source (not just the docs). Movement since the June 23 baseline (79). _Testing 72→78 after TEST-1's first batch (June 25)._
 
 | Area | Score | Verdict |
 |---|:--:|---|
@@ -23,7 +23,7 @@
 | Accessibility / RTL | **80** | RTL-first + 79 aria uses; no a11y automation, no i18n seam |
 | Performance & scale | **79** | Indexes+cache+cursors; synchronous fan-out; no load test |
 | Observability & Ops | **78** | pino + Sentry + readiness; **no metrics/tracing/alerting** |
-| **Testing & QA** | **72** | e2e (19) is excellent; **most services + web components untested**; no coverage gate |
+| **Testing & QA** | **78** | e2e (19) + **92 unit** (3 core services now branch-covered); web component tests + coverage gate still pending |
 
 **The two gates to "confidently in production":** raise **Testing** (service unit tests + web component tests + a coverage floor) and stand up a **real deploy host**. Neither is a rewrite. See `.ai/PROD_READINESS.md` for the go/no-go.
 
@@ -61,15 +61,15 @@
 - [x] **PROD-4 · PostGIS geo search.** ✅ (June 24) Migration `add_geo_point` adds a `geog geography(Point,4326)` column (mapped in Prisma as `Unsupported(...)` so the column exists but Prisma doesn't manage it), a **GiST index**, a `BEFORE INSERT/UPDATE` trigger that keeps `geog` in sync from `lat`/`lng`, and a backfill for existing rows. `GET /properties?lat&lng&radiusKm` (radius default 5 km, max 50) runs a PostGIS **`ST_DWithin`** prefilter (GiST-indexed) returning nearby published ids **ordered by distance** (`geog <-> point`, LIMIT 300), then the list query constrains to those ids and orders by proximity — unified with the Meili relevance path into one `relevanceOrder` fetch-all-then-cursor-slice branch (so `q` + geo compose: text drives order, geo constrains). No coords → the existing cursor path is untouched. **Verified live:** Maadi 10 km → property 2 (0 km) then 5 (~10 km) distance-ordered; `radiusKm=2` → only Maadi; Alexandria 5 km → the Smouha listing (geo works in a 2nd city); geo + `freeOnly` composes; **cursor pagination across the geo order** (page 1 → 2, page 2 → 5). 52 unit + 19 e2e green; `tsc`/`build`/`lint` clean. `.ai/API_SPEC.md` documents the params.
 - [x] **PROD-5 · Verification flow (KYC) backend.** ✅ (June 24) New `verification` module: `POST /me/verification` (submit ID/selfie/ownership doc URLs → pending request + `User.verificationStatus=pending`), `GET /me/verification` (my status), admin `GET /admin/verifications` (+`/count`), `POST /admin/verifications/:id/approve` (→ `verified` + `verificationStatus=verified`, **recompute trust** so the T-2 verification bonus applies, + a verification notification) / `:id/reject` (reason + notification). `AdminGuard` + transactional updates. **FE** (flag-aware): `verify.tsx` uploads docs via PROD-1's `uploadImage` then submits; new admin `/dashboard/verifications` queue (doc thumbnails, approve/reject) + a nav badge. **Verified:** an **e2e flow test** (submit → `/me` pending → non-admin 403 → admin approve → `/me` verified + notification) + 52 unit; both apps `tsc`/`lint`/`build` clean. (Also: `ThrottlerModule` now skips under `NODE_ENV=test` so the e2e's many logins don't 429.)
 
-## � Launch blockers (do these to actually go live) — see `.ai/PROD_READINESS.md`
+## 🚀 Launch blockers (do these to actually go live) — see `.ai/PROD_READINESS.md`
 
 > P0→P2 hardening is done, but the app **isn't deployed anywhere** and the deepest business logic is only e2e-covered. These are the gates from "feature-complete + hardened" to "in production."
 
 - [ ] **DEPLOY-1 · Real deploy host.** Wire the `deploy-staging` placeholder to an actual target (Fly/Render/Railway/managed k8s): apply the pushed image tag → `prisma migrate deploy` → gate traffic on `GET /health/ready`. Provision managed Postgres+PostGIS / Redis / Meilisearch / object storage / an SMS provider, and load strong distinct secrets via the host's secret manager. **The last hard blocker.**
-- [ ] **TEST-1 · Service unit tests + coverage floor.** NestJS service tests with a mocked Prisma for the trust-moving + authz paths (`listings`, `engagement`, `reviews`, `verification`, `admin`, `auth`); add a CI coverage threshold. _(The e2e suite covers the happy paths + authz matrix; this adds branch-level safety.)_
+- [~] **TEST-1 · Service unit tests + coverage floor.** 🔨 in progress (June 25) Added mocked-Prisma service specs for the three heaviest business services — **`verification` (13), `reviews` (16), `engagement` (11)** = **40 new tests** (suite **52 → 92**). They lock the branch logic the e2e only happy-paths: the KYC submit guards + "one active request" replacement + approve-transaction/trust-recompute + reject reason-defaulting; the review residency gate (30-day tenancy), helpful-vote toggle, owner-reply ownership, and the two-sided renter-review guards; the save toggle, the **lead→tenancy completion (idempotent)**, ownership 403s, and Q&A answer ownership. Remaining: `listings`/`admin`/`auth` service specs + a CI coverage floor. `tsc`/`lint` clean.
 - [ ] **TEST-3 · Web component tests.** `@testing-library/react` for the highest-risk surfaces: the flag-aware `queries.ts` hooks, `property.$id` actions, and the listing-wizard validation.
 
-## �🟢 P3 — Polish & scale (nice-to-have)
+## 🟢 P3 — Polish & scale (nice-to-have)
 
 - [ ] **POLISH-1 · Decompose monolith files.** `list/new.tsx` (2,290 LOC) and `property.$id.tsx` (1,454 LOC) → step/section components.
 - [ ] **POLISH-2 · Shared packages or delete them.** `@beitco/types|utils|validators` have **0 imports**; types are duplicated between `apps/web/lib/beitco/types.ts` and the API serializers. Either make them the shared contract or remove them.

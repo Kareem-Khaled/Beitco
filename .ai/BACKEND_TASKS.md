@@ -19,6 +19,14 @@ _(**Build phase complete.** Backend B-0→MOD-1 + FE wiring (slices 1–6d) + T-
 
 ## ✅ Done
 
+### TEST-1 · Service unit tests (batch 1) 🔨 (June 25)
+- Added mocked-Prisma unit specs for the three heaviest **business** services — the branch logic the 19-test e2e only happy-paths:
+  - **`verification.service.spec.ts` (13):** submit guards (`USER_NOT_FOUND`, `ALREADY_VERIFIED`), the "one active request" `deleteMany` replacement + pending flip, `ownershipDocUrl` pass-through, `mine`/`pending`/`pendingCount`, **approve** (`REQUEST_NOT_FOUND`, `$transaction` shape + `trust.recomputeOwner`), **reject** (reason trim + default, no trust recompute).
+  - **`reviews.service.spec.ts` (16):** the residency gate (`PROPERTY_NOT_FOUND` / `NOT_A_RESIDENT` / `TENANCY_TOO_SHORT`), success path derives `monthsLived` + **calls `trust.recomputeListing` (the wedge)**, helpful-vote toggle (add/remove + floor at 0), owner-reply ownership (`NOT_OWNER`), two-sided renter review (`SELF_REVIEW` / `NO_TENANCY` / `ALREADY_REVIEWED` / success → `recomputeRenterReputation`), `reviewMeta` 30-day gate.
+  - **`engagement.service.spec.ts` (11):** save toggle (on/off + `PROPERTY_NOT_FOUND`), **lead→tenancy** completion (`LEAD_NOT_FOUND`, `NOT_OWNER` 403, creates a tenancy on `completed`, **idempotent** when one exists, none for other transitions), Q&A answer ownership.
+- **Pattern:** lightweight `new Service(mock as unknown as PrismaService)` (matches `uploads.service.spec.ts`) — a typed `PrismaMock` interface of `jest.fn()`s, `$transaction` resolves its op array, Trust is a 2-method stub. No DB, fast (<1.5s).
+- **Verified:** `npx jest` **92 passed** (was 52; +40), `tsc` + `lint` clean. Remaining for TEST-1: `listings`/`admin`/`auth` service specs + a CI coverage floor.
+
 ### POLISH-3 · Shared RedisModule ✅ (June 24)
 - **Problem:** `auth.service`, `notifications.service`, and `health.service` each did `new Redis(config.get('REDIS_URL'), {...})` with their own connect/quit lifecycle — the URL read, the options, and the connection were triplicated (a connection-count + drift risk).
 - **New `@Global() RedisModule` + `RedisService`** (`src/redis/`): owns **one** lazily-connected `ioredis` client; attempts an eager connect at boot (logs "Redis connected" / warns + degrades when down); attaches an `error` handler so an outage can't crash the process. Exposes `client` (the raw connection), a **live `ready` getter** (`status === 'ready'`), and `ping()` for the SEC-3 readiness probe (reconnects only from an idle state; never issues a command while not-ready). Registered in `app.module` right after `PrismaModule`.
