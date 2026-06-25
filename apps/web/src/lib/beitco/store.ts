@@ -17,7 +17,13 @@ import type {
   RenterProfile,
   VerificationStatus,
 } from "./types";
-import type { SavedSearch, SavedSearchParams, ResponseEvent, RenterReview } from "./types";
+import type {
+  SavedSearch,
+  SavedSearchParams,
+  ResponseEvent,
+  RenterReview,
+  PlatformStats,
+} from "./types";
 import {
   computeListingTrust,
   computeOwnerTrust,
@@ -416,6 +422,104 @@ export function rejectListing(id: string, reason: string): void {
   all[idx].rejectionReason = reason.trim() || "مخالف لشروط النشر.";
   all[idx].moderatedAt = new Date().toISOString();
   writeJSON(STORAGE_KEYS.properties, all);
+}
+
+// ---------- Platform stats (ADMIN-1, mock) ----------
+// Mirrors the API's GET /admin/stats, computed from the local seed + whatever
+// the demo user has generated (leads/tenancies/threads/searches). Operator-only.
+export function getPlatformStats(): PlatformStats {
+  ensureSeeded();
+  const users = readJSON<User[]>(STORAGE_KEYS.users, seedUsers);
+  const props = getAllProperties();
+  const leads = readJSON<Lead[]>(STORAGE_KEYS.leads, []);
+  const tenancies = readJSON<Tenancy[]>(STORAGE_KEYS.tenancies, []);
+  const threads = readJSON<Thread[]>(STORAGE_KEYS.threads, []);
+  const searches = readJSON<SavedSearch[]>(STORAGE_KEYS.savedSearches, []);
+
+  const now = Date.now();
+  const within = (iso: string | undefined, days: number) =>
+    !!iso && now - +new Date(iso) <= days * 86400000;
+  const byRole = (r: string) => users.filter((u) => u.role === r).length;
+  const byStatus = (s: PropertyStatus) => props.filter((p) => p.status === s).length;
+  const byType = (t: PropertyType) =>
+    props.filter((p) => p.status === "published" && p.type === t).length;
+
+  const published = props.filter((p) => p.status === "published");
+  const owners = users.filter((u) => u.role === "owner" || u.role === "both");
+  const avg = (nums: number[]) =>
+    nums.length ? Math.round((nums.reduce((a, b) => a + b, 0) / nums.length) * 10) / 10 : null;
+
+  const totalBeds = published.reduce((sum, p) => sum + (p.beds?.total ?? 0), 0);
+  const availableBeds = published.reduce((sum, p) => sum + (p.beds?.available ?? 0), 0);
+  const reviews = props.reduce((sum, p) => sum + (p.reviews?.length ?? 0), 0);
+  const questions = props.reduce((sum, p) => sum + (p.qa?.length ?? 0), 0);
+
+  return {
+    users: {
+      total: users.length,
+      renters: byRole("renter"),
+      owners: byRole("owner"),
+      both: byRole("both"),
+      admins: users.filter((u) => u.isAdmin).length,
+      verified: users.filter((u) => u.verified).length,
+      pendingVerification: users.filter((u) => u.verificationStatus === "pending").length,
+      new7d: users.filter((u) => within(u.createdAt, 7)).length,
+      new30d: users.filter((u) => within(u.createdAt, 30)).length,
+    },
+    listings: {
+      total: props.length,
+      published: byStatus("published"),
+      pending: byStatus("pending_approval"),
+      draft: byStatus("draft"),
+      rejected: byStatus("rejected"),
+      verified: props.filter((p) => p.verified).length,
+      new7d: props.filter((p) => within(p.createdAt, 7)).length,
+      new30d: props.filter((p) => within(p.createdAt, 30)).length,
+      byType: { شقة: byType("شقة"), أوضة: byType("أوضة"), سرير: byType("سرير") },
+    },
+    engagement: {
+      leads: leads.length,
+      leadsPending: leads.filter((l) => l.status === "pending").length,
+      tenancies: tenancies.length,
+      reviews,
+      questions,
+      threads: threads.length,
+      savedSearches: searches.length,
+    },
+    inventory: { totalBeds, availableBeds },
+    trust: {
+      avgListingTrust: avg(published.map((p) => p.trust)),
+      avgOwnerTrust: avg(owners.map((u) => u.trust)),
+    },
+    queues: {
+      pendingListings: byStatus("pending_approval"),
+      pendingVerifications: users.filter((u) => u.verificationStatus === "pending").length,
+    },
+    recent: {
+      users: [...users]
+        .sort((a, b) => +new Date(b.createdAt ?? 0) - +new Date(a.createdAt ?? 0))
+        .slice(0, 6)
+        .map((u) => ({
+          id: u.id,
+          name: u.name,
+          role: u.role,
+          verified: !!u.verified,
+          createdAt: u.createdAt ?? new Date().toISOString(),
+        })),
+      listings: [...props]
+        .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
+        .slice(0, 6)
+        .map((p) => ({
+          id: p.id,
+          title: p.title,
+          area: p.area,
+          type: p.type,
+          status: p.status,
+          price: p.price,
+          createdAt: p.createdAt,
+        })),
+    },
+  };
 }
 
 // ---------- Threads ----------

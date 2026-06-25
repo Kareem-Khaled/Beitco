@@ -36,6 +36,7 @@ import {
   postRenterReview as storePostRenterReview,
   getPendingListings,
   getPendingListingsCount,
+  getPlatformStats,
   approveListing as storeApproveListing,
   rejectListing as storeRejectListing,
   getMatchesForUser,
@@ -75,6 +76,7 @@ import {
   apiReviewRenter,
   apiListPendingListings,
   apiModerationCount,
+  apiAdminStats,
   apiApproveListing,
   apiRejectListing,
   apiGetMatches,
@@ -106,6 +108,7 @@ import type {
   SaleStatus,
   Thread,
   Message,
+  PlatformStats,
 } from "./types";
 import type { MatchResult } from "./matching";
 
@@ -535,6 +538,16 @@ export function useModerationCount() {
     queryKey: ["moderationCount", { source: USE_API ? "api" : "mock" }],
     queryFn: async () => (USE_API ? apiModerationCount() : getPendingListingsCount()),
     initialData: USE_API ? undefined : () => getPendingListingsCount(),
+    staleTime: USE_API ? 30_000 : Infinity,
+  });
+}
+
+// ADMIN-1: platform-operator overview snapshot (GET /admin/stats / mock equiv).
+export function useAdminStats() {
+  return useQuery<PlatformStats>({
+    queryKey: ["adminStats", { source: USE_API ? "api" : "mock" }],
+    queryFn: async () => (USE_API ? apiAdminStats() : getPlatformStats()),
+    initialData: USE_API ? undefined : () => getPlatformStats(),
     staleTime: USE_API ? 30_000 : Infinity,
   });
 }

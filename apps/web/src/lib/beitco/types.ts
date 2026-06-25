@@ -425,3 +425,53 @@ export type SavedSearch = {
   params: SavedSearchParams;
   createdAt: string;
 };
+
+// ADMIN-1: the platform-operator overview snapshot (GET /admin/stats).
+export type PlatformStats = {
+  users: {
+    total: number;
+    renters: number;
+    owners: number;
+    both: number;
+    admins: number;
+    verified: number;
+    pendingVerification: number;
+    new7d: number;
+    new30d: number;
+  };
+  listings: {
+    total: number;
+    published: number;
+    pending: number;
+    draft: number;
+    rejected: number;
+    verified: number;
+    new7d: number;
+    new30d: number;
+    byType: Record<PropertyType, number>;
+  };
+  engagement: {
+    leads: number;
+    leadsPending: number;
+    tenancies: number;
+    reviews: number;
+    questions: number;
+    threads: number;
+    savedSearches: number;
+  };
+  inventory: { totalBeds: number; availableBeds: number };
+  trust: { avgListingTrust: number | null; avgOwnerTrust: number | null };
+  queues: { pendingListings: number; pendingVerifications: number };
+  recent: {
+    users: { id: string; name: string; role: string; verified: boolean; createdAt: string }[];
+    listings: {
+      id: string;
+      title: string;
+      area: string;
+      type: PropertyType;
+      status: string;
+      price: number;
+      createdAt: string;
+    }[];
+  };
+};

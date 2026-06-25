@@ -38,7 +38,7 @@
 - **Chat:** `/messages` + thread view, "كلّم صاحب الشقة", live updates via Socket.io.
 - **Notifications:** bell badge + `/notifications` feed (leads, messages, review-eligibility, verification, saved-search alerts).
 - **Verification (KYC):** `dashboard/verify` (upload ID/selfie/ownership docs → pending) + admin `dashboard/verifications` queue (approve/reject).
-- **Admin:** moderation queue (`/dashboard/moderation`) + verifications queue, gated on `isPlatformAdmin`.
+- **Admin:** moderation queue (`/dashboard/moderation`) + verifications queue, gated on `isPlatformAdmin`. **Operator portal** (`/admin`) — a platform-overview dashboard (KPIs, queues, recent activity) for the Beitco team.
 - **Platform:** dark mode, PWA manifest, mobile bottom-nav, accessibility pass (skip link, aria, focus management), maps (Leaflet pin-drop + Google embeds), public profiles.
 
 **Tests:** 31 Vitest (trust + matching pure engines). `tsc` clean.
@@ -61,7 +61,7 @@
 | `matching` | Pure engine (`matching.engine.ts`) + `GET /me/matches`; renter-preferences persistence via `PATCH /users/me`. |
 | `chat` | REST threads/messages (find-or-create, mark-read) + Socket.io gateway (`/ws/chat`, cookie-JWT auth) for live delivery. T-3 response events feed owner trust. |
 | `notifications` | Derived feed (leads/messages/reviews/verification) + Redis last-seen marker + persisted **saved-search alerts** on publish/approve. |
-| `admin` | Moderation queue + KYC review (`AdminGuard`): pending list/count, approve (→ publish + alerts), reject (reason); verification approve/reject. |
+| `admin` | Moderation queue + KYC review + **platform-operator portal** (`AdminGuard`): pending list/count, approve/reject; verification approve/reject; **`GET /admin/stats`** (platform overview KPIs). |
 | `verification` | KYC (PROD-5): `POST/GET /me/verification` (submit ID/selfie/ownership docs → pending), admin queue + approve (→ `verified` + trust recompute + notification) / reject. |
 | `uploads` | Image pipeline (PROD-1): `POST /uploads/presign` → presigned S3/R2 PUT + public URL (content-type/size validated); `GET /uploads/config`. Config-gated; base64 fallback when unset. |
 | `search` | Meilisearch (PROD-3): config-gated client; indexes published listings on boot + keeps them in sync; powers typo-tolerant Arabic `?q=` with a DB `contains` fallback. |
@@ -70,7 +70,7 @@
 | `common` | Global response-envelope interceptor + all-exceptions filter (Sentry-reporting). |
 | `health` | Liveness (`GET /health`) + **readiness** (`GET /health/ready`, pings Postgres + Redis, 503 when either is down). |
 
-**Tests:** 92 Jest (17 trust + 13 matching + 10 saved-search matcher + 13 verification + 16 reviews + 11 engagement + 5 uploads + 5 sms + 2 health) + **19 e2e** (Supertest, real Postgres/Redis). 0 hand-written `any`. Strict `ValidationPipe` (whitelist + forbidNonWhitelisted).
+**Tests:** 97 Jest (17 trust + 13 matching + 10 saved-search matcher + 13 verification + 16 reviews + 11 engagement + 5 admin-stats + 5 uploads + 5 sms + 2 health) + **19 e2e** (Supertest, real Postgres/Redis). 0 hand-written `any`. Strict `ValidationPipe` (whitelist + forbidNonWhitelisted).
 
 **Schema:** 22 models, 21 enums, UUID PKs, snake_case `@map`, soft deletes, 30 indexes/uniques. 3 migrations applied (bed-level/trust, saved-search-notification, geo-point). Idempotent seed (12 users, 7 properties).
 

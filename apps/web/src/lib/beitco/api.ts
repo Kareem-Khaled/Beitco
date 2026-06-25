@@ -461,6 +461,12 @@ export async function apiRejectListing(id: string, reason: string): Promise<void
   await postJSON(`/admin/moderation/${encodeURIComponent(id)}/reject`, { reason });
 }
 
+// ── Admin portal (ADMIN-1) ──────────────────────────────────────────────────
+export async function apiAdminStats(): Promise<import("./types").PlatformStats> {
+  const body = await getJSON<import("./types").PlatformStats>("/admin/stats");
+  return body.data;
+}
+
 // ── Matching (T-MATCH) ──────────────────────────────────────────────────────
 export async function apiGetMatches(): Promise<
   { property: import("./types").PropertySummary; match: import("./matching").MatchResult }[]

@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   ShieldAlert,
   ScanFace,
+  LayoutDashboard,
 } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
 import { getVerificationStatus, isPlatformAdmin } from "@/lib/beitco/store";
@@ -106,6 +107,16 @@ function DashboardLayout() {
               {isPlatformAdmin(user) && <ModerationNavLink />}
               {/* Admin-only: verification queue */}
               {isPlatformAdmin(user) && <VerificationNavLink />}
+              {/* Admin-only: the platform-operator portal */}
+              {isPlatformAdmin(user) && (
+                <Link
+                  to="/admin"
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  <span>لوحة الإدارة</span>
+                </Link>
+              )}
             </nav>
             <div className="mt-3 border-t border-border pt-3">
               <Button asChild className="w-full">

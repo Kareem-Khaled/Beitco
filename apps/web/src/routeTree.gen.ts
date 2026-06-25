@@ -18,10 +18,12 @@ import { Route as HelpRouteImport } from './routes/help'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as MeRouteRouteImport } from './routes/me/route'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MessagesIndexRouteImport } from './routes/messages/index'
 import { Route as MeIndexRouteImport } from './routes/me/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as UIdRouteImport } from './routes/u.$id'
 import { Route as PropertyIdRouteImport } from './routes/property.$id'
 import { Route as MessagesThreadIdRouteImport } from './routes/messages/$threadId'
@@ -87,6 +89,11 @@ const DashboardRouteRoute = DashboardRouteRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -106,6 +113,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRouteRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const UIdRoute = UIdRouteImport.update({
   id: '/u/$id',
@@ -205,6 +217,7 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/me': typeof MeRouteRouteWithChildren
   '/about': typeof AboutRoute
@@ -233,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/messages/$threadId': typeof MessagesThreadIdRoute
   '/property/$id': typeof PropertyIdRoute
   '/u/$id': typeof UIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/me/': typeof MeIndexRoute
   '/messages/': typeof MessagesIndexRoute
@@ -265,6 +279,7 @@ export interface FileRoutesByTo {
   '/messages/$threadId': typeof MessagesThreadIdRoute
   '/property/$id': typeof PropertyIdRoute
   '/u/$id': typeof UIdRoute
+  '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/me': typeof MeIndexRoute
   '/messages': typeof MessagesIndexRoute
@@ -272,6 +287,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/me': typeof MeRouteRouteWithChildren
   '/about': typeof AboutRoute
@@ -300,6 +316,7 @@ export interface FileRoutesById {
   '/messages/$threadId': typeof MessagesThreadIdRoute
   '/property/$id': typeof PropertyIdRoute
   '/u/$id': typeof UIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/me/': typeof MeIndexRoute
   '/messages/': typeof MessagesIndexRoute
@@ -308,6 +325,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/dashboard'
     | '/me'
     | '/about'
@@ -336,6 +354,7 @@ export interface FileRouteTypes {
     | '/messages/$threadId'
     | '/property/$id'
     | '/u/$id'
+    | '/admin/'
     | '/dashboard/'
     | '/me/'
     | '/messages/'
@@ -368,12 +387,14 @@ export interface FileRouteTypes {
     | '/messages/$threadId'
     | '/property/$id'
     | '/u/$id'
+    | '/admin'
     | '/dashboard'
     | '/me'
     | '/messages'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/dashboard'
     | '/me'
     | '/about'
@@ -402,6 +423,7 @@ export interface FileRouteTypes {
     | '/messages/$threadId'
     | '/property/$id'
     | '/u/$id'
+    | '/admin/'
     | '/dashboard/'
     | '/me/'
     | '/messages/'
@@ -409,6 +431,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   MeRouteRoute: typeof MeRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
@@ -493,6 +516,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -520,6 +550,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRouteRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/u/$id': {
       id: '/u/$id'
@@ -657,6 +694,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteRouteChildren {
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
 interface DashboardRouteRouteChildren {
   DashboardLeadsRoute: typeof DashboardLeadsRoute
   DashboardListingsRoute: typeof DashboardListingsRoute
@@ -706,6 +755,7 @@ const MeRouteRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   MeRouteRoute: MeRouteRouteWithChildren,
   AboutRoute: AboutRoute,
