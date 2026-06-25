@@ -712,6 +712,27 @@ export async function apiAdminRestoreReview(id: string): Promise<import("./types
   return body.data;
 }
 
+// ── Admin: analytics (ADMIN-9) ──────────────────────────────────────────────
+export async function apiAdminTimeseries(
+  metric: string,
+  days: number,
+): Promise<import("./types").TimeseriesResult> {
+  const body = await getJSON<import("./types").TimeseriesResult>(
+    `/admin/analytics/timeseries?metric=${encodeURIComponent(metric)}&days=${days}`,
+  );
+  return body.data;
+}
+
+export async function apiAdminFunnel(): Promise<import("./types").FunnelResult> {
+  const body = await getJSON<import("./types").FunnelResult>("/admin/analytics/funnel");
+  return body.data;
+}
+
+export async function apiAdminAreas(): Promise<import("./types").AreaStat[]> {
+  const body = await getJSON<import("./types").AreaStat[]>("/admin/analytics/areas");
+  return body.data;
+}
+
 // ── Matching (T-MATCH) ──────────────────────────────────────────────────────
 export async function apiGetMatches(): Promise<
   { property: import("./types").PropertySummary; match: import("./matching").MatchResult }[]

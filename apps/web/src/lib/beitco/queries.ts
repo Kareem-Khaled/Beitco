@@ -54,6 +54,9 @@ import {
   getAdminReviews,
   adminRemoveReview as storeAdminRemoveReview,
   adminRestoreReview as storeAdminRestoreReview,
+  getAdminTimeseries,
+  getAdminFunnel,
+  getAdminAreas,
   approveListing as storeApproveListing,
   rejectListing as storeRejectListing,
   getMatchesForUser,
@@ -113,6 +116,9 @@ import {
   apiAdminReviews,
   apiAdminRemoveReview,
   apiAdminRestoreReview,
+  apiAdminTimeseries,
+  apiAdminFunnel,
+  apiAdminAreas,
   apiApproveListing,
   apiRejectListing,
   apiGetMatches,
@@ -152,6 +158,9 @@ import type {
   ReportTargetType,
   ReportStatus,
   AdminReviewRow,
+  TimeseriesResult,
+  FunnelResult,
+  AreaStat,
 } from "./types";
 import type { MatchResult } from "./matching";
 
@@ -781,6 +790,35 @@ export async function adminRestoreReview(id: string): Promise<void> {
     return;
   }
   storeAdminRestoreReview(id);
+}
+
+// ADMIN-9: analytics.
+export function useAdminTimeseries(metric: string, days: number) {
+  return useQuery<TimeseriesResult>({
+    queryKey: ["adminTimeseries", metric, days, { source: USE_API ? "api" : "mock" }],
+    queryFn: async () =>
+      USE_API ? apiAdminTimeseries(metric, days) : getAdminTimeseries(metric, days),
+    initialData: USE_API ? undefined : () => getAdminTimeseries(metric, days),
+    staleTime: USE_API ? 60_000 : Infinity,
+  });
+}
+
+export function useAdminFunnel() {
+  return useQuery<FunnelResult>({
+    queryKey: ["adminFunnel", { source: USE_API ? "api" : "mock" }],
+    queryFn: async () => (USE_API ? apiAdminFunnel() : getAdminFunnel()),
+    initialData: USE_API ? undefined : () => getAdminFunnel(),
+    staleTime: USE_API ? 60_000 : Infinity,
+  });
+}
+
+export function useAdminAreas() {
+  return useQuery<AreaStat[]>({
+    queryKey: ["adminAreas", { source: USE_API ? "api" : "mock" }],
+    queryFn: async () => (USE_API ? apiAdminAreas() : getAdminAreas()),
+    initialData: USE_API ? undefined : () => getAdminAreas(),
+    staleTime: USE_API ? 60_000 : Infinity,
+  });
 }
 
 export async function approveListing(id: string): Promise<void> {

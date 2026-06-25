@@ -84,8 +84,8 @@ Operator portal + platform-overview dashboard. Remaining polish: migrate the mod
 - **Revenue dashboard** — MRR, fee revenue, boost revenue, refunds.
 - **New models:** `Subscription`, `SuccessFee` (or `Invoice` + `InvoiceLine`), `Boost`. Provider hooks (Paymob/Stripe EGP) from PAY-1.
 
-### ADMIN-9 · Analytics & insights 🟡
-**Goal:** understand growth + supply/demand.
+### ADMIN-9 · Analytics & insights 🟡 — ✅ done (June 25)
+**Goal:** understand growth + supply/demand. — **Shipped:** `/admin/analytics` — growth time-series (metric switcher + 30/90d), the conversion funnel + rates, and supply/demand-by-area (gap-sorted). _Tail (optional): trust histogram + CSV export._
 - **Time-series** — signups, listings, leads, move-ins per day/week (charts).
 - **Conversion funnel** with rates; **cohort retention**.
 - **Supply/demand by area** (listings vs saved-searches/leads per area — where to seed supply).

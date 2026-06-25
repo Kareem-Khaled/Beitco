@@ -31,6 +31,9 @@ import type {
   ReportStatus,
   Review,
   AdminReviewRow,
+  TimeseriesResult,
+  FunnelResult,
+  AreaStat,
 } from "./types";
 import {
   computeListingTrust,
@@ -866,6 +869,95 @@ export function adminRestoreReview(id: string): AdminReviewRow | undefined {
     r.removedAt = undefined;
     r.removedReason = undefined;
   });
+}
+
+// ---------- Analytics (ADMIN-9, mock) ----------
+function dayKey(d: Date): string {
+  return d.toISOString().slice(0, 10);
+}
+
+export function getAdminTimeseries(metric: string, days: number): TimeseriesResult {
+  ensureSeeded();
+  const props = getAllProperties();
+  const users = readJSON<User[]>(STORAGE_KEYS.users, seedUsers);
+  const leads = readJSON<Lead[]>(STORAGE_KEYS.leads, []);
+  const tenancies = readJSON<Tenancy[]>(STORAGE_KEYS.tenancies, []);
+
+  const dates: string[] =
+    metric === "listings"
+      ? props.map((p) => p.createdAt)
+      : metric === "leads"
+        ? leads.map((l) => l.createdAt)
+        : metric === "tenancies"
+          ? tenancies.map((t) => t.moveInDate)
+          : users.map((u) => u.createdAt ?? new Date().toISOString());
+
+  const counts = new Map<string, number>();
+  for (const iso of dates) {
+    if (!iso) continue;
+    const k = dayKey(new Date(iso));
+    counts.set(k, (counts.get(k) ?? 0) + 1);
+  }
+
+  const points: { date: string; count: number }[] = [];
+  const start = new Date();
+  start.setUTCHours(0, 0, 0, 0);
+  start.setUTCDate(start.getUTCDate() - (days - 1));
+  for (let i = 0; i < days; i++) {
+    const d = new Date(start);
+    d.setUTCDate(start.getUTCDate() + i);
+    const k = dayKey(d);
+    points.push({ date: k, count: counts.get(k) ?? 0 });
+  }
+  return { metric, days, total: points.reduce((a, b) => a + b.count, 0), points };
+}
+
+export function getAdminFunnel(): FunnelResult {
+  ensureSeeded();
+  const users = readJSON<User[]>(STORAGE_KEYS.users, seedUsers);
+  const leads = readJSON<Lead[]>(STORAGE_KEYS.leads, []);
+  const tenancies = readJSON<Tenancy[]>(STORAGE_KEYS.tenancies, []);
+  const searches = readJSON<SavedSearch[]>(STORAGE_KEYS.savedSearches, []);
+  const savers = new Set(searches.map((s) => s.userId)).size;
+  const approved = leads.filter((l) => l.status === "approved" || l.status === "completed").length;
+  const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 1000) / 10 : 0);
+  return {
+    stages: [
+      { key: "users", label: "مستخدمين", value: users.length },
+      { key: "savers", label: "حافظوا بحث", value: savers },
+      { key: "leads", label: "طلبوا معاينة", value: leads.length },
+      { key: "approved", label: "اتوافق عليهم", value: approved },
+      { key: "tenancies", label: "سكنوا", value: tenancies.length },
+    ],
+    rates: {
+      userToLead: pct(leads.length, users.length),
+      leadToApproved: pct(approved, leads.length),
+      approvedToMoveIn: pct(tenancies.length, approved),
+      leadToMoveIn: pct(tenancies.length, leads.length),
+    },
+  };
+}
+
+export function getAdminAreas(): AreaStat[] {
+  ensureSeeded();
+  const props = getAllProperties().filter((p) => p.status === "published");
+  const leads = readJSON<Lead[]>(STORAGE_KEYS.leads, []);
+  const propById = new Map(getAllProperties().map((p) => [p.id, p]));
+  const supply = new Map<string, number>();
+  for (const p of props) supply.set(p.area, (supply.get(p.area) ?? 0) + 1);
+  const demand = new Map<string, number>();
+  for (const l of leads) {
+    const area = propById.get(l.propertyId)?.area;
+    if (area) demand.set(area, (demand.get(area) ?? 0) + 1);
+  }
+  const areas = new Set([...supply.keys(), ...demand.keys()]);
+  return [...areas]
+    .map((area) => {
+      const s = supply.get(area) ?? 0;
+      const d = demand.get(area) ?? 0;
+      return { area, supply: s, demand: d, gap: d - s };
+    })
+    .sort((a, b) => b.gap - a.gap || b.demand - a.demand);
 }
 
 // ---------- Threads ----------

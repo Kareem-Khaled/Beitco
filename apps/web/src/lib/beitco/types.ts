@@ -575,3 +575,25 @@ export type AdminReviewRow = {
   removedReason?: string;
   createdAt: string;
 };
+
+// ADMIN-9: analytics & insights.
+export type TimeseriesMetric = "signups" | "listings" | "leads" | "tenancies";
+
+export type TimeseriesResult = {
+  metric: string;
+  days: number;
+  total: number;
+  points: { date: string; count: number }[];
+};
+
+export type FunnelResult = {
+  stages: { key: string; label: string; value: number }[];
+  rates: {
+    userToLead: number;
+    leadToApproved: number;
+    approvedToMoveIn: number;
+    leadToMoveIn: number;
+  };
+};
+
+export type AreaStat = { area: string; supply: number; demand: number; gap: number };

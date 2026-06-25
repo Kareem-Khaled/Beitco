@@ -47,6 +47,7 @@ import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminReviewsRouteImport } from './routes/admin/reviews'
 import { Route as AdminReportsRouteImport } from './routes/admin/reports'
 import { Route as AdminListingsRouteImport } from './routes/admin/listings'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
 
 const TrustRoute = TrustRouteImport.update({
   id: '/trust',
@@ -238,6 +239,11 @@ const AdminListingsRoute = AdminListingsRouteImport.update({
   path: '/listings',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -251,6 +257,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/trust': typeof TrustRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/reviews': typeof AdminReviewsRoute
@@ -288,6 +295,7 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/trust': typeof TrustRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/reviews': typeof AdminReviewsRoute
@@ -329,6 +337,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/trust': typeof TrustRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/reviews': typeof AdminReviewsRoute
@@ -371,6 +380,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/trust'
+    | '/admin/analytics'
     | '/admin/listings'
     | '/admin/reports'
     | '/admin/reviews'
@@ -408,6 +418,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/trust'
+    | '/admin/analytics'
     | '/admin/listings'
     | '/admin/reports'
     | '/admin/reviews'
@@ -448,6 +459,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/trust'
+    | '/admin/analytics'
     | '/admin/listings'
     | '/admin/reports'
     | '/admin/reviews'
@@ -767,10 +779,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminListingsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
   }
 }
 
 interface AdminRouteRouteChildren {
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminListingsRoute: typeof AdminListingsRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminReviewsRoute: typeof AdminReviewsRoute
@@ -779,6 +799,7 @@ interface AdminRouteRouteChildren {
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminListingsRoute: AdminListingsRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminReviewsRoute: AdminReviewsRoute,

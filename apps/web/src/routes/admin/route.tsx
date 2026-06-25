@@ -10,6 +10,7 @@ import {
   Home,
   Flag,
   Star,
+  TrendingUp,
 } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
 import { isPlatformAdmin } from "@/lib/beitco/store";
@@ -71,6 +72,7 @@ function AdminLayout() {
         <aside className="lg:sticky lg:top-20 lg:self-start">
           <nav className="flex flex-col gap-1 rounded-2xl border border-border bg-card p-3">
             <AdminNavLink to="/admin" label="نظرة عامة" icon={LayoutDashboard} exact />
+            <AdminNavLink to="/admin/analytics" label="التحليلات" icon={TrendingUp} />
             <AdminNavLink to="/admin/users" label="المستخدمين" icon={Users} />
             <AdminNavLink to="/admin/listings" label="الإعلانات" icon={Home} />
             <AdminNavLink to="/admin/reviews" label="التقييمات" icon={Star} />
@@ -107,6 +109,7 @@ function AdminNavLink({
 }: {
   to:
     | "/admin"
+    | "/admin/analytics"
     | "/admin/users"
     | "/admin/listings"
     | "/admin/reviews"

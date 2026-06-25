@@ -61,7 +61,7 @@
 | `matching` | Pure engine (`matching.engine.ts`) + `GET /me/matches`; renter-preferences persistence via `PATCH /users/me`. |
 | `chat` | REST threads/messages (find-or-create, mark-read) + Socket.io gateway (`/ws/chat`, cookie-JWT auth) for live delivery. T-3 response events feed owner trust. |
 | `notifications` | Derived feed (leads/messages/reviews/verification) + Redis last-seen marker + persisted **saved-search alerts** on publish/approve. |
-| `admin` | Moderation queue + KYC review + **operator portal** (`AdminGuard`): listing approve/reject; verification approve/reject; **`GET /admin/stats`** (overview KPIs); **`/admin/users`** (search/filter, ban/reinstate, verify, make/revoke admin, trust override); **`/admin/listings`** (search all statuses, force-takedown/restore, verify, delete); **`/admin/reviews`** (soft-remove/restore reviews + Q&A → recompute trust); **`GET /admin/audit`** (append-only admin action log). |
+| `admin` | Moderation queue + KYC review + **operator portal** (`AdminGuard`): listing approve/reject; verification approve/reject; **`/admin/stats`** (overview) + **`/admin/analytics`** (time-series, funnel, supply/demand); **`/admin/users`** (search/filter, ban/reinstate, verify, make/revoke admin, trust override); **`/admin/listings`** (search all statuses, force-takedown/restore, verify, delete); **`/admin/reviews`** (soft-remove/restore reviews + Q&A → recompute trust); **`GET /admin/audit`** (append-only admin action log). |
 | `reports` | Abuse reports (ADMIN-5): `POST /reports` (any user, target-validated + dedup), `GET/PATCH /admin/reports` (+`/count`) triage queue (`AdminGuard`), audit-logged. |
 | `verification` | KYC (PROD-5): `POST/GET /me/verification` (submit ID/selfie/ownership docs → pending), admin queue + approve (→ `verified` + trust recompute + notification) / reject. |
 | `uploads` | Image pipeline (PROD-1): `POST /uploads/presign` → presigned S3/R2 PUT + public URL (content-type/size validated); `GET /uploads/config`. Config-gated; base64 fallback when unset. |
@@ -71,7 +71,7 @@
 | `common` | Global response-envelope interceptor + all-exceptions filter (Sentry-reporting). |
 | `health` | Liveness (`GET /health`) + **readiness** (`GET /health/ready`, pings Postgres + Redis, 503 when either is down). |
 
-**Tests:** 136 Jest (17 trust + 13 matching + 10 saved-search matcher + 13 verification + 16 reviews + 11 engagement + 5 admin-stats + 8 admin-users + 4 admin-audit + 8 admin-listings + 6 admin-content + 10 reports + 5 uploads + 5 sms + 2 health) + **19 e2e** (Supertest, real Postgres/Redis). 0 hand-written `any`. Strict `ValidationPipe` (whitelist + forbidNonWhitelisted).
+**Tests:** 141 Jest (17 trust + 13 matching + 10 saved-search matcher + 13 verification + 16 reviews + 11 engagement + 5 admin-stats + 8 admin-users + 4 admin-audit + 8 admin-listings + 6 admin-content + 5 admin-analytics + 10 reports + 5 uploads + 5 sms + 2 health) + **19 e2e** (Supertest, real Postgres/Redis). 0 hand-written `any`. Strict `ValidationPipe` (whitelist + forbidNonWhitelisted).
 
 **Schema:** 24 models, 23 enums, UUID PKs, snake_case `@map`, soft deletes (incl. content moderation), 30+ indexes/uniques. 6 migrations applied (bed-level/trust, saved-search-notification, geo-point, admin-audit-and-ban, reports, content-moderation). Idempotent seed (12 users, 7 properties).
 
