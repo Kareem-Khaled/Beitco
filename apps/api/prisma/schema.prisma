@@ -165,6 +165,11 @@ model User {
   renterReputation   Float?             @map("renter_reputation")
   renterReviewsCount Int                @default(0) @map("renter_reviews_count")
 
+  // ADMIN-2: operator can suspend an account. bannedAt set => login blocked +
+  // listings hidden; banReason surfaced to the user.
+  bannedAt  DateTime? @map("banned_at")
+  banReason String?   @map("ban_reason")
+
   notificationPrefs Json?          @map("notification_prefs")
   profile           RenterProfile?
 
@@ -629,4 +634,22 @@ model VerificationRequest {
   @@index([userId])
   @@index([status])
   @@map("verification_requests")
+}
+
+// ADMIN-12: an append-only record of every operator action (who did what to
+// whom, with optional before/after in meta). Read-only in the portal.
+model AdminAuditLog {
+  id         String   @id @default(uuid())
+  adminId    String   @map("admin_id")
+  adminName  String   @map("admin_name")
+  action     String // e.g. user.ban, user.verify, listing.takedown, review.remove
+  targetType String   @map("target_type") // user | listing | review | report | ...
+  targetId   String?  @map("target_id")
+  meta       Json? // reason, before/after, extra context
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([adminId])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+  @@map("admin_audit_logs")
 }

@@ -475,3 +475,55 @@ export type PlatformStats = {
     }[];
   };
 };
+
+// ADMIN-2: a row in the operator user table.
+export type AdminUser = {
+  id: string;
+  name: string;
+  phone: string;
+  role: string;
+  gender?: string;
+  avatar?: string;
+  isAdmin: boolean;
+  verified: boolean;
+  verificationStatus: string;
+  trust: number;
+  responseRate?: number;
+  renterReputation?: number;
+  renterReviewsCount: number;
+  banned: boolean;
+  bannedAt?: string;
+  banReason?: string;
+  createdAt: string;
+};
+
+export type AdminUserDetail = AdminUser & {
+  trustBreakdown?: TrustBreakdown;
+  counts: {
+    listings: number;
+    leads: number;
+    tenancies: number;
+    reviewsAuthored: number;
+    reviewsReceived: number;
+    threads: number;
+  };
+  verifications: {
+    id: string;
+    status: string;
+    rejectionReason?: string;
+    submittedAt: string;
+    reviewedAt?: string;
+  }[];
+};
+
+// ADMIN-12: an entry in the admin audit log.
+export type AdminAuditEntry = {
+  id: string;
+  adminId: string;
+  adminName: string;
+  action: string;
+  targetType: string;
+  targetId?: string;
+  meta?: Record<string, unknown>;
+  createdAt: string;
+};

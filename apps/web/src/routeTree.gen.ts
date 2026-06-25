@@ -43,6 +43,7 @@ import { Route as DashboardLeadsRouteImport } from './routes/dashboard/leads'
 import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
 import { Route as AuthProfileRouteImport } from './routes/auth/profile'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
 
 const TrustRoute = TrustRouteImport.update({
   id: '/trust',
@@ -214,6 +215,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -227,6 +233,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/trust': typeof TrustRoute
+  '/admin/users': typeof AdminUsersRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/profile': typeof AuthProfileRoute
   '/auth/verify': typeof AuthVerifyRoute
@@ -260,6 +267,7 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/trust': typeof TrustRoute
+  '/admin/users': typeof AdminUsersRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/profile': typeof AuthProfileRoute
   '/auth/verify': typeof AuthVerifyRoute
@@ -297,6 +305,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/trust': typeof TrustRoute
+  '/admin/users': typeof AdminUsersRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/profile': typeof AuthProfileRoute
   '/auth/verify': typeof AuthVerifyRoute
@@ -335,6 +344,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/trust'
+    | '/admin/users'
     | '/auth/login'
     | '/auth/profile'
     | '/auth/verify'
@@ -368,6 +378,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/trust'
+    | '/admin/users'
     | '/auth/login'
     | '/auth/profile'
     | '/auth/verify'
@@ -404,6 +415,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/trust'
+    | '/admin/users'
     | '/auth/login'
     | '/auth/profile'
     | '/auth/verify'
@@ -691,14 +703,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
   }
 }
 
 interface AdminRouteRouteChildren {
+  AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 

@@ -76,7 +76,7 @@
 > The control room for the **Beitco team** to run the marketplace (separate from the landlord dashboard). Full spec + API + new models in `.ai/ADMIN_PLAN.md`. Build order: ADMIN-12 → 2/3 → 4/5 → 6/9 → 7/8 → rest. Each ships as a vertical slice (endpoints + `AdminGuard` + audit log + `/admin/*` page + flag-aware FE + tests).
 
 - [~] **ADMIN-1 · Portal shell + overview.** 🔨 slice 1 done (June 25) — `/admin` portal + platform-overview dashboard (`GET /admin/stats`). _Remaining: migrate the moderation + KYC queues under `/admin`; a time-range filter._
-- [ ] **ADMIN-2 · User management** 🔴 — search/filter users; user detail (their listings/leads/tenancies/reviews/trust); actions: verify, **ban/reinstate**, make/revoke admin, role edit, trust override, view-as. (`GET/PATCH /admin/users…`, `+banReason` on User.)
+- [x] **ADMIN-2 · User management** 🔴 ✅ (June 25) — `/admin/users`: search (name/phone) + filter (role/status/verified/admins) + cursor pagination; user-detail sheet (activity counts + KYC history); actions: manual **verify/unverify** (recomputes trust), **ban/reinstate** (notifies the user), **make/revoke admin**, role + trust override. Self-action + admin-ban guards. Every mutation is **audit-logged** (ADMIN-12). Flag-aware mock. (`GET/PATCH /admin/users…`, `/ban` `/reinstate` `/make-admin` `/revoke-admin`; `+bannedAt/banReason` on User.) 15 unit tests; live-verified (ban→reinstate→audit).
 - [ ] **ADMIN-3 · Listing management** 🔴 — search/filter **all** listings (any status); **force-takedown** a published listing, pause, toggle verified, edit, delete. (`GET/PATCH /admin/listings…`, `/takedown`.)
 - [ ] **ADMIN-4 · Content moderation** 🟠 — remove fake/abusive **reviews** (→ recompute trust), Q&A, renter-reviews; soft-remove + reason. (`GET /admin/reviews`, `DELETE …`.)
 - [ ] **ADMIN-5 · Reports & abuse queue** 🟠 — a "report" button across the app + an operator triage queue. **New `Report` model.** (`POST /reports`, `GET/PATCH /admin/reports`.)
@@ -86,7 +86,7 @@
 - [ ] **ADMIN-9 · Analytics & insights** 🟡 — growth time-series, conversion funnel, supply/demand by area, trust histogram, CSV export. (`/admin/analytics/*`.)
 - [ ] **ADMIN-10 · Communications & broadcast** 🟢 — push an announcement/notification to a user segment; in-app banner. (`POST /admin/broadcast`.)
 - [ ] **ADMIN-11 · Platform config & ops** 🟢 — feature flags, areas/locations management, Meilisearch reindex trigger, system-health view, CMS copy.
-- [ ] **ADMIN-12 · Audit log & admin RBAC** 🔴 (do early) — log every admin action (who/what/when); split `isAdmin` into roles (super_admin/moderator/support/finance); admin roster + invite. **New `AdminAuditLog` model + `AdminRole`.**
+- [~] **ADMIN-12 · Audit log & admin RBAC** 🔴 (do early) — ✅ **audit log done** (June 25): an `AdminAuditLog` model + `AdminAuditService` records every operator mutation (who/what/target/meta), best-effort (never breaks the action); `GET /admin/audit` (filter + paginate). _Remaining: split `isAdmin` into roles (super_admin/moderator/support/finance) + an admin-roster UI._
 - [ ] **ADMIN-13 · Support & disputes** 🟢 — per-user activity timeline, dispute-resolution workflow, internal notes.
 
 

@@ -23,6 +23,8 @@ import type {
   ResponseEvent,
   RenterReview,
   PlatformStats,
+  AdminUser,
+  AdminUserDetail,
 } from "./types";
 import {
   computeListingTrust,
@@ -520,6 +522,125 @@ export function getPlatformStats(): PlatformStats {
         })),
     },
   };
+}
+
+// ---------- Admin: user management (ADMIN-2, mock) ----------
+type BannableUser = User & { bannedAt?: string; banReason?: string };
+
+function toAdminUser(u: BannableUser): AdminUser {
+  return {
+    id: u.id,
+    name: u.name,
+    phone: u.phone,
+    role: u.role,
+    avatar: u.avatar,
+    isAdmin: !!u.isAdmin,
+    verified: !!u.verified,
+    verificationStatus: u.verificationStatus ?? (u.verified ? "verified" : "unverified"),
+    trust: u.trust,
+    responseRate: u.responseRate,
+    renterReputation: u.renterReputation,
+    renterReviewsCount: u.renterReviewsCount ?? 0,
+    banned: !!u.bannedAt,
+    bannedAt: u.bannedAt,
+    banReason: u.banReason,
+    createdAt: u.createdAt,
+  };
+}
+
+export function getAdminUsers(params: {
+  q?: string;
+  role?: string;
+  status?: string;
+  verified?: string;
+  admins?: string;
+}): AdminUser[] {
+  ensureSeeded();
+  let users = readJSON<BannableUser[]>(STORAGE_KEYS.users, seedUsers);
+  const q = params.q?.trim().toLowerCase();
+  if (q) users = users.filter((u) => u.name.toLowerCase().includes(q) || u.phone.includes(q));
+  if (params.role) users = users.filter((u) => u.role === params.role);
+  if (params.verified === "true") users = users.filter((u) => u.verified);
+  if (params.verified === "false") users = users.filter((u) => !u.verified);
+  if (params.admins === "true") users = users.filter((u) => u.isAdmin);
+  if (params.status === "banned") users = users.filter((u) => !!u.bannedAt);
+  if (params.status === "active") users = users.filter((u) => !u.bannedAt);
+  if (params.status === "pending") users = users.filter((u) => u.verificationStatus === "pending");
+  return users
+    .slice()
+    .sort((a, b) => +new Date(b.createdAt ?? 0) - +new Date(a.createdAt ?? 0))
+    .map(toAdminUser);
+}
+
+export function getAdminUser(id: string): AdminUserDetail | undefined {
+  ensureSeeded();
+  const users = readJSON<BannableUser[]>(STORAGE_KEYS.users, seedUsers);
+  const u = users.find((x) => x.id === id);
+  if (!u) return undefined;
+  const props = getAllProperties();
+  const leads = readJSON<Lead[]>(STORAGE_KEYS.leads, []);
+  const tenancies = readJSON<Tenancy[]>(STORAGE_KEYS.tenancies, []);
+  const threads = readJSON<Thread[]>(STORAGE_KEYS.threads, []);
+  const reviewsAuthored = props.reduce(
+    (n, p) => n + (p.reviews?.filter((r) => r.author === u.name).length ?? 0),
+    0,
+  );
+  return {
+    ...toAdminUser(u),
+    trustBreakdown: u.trustBreakdown,
+    counts: {
+      listings: props.filter((p) => p.ownerId === id).length,
+      leads: leads.filter((l) => l.renterId === id).length,
+      tenancies: tenancies.filter((t) => t.userId === id).length,
+      reviewsAuthored,
+      reviewsReceived: u.renterReviewsCount ?? 0,
+      threads: threads.filter((t) => t.ownerId === id || t.renterId === id).length,
+    },
+    verifications: [],
+  };
+}
+
+function mutateAdminUser(id: string, fn: (u: BannableUser) => void): AdminUserDetail | undefined {
+  const users = readJSON<BannableUser[]>(STORAGE_KEYS.users, seedUsers);
+  const idx = users.findIndex((u) => u.id === id);
+  if (idx < 0) return undefined;
+  fn(users[idx]);
+  writeJSON(STORAGE_KEYS.users, users);
+  return getAdminUser(id);
+}
+
+export function adminUpdateUser(
+  id: string,
+  patch: { role?: string; verified?: boolean; trust?: number },
+): AdminUserDetail | undefined {
+  return mutateAdminUser(id, (u) => {
+    if (patch.role) u.role = patch.role as User["role"];
+    if (patch.verified != null) {
+      u.verified = patch.verified;
+      u.verificationStatus = patch.verified ? "verified" : "unverified";
+    }
+    if (patch.trust != null) u.trust = patch.trust;
+  });
+}
+
+export function adminUserAction(
+  id: string,
+  action: "ban" | "reinstate" | "make-admin" | "revoke-admin",
+  reason?: string,
+): AdminUserDetail | undefined {
+  return mutateAdminUser(id, (u) => {
+    if (action === "ban") {
+      u.bannedAt = new Date().toISOString();
+      u.banReason = reason?.trim() || "مخالفة شروط الاستخدام.";
+    } else if (action === "reinstate") {
+      u.bannedAt = undefined;
+      u.banReason = undefined;
+    } else if (action === "make-admin") {
+      u.isAdmin = true;
+    } else if (action === "revoke-admin") {
+      u.isAdmin = false;
+    }
+  });
 }
 
 // ---------- Threads ----------

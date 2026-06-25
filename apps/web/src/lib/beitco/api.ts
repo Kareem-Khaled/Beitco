@@ -467,6 +467,73 @@ export async function apiAdminStats(): Promise<import("./types").PlatformStats> 
   return body.data;
 }
 
+// ── Admin: user management (ADMIN-2) ────────────────────────────────────────
+export type AdminUsersParams = {
+  q?: string;
+  role?: string;
+  status?: string;
+  verified?: string;
+  admins?: string;
+  cursor?: string;
+  limit?: number;
+};
+
+function adminUsersQuery(p: AdminUsersParams): string {
+  const s = new URLSearchParams();
+  if (p.q) s.set("q", p.q);
+  if (p.role) s.set("role", p.role);
+  if (p.status) s.set("status", p.status);
+  if (p.verified) s.set("verified", p.verified);
+  if (p.admins) s.set("admins", p.admins);
+  if (p.cursor) s.set("cursor", p.cursor);
+  if (p.limit != null) s.set("limit", String(p.limit));
+  const q = s.toString();
+  return q ? `?${q}` : "";
+}
+
+export async function apiAdminUsers(
+  params: AdminUsersParams = {},
+): Promise<{ items: import("./types").AdminUser[]; cursor: string | null; hasMore: boolean }> {
+  const body = await getJSON<import("./types").AdminUser[]>(
+    `/admin/users${adminUsersQuery(params)}`,
+  );
+  return {
+    items: body.data,
+    cursor: body.meta?.cursor ?? null,
+    hasMore: body.meta?.hasMore ?? false,
+  };
+}
+
+export async function apiAdminUser(id: string): Promise<import("./types").AdminUserDetail> {
+  const body = await getJSON<import("./types").AdminUserDetail>(
+    `/admin/users/${encodeURIComponent(id)}`,
+  );
+  return body.data;
+}
+
+export async function apiAdminUpdateUser(
+  id: string,
+  patch: { role?: string; verified?: boolean; trust?: number; reason?: string },
+): Promise<import("./types").AdminUserDetail> {
+  const body = await patchJSON<import("./types").AdminUserDetail>(
+    `/admin/users/${encodeURIComponent(id)}`,
+    patch,
+  );
+  return body.data;
+}
+
+export async function apiAdminUserAction(
+  id: string,
+  action: "ban" | "reinstate" | "make-admin" | "revoke-admin",
+  payload?: { reason: string },
+): Promise<import("./types").AdminUserDetail> {
+  const body = await postJSON<import("./types").AdminUserDetail>(
+    `/admin/users/${encodeURIComponent(id)}/${action}`,
+    payload,
+  );
+  return body.data;
+}
+
 // ── Matching (T-MATCH) ──────────────────────────────────────────────────────
 export async function apiGetMatches(): Promise<
   { property: import("./types").PropertySummary; match: import("./matching").MatchResult }[]

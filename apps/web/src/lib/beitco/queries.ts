@@ -37,6 +37,10 @@ import {
   getPendingListings,
   getPendingListingsCount,
   getPlatformStats,
+  getAdminUsers,
+  getAdminUser,
+  adminUpdateUser as storeAdminUpdateUser,
+  adminUserAction as storeAdminUserAction,
   approveListing as storeApproveListing,
   rejectListing as storeRejectListing,
   getMatchesForUser,
@@ -77,6 +81,11 @@ import {
   apiListPendingListings,
   apiModerationCount,
   apiAdminStats,
+  apiAdminUsers,
+  apiAdminUser,
+  apiAdminUpdateUser,
+  apiAdminUserAction,
+  type AdminUsersParams,
   apiApproveListing,
   apiRejectListing,
   apiGetMatches,
@@ -109,6 +118,8 @@ import type {
   Thread,
   Message,
   PlatformStats,
+  AdminUser,
+  AdminUserDetail,
 } from "./types";
 import type { MatchResult } from "./matching";
 
@@ -550,6 +561,52 @@ export function useAdminStats() {
     initialData: USE_API ? undefined : () => getPlatformStats(),
     staleTime: USE_API ? 30_000 : Infinity,
   });
+}
+
+// ADMIN-2: operator user management.
+export function useAdminUsers(params: AdminUsersParams) {
+  return useQuery<AdminUser[]>({
+    queryKey: ["adminUsers", params, { source: USE_API ? "api" : "mock" }],
+    queryFn: async () => {
+      if (USE_API) {
+        const { items } = await apiAdminUsers(params);
+        return items;
+      }
+      return getAdminUsers(params);
+    },
+    initialData: USE_API ? undefined : () => getAdminUsers(params),
+    staleTime: USE_API ? 15_000 : Infinity,
+  });
+}
+
+export function useAdminUser(id: string | undefined) {
+  return useQuery<AdminUserDetail | undefined>({
+    queryKey: ["adminUser", id, { source: USE_API ? "api" : "mock" }],
+    enabled: !!id,
+    queryFn: async () => {
+      if (!id) return undefined;
+      return USE_API ? apiAdminUser(id) : getAdminUser(id);
+    },
+    initialData: USE_API || !id ? undefined : () => getAdminUser(id),
+    staleTime: USE_API ? 10_000 : Infinity,
+  });
+}
+
+export async function adminUpdateUser(
+  id: string,
+  patch: { role?: string; verified?: boolean; trust?: number; reason?: string },
+): Promise<AdminUserDetail | undefined> {
+  if (USE_API) return apiAdminUpdateUser(id, patch);
+  return storeAdminUpdateUser(id, patch);
+}
+
+export async function adminUserAction(
+  id: string,
+  action: "ban" | "reinstate" | "make-admin" | "revoke-admin",
+  reason?: string,
+): Promise<AdminUserDetail | undefined> {
+  if (USE_API) return apiAdminUserAction(id, action, reason ? { reason } : undefined);
+  return storeAdminUserAction(id, action, reason);
 }
 
 export async function approveListing(id: string): Promise<void> {

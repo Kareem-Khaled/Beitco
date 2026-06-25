@@ -33,7 +33,7 @@ Operator portal + platform-overview dashboard. Remaining polish: migrate the mod
 
 ---
 
-### ADMIN-2 · User management 🔴
+### ADMIN-2 · User management 🔴 — ✅ done (June 25)
 **Goal:** find any user and act on them.
 - **Browse/search/filter** users — by name/phone, role (renter/owner/both), status (verified/pending/unverified/banned), `isAdmin`; sort by joined/trust; cursor-paginated.
 - **User detail** — profile + counts (listings, leads, tenancies, reviews given/received, threads), trust + breakdown, KYC history, join date, last activity.
@@ -108,8 +108,8 @@ Operator portal + platform-overview dashboard. Remaining polish: migrate the mod
 - **System health** — surface `/health/ready` (DB/Redis) + (later) BullMQ job status.
 - **CMS** — edit help/terms/FAQ copy.
 
-### ADMIN-12 · Audit log & admin RBAC 🔴 (do early)
-**Goal:** accountability + least-privilege for the team. **Should land alongside ADMIN-2/3** so every destructive action is recorded from day one.
+### ADMIN-12 · Audit log & admin RBAC 🔴 (do early) — 🔨 audit log done (June 25)
+**Goal:** accountability + least-privilege for the team. **Should land alongside ADMIN-2/3** so every destructive action is recorded from day one. — **`AdminAuditLog` + `AdminAuditService` shipped** (every ADMIN-2 mutation logs; `GET /admin/audit`); **RBAC roles still TODO.**
 - **Audit log** — every admin action (who, what, target, before/after, when). Read-only, filterable.
 - **Admin roles** — replace the single `isAdmin` bool with levels: `super_admin` (everything incl. billing + admin management), `moderator` (listings/reviews/reports), `support` (users/view-as, no destructive), `finance` (billing read).
 - **Admin management** — invite/grant/revoke admin, see the admin roster.
