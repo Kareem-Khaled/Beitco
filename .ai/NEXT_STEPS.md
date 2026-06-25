@@ -24,7 +24,7 @@
 | Accessibility / RTL | **80** | 83 aria uses, logical-CSS clean; no a11y automation, no i18n seam |
 | Performance & scale | **79** | Indexes+cache+cursors+GiST; synchronous fan-out; no load test |
 | Observability & Ops | **78** | pino + Sentry + readiness; **no metrics/tracing/alerting** |
-| **Testing & QA** | **84** | e2e (19) + **182 API unit** + **52 web** (logic + mock data layer + Testing-Library component tests) + a CI coverage floor |
+| **Testing & QA** | **85** | e2e (19) + **182 API unit** + **62 web** (logic + mock data layer + component renders + a real ReportButton interaction) + a CI coverage floor |
 
 **The two gates to "confidently in production":** raise **Testing** (≈9 heavy service specs + web component tests + a coverage floor) and stand up a **real deploy host**. Neither is a rewrite. See `.ai/PROD_READINESS.md`.
 
@@ -111,7 +111,7 @@
 P0→P2 hardening is done; the operator portal is built (ADMIN-1…5, 9, 12). To move from "feature-complete + hardened" to "confidently in production," in order:
 
 1. **TEST-1 (✅ done June 25) · Service unit tests + coverage floor.** Every service with real logic now has a mocked-Prisma spec — `verification`, `reviews`, `engagement`, `admin-*`, `reports`, `uploads`, `sms`, **+ `listings`, `users`, `trust`, `notifications`, `matching`, `search`** (182 unit). A **CI coverage floor** (`coverageThreshold` in `jest.config.js`, run in the `quality` job) blocks regressions. _Thin/by-design remaining: `auth`, `chat`, `listings.write` are covered by the 19 e2e + can get specs later._
-2. **TEST-3 (✅ first pass June 25) · Web component tests.** Stood up `@testing-library/react` + jsdom (own `vitest.config.ts` + setup), then **+21 tests**: the **flag-aware mock data layer** (browse + admin users/listings/content/analytics filters + takedown/restore round-trips) and **component renders** (TrustBadge tone branches, EmptyState). 52 web tests total. _Next: cover `property.$id` actions + the listing wizard validation (need Router/Query test wrappers)._
+2. **TEST-3 (✅ June 25) · Web component tests.** Stood up `@testing-library/react` + jsdom (own `vitest.config.ts` + setup), then **+31 tests** (31→62): the **flag-aware mock data layer** (browse + admin users/listings/content/analytics filters + takedown/restore round-trips), **component renders** (TrustBadge tone branches, EmptyState, BeitcoListingCard), and a **real interaction** (ReportButton: logged-out→login redirect; logged-in→dialog→reason→submit→mock-store write asserted). _Next slice (optional): the listing wizard's step validation + `property.$id` actions._
 3. **DEPLOY-1 · A real deploy host** — `deploy-staging` is still 6 placeholder lines. Wire it to an actual target (Fly/Render/Railway/k8s): apply the image tag → `prisma migrate deploy` → gate on `/health/ready`. **The last hard blocker.**
 4. **POLISH-2** (resolve/delete the 3 empty `@beitco/*` packages) + remove **`_unported/`** (1,082 LOC dead) — cheap clutter cleanup.
 5. **Admin tail** (optional, by value): **ADMIN-12 RBAC roles** (split `isAdmin` → super_admin/moderator/support/finance so the audit log ties to roles), **ADMIN-6** (trust override + fraud signals), **ADMIN-7** (leads/tenancies oversight), **ADMIN-8** (billing, needs PAY-1), ADMIN-10/11/13.
