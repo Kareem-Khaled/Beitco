@@ -104,7 +104,7 @@ Treat this section as the source of truth over any `@RequireTier` references els
 
 - **Security / shippable / observability:** ✅ done — secrets fail-fast + `helmet` + readiness (DB+Redis) + OTP throttle; API ESLint + CI/CD + Dockerfiles; e2e suite (19); structured pino logs + Sentry.
 - **Product:** ✅ image-upload pipeline (PROD-1), real OTP/SMS gateway (PROD-2), Meilisearch (PROD-3), PostGIS geo (PROD-4), verification/KYC (PROD-5).
-- **Still open (optional):** **Launch blockers** — a real deploy host (DEPLOY-1) + service/web test depth (TEST-1/TEST-3); see `.ai/PROD_READINESS.md`. **P3 polish** — decompose the two monolith FE files, resolve the 3 empty shared packages, a BullMQ worker for saved-search alerts, the occupant-link consent flow, a11y automation. **P4 business** — payments (Paymob/Stripe EGP) + Capacitor mobile wrap.
+- **Still open (optional):** **Launch blocker** — a real deploy host (DEPLOY-1); see `.ai/PROD_READINESS.md`. _(TEST-1 service specs + a CI coverage floor and TEST-3 web component tests are done; the empty shared packages + `_unported/` are deleted.)_ **P3 polish** — decompose the monolith FE files, a BullMQ worker for saved-search alerts, the occupant-link consent flow, a11y automation, the admin tail (RBAC roles, trust controls, billing). **P4 business** — payments (Paymob/Stripe EGP) + Capacitor mobile wrap.
 
 ---
 

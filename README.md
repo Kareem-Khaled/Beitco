@@ -59,7 +59,6 @@ Beitco/
 ├── apps/
 │   ├── web/              ← TanStack Start frontend (live, fully wired)
 │   └── api/              ← NestJS backend (live, 16 modules)
-├── packages/             ← shared type/util/validator stubs (unused — see POLISH-2)
 ├── .ai/                  ← strategy + engineering docs (source of truth)
 ├── .github/workflows/    ← CI/CD (quality · e2e · docker · release)
 ├── docker-compose.yml    ← local services

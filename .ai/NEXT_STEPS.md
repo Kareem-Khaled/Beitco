@@ -19,7 +19,7 @@
 | Security & Auth | **88** | httpOnly+rotation, env fail-fast, helmet, throttle; no CSRF token yet |
 | Product completeness / UX | **87** | Full loop + trust wedge + real operator tooling |
 | Frontend | **86** | SSR, error boundary+404, **RTL logical-CSS clean**; monolith files remain |
-| Architecture / monorepo | **85** | Clean flag pattern; dead weight (3 empty packages + `_unported/` + monoliths) |
+| Architecture / monorepo | **88** | Clean flag pattern; dead weight removed (empty packages + `_unported/` gone); 5 monolith files remain |
 | DevOps / Deployment | **82** | Great CI; **deploy job is still a placeholder** (no live host) |
 | Accessibility / RTL | **80** | 83 aria uses, logical-CSS clean; no a11y automation, no i18n seam |
 | Performance & scale | **79** | Indexes+cache+cursors+GiST; synchronous fan-out; no load test |
@@ -93,7 +93,7 @@
 
 
 - [ ] **POLISH-1 · Decompose monolith files.** `list/new.tsx` (2,290 LOC) and `property.$id.tsx` (1,454 LOC) → step/section components.
-- [ ] **POLISH-2 · Shared packages or delete them.** `@beitco/types|utils|validators` have **0 imports**; types are duplicated between `apps/web/lib/beitco/types.ts` and the API serializers. Either make them the shared contract or remove them.
+- [x] **POLISH-2 · Shared packages or delete them.** ✅ (June 25) The `@beitco/types|utils|validators` packages held **pre-pivot social-network types** (post/comment/group/video/feed) with **0 imports** anywhere — deleted (`packages/` removed, the 3 `workspace:*` deps dropped from `apps/api`, `pnpm-workspace.yaml` → `apps/*` only). Also removed **`apps/api/src/_unported/`** (1,082 LOC of dead pre-pivot modules, already excluded from both tsconfigs). The frontend `lib/beitco/types.ts` + the API serializers remain the shape contract. Verified: 182 API unit + 19 e2e + 62 web green; both apps `tsc`/`build` clean.
 - [x] **POLISH-3 · RedisModule provider.** ✅ (June 24) New `@Global()` `RedisModule` + `RedisService` (one lazily-connected `ioredis` client; eager connect at boot with graceful degradation; a **live `ready` getter** = `status === 'ready'`; a `ping()` for the readiness probe). `auth`, `notifications`, and `health` now inject it instead of each `new Redis(...)`-ing their own — `ioredis` is imported in **exactly one file**. auth/notifications keep their call sites via a private `redis` getter (→ `redisService.client`) and gate on `redisService.ready`; health delegates to `redis.ping()`. Bonus: the live `ready` getter means a post-boot outage now degrades with the friendly message (the old per-service boot flag went stale), and recovery is auto-detected. Verified: tsc/build/lint clean, 52 unit + 19 e2e green, live boot "Redis connected" + `/health/ready` redis:up + OTP send/verify both work through the shared client.
 - [ ] **POLISH-4 · BullMQ worker for saved-search alerts.** `notifyForNewListing` scans all saved searches synchronously on publish (correct + instant now). Move to a queue before volume grows.
 - [ ] **POLISH-5 · Occupant-link consent flow.** Owner registers a tenant on a bed/room → renter confirms the link (the `link` notification type + `LinkStatus` exist; the action flow isn't wired).
@@ -113,7 +113,7 @@ P0→P2 hardening is done; the operator portal is built (ADMIN-1…5, 9, 12). To
 1. **TEST-1 (✅ done June 25) · Service unit tests + coverage floor.** Every service with real logic now has a mocked-Prisma spec — `verification`, `reviews`, `engagement`, `admin-*`, `reports`, `uploads`, `sms`, **+ `listings`, `users`, `trust`, `notifications`, `matching`, `search`** (182 unit). A **CI coverage floor** (`coverageThreshold` in `jest.config.js`, run in the `quality` job) blocks regressions. _Thin/by-design remaining: `auth`, `chat`, `listings.write` are covered by the 19 e2e + can get specs later._
 2. **TEST-3 (✅ June 25) · Web component tests.** Stood up `@testing-library/react` + jsdom (own `vitest.config.ts` + setup), then **+31 tests** (31→62): the **flag-aware mock data layer** (browse + admin users/listings/content/analytics filters + takedown/restore round-trips), **component renders** (TrustBadge tone branches, EmptyState, BeitcoListingCard), and a **real interaction** (ReportButton: logged-out→login redirect; logged-in→dialog→reason→submit→mock-store write asserted). _Next slice (optional): the listing wizard's step validation + `property.$id` actions._
 3. **DEPLOY-1 · A real deploy host** — `deploy-staging` is still 6 placeholder lines. Wire it to an actual target (Fly/Render/Railway/k8s): apply the image tag → `prisma migrate deploy` → gate on `/health/ready`. **The last hard blocker.**
-4. **POLISH-2** (resolve/delete the 3 empty `@beitco/*` packages) + remove **`_unported/`** (1,082 LOC dead) — cheap clutter cleanup.
+4. **POLISH-2** ✅ done (deleted the 3 empty `@beitco/*` packages + `_unported/`).
 5. **Admin tail** (optional, by value): **ADMIN-12 RBAC roles** (split `isAdmin` → super_admin/moderator/support/finance so the audit log ties to roles), **ADMIN-6** (trust override + fraud signals), **ADMIN-7** (leads/tenancies oversight), **ADMIN-8** (billing, needs PAY-1), ADMIN-10/11/13.
 6. Then **P3** (POLISH-1 monoliths, POLISH-4 BullMQ, POLISH-5 occupant-link, POLISH-6 a11y) and **P4** (payments, mobile) as capacity allows.
 

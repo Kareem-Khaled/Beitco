@@ -13,11 +13,11 @@ A **Turborepo + pnpm** monorepo:
 apps/
   web/   TanStack Start (Vite + React 19) — the Arabic-RTL frontend
   api/   NestJS 11 — the trust-first marketplace API
-packages/
-  types/ utils/ validators/   shared libs (currently UNUSED — see POLISH-2)
 infra:   docker-compose.yml  (Postgres 16+PostGIS, Redis 7, Meilisearch v1.11)
 .ai/     the documentation / knowledge base
 ```
+
+> A monorepo with no shared `packages/` today — the frontend `lib/beitco/types.ts` is the shape spec, the API serializers mirror it (the pre-pivot `@beitco/*` packages were unused and removed, POLISH-2). Add a shared package later only if a real contract emerges.
 
 Run: `pnpm web` (→ :8080) · `pnpm api` (→ :3001) · `pnpm dev` (both).
 
