@@ -71,7 +71,7 @@
 | `common` | Global response-envelope interceptor + all-exceptions filter (Sentry-reporting). |
 | `health` | Liveness (`GET /health`) + **readiness** (`GET /health/ready`, pings Postgres + Redis, 503 when either is down). |
 
-**Tests:** 187 Jest unit + **20 e2e** (Supertest, real Postgres/Redis; incl. the BUG-1 ban-lockout flow). Every service with real logic now has a mocked-Prisma spec. A **CI coverage floor** (`jest.config.js` `coverageThreshold`, ~57% stmts/45% branches on the logic files) blocks regressions. 0 hand-written `any`. Strict `ValidationPipe` (whitelist + forbidNonWhitelisted).
+**Tests:** 189 Jest unit + **20 e2e** (Supertest, real Postgres/Redis; incl. the BUG-1 ban-lockout flow). Every service with real logic now has a mocked-Prisma spec. A **CI coverage floor** (`jest.config.js` `coverageThreshold`, ~57% stmts/45% branches on the logic files) blocks regressions. 0 hand-written `any`. Strict `ValidationPipe` (whitelist + forbidNonWhitelisted).
 
 **Schema:** 24 models, 23 enums, UUID PKs, snake_case `@map`, soft deletes (incl. content moderation), 30+ indexes/uniques. 6 migrations applied (bed-level/trust, saved-search-notification, geo-point, admin-audit-and-ban, reports, content-moderation). Idempotent seed (12 users, 7 properties).
 
@@ -93,7 +93,7 @@ Treat this section as the source of truth over any `@RequireTier` references els
 ## Infra (`docker-compose.yml`)
 
 - **Postgres 16 + PostGIS** (`beitco-postgres`). Dev runs on **host port 5433** via the gitignored `docker-compose.override.yml` (a native Postgres occupies 5432). A trigger-maintained, **GiST-indexed `geog` column** (derived from `lat`/`lng`) powers `ST_DWithin` radius search (PROD-4).
-- **Redis 7** (`beitco-redis`) — OTP store + notification last-seen marker.
+- **Redis 7** (`beitco-redis`) — OTP store + notification last-seen marker + **BullMQ** queue backend (SCALE-1 saved-search fan-out worker).
 - **Meilisearch v1.11** (`beitco-meilisearch`) — **integrated** (PROD-3): typo-tolerant, Arabic-aware `?q=` with relevance ordering + a DB `contains` fallback when it's unreachable/unset.
 
 ---

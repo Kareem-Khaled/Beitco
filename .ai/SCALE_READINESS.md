@@ -31,9 +31,9 @@
 
 ## 🟠 Will break at "thousands" — before public launch
 
-### SCALE-1 · Async the saved-search fan-out (BullMQ) — was POLISH-4
-**Severity: high at volume · Effort: ~1 day.** On publish, `notifyForNewListing` loads **every** `savedSearch` into memory (no limit), loops in JS, and does a **sequential** `findFirst` + `create` per match (N+1 awaited in a loop). Fine at 100s; at 1,000s a publish blocks for seconds + hammers Postgres.
-- **Fix:** a **BullMQ** queue — publish enqueues `{propertyId}`; a worker does the matching + inserts in batches. Needs a shared Redis (already have `RedisModule`). Add a `dead-letter` + retry. This also unblocks future async work (emails, SMS campaigns, reindex).
+### SCALE-1 · Async the saved-search fan-out (BullMQ) — was POLISH-4 — ✅ DONE (June 25)
+**Severity: high at volume · Effort: ~1 day.** On publish, `notifyForNewListing` loaded **every** `savedSearch` into memory, looped in JS, and did a **sequential** `findFirst` + `create` per match (N+1 awaited in a loop). Fine at 100s; at 1,000s a publish blocked for seconds + hammered Postgres.
+- **Fixed:** a new **`FanoutService`** (BullMQ) — `listings.write.publish` + `admin.approve` now call `fanout.enqueue(propertyId)` instead of awaiting the matcher, so the publish response returns immediately. A background **Worker** (`saved-search-alerts` queue, concurrency 5, `attempts: 3` + exponential backoff + `removeOnComplete`) runs the existing `notifyForNewListing` off the request path. **Config-gated:** with no `REDIS_URL` (or if a job fails to enqueue) it runs the matcher **inline** — so dev/CI/e2e/mock deliver alerts with zero setup. BullMQ uses its own connection (`maxRetriesPerRequest: null`, separate from the shared `RedisService`). The e2e is now poll-tolerant (the alert is eventually-consistent). 189 unit + 20 e2e green.
 
 ### SCALE-2 · Paginate / cap the unbounded reads — ✅ DONE (June 25)
 **Severity: high at volume · Effort: ~1 day.** ~30 of 37 `findMany` calls had **no `take`** — the notification feed, owner leads, saved searches, chat threads. A power user (or scraper) with thousands of rows turned one request into a full scan.

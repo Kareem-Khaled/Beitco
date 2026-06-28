@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { TrustService } from '../trust/trust.service';
-import { NotificationsService } from '../notifications/notifications.service';
+import { FanoutService } from '../notifications/fanout.service';
 import { SearchService } from '../search/search.service';
 import { serializeProperty, type PropertyRow } from './listings.serializer';
 import { CreateListingDto, ManageListingDto } from './dto/create-listing.dto';
@@ -56,7 +56,7 @@ export class ListingsWriteService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly trust: TrustService,
-    private readonly notifications: NotificationsService,
+    private readonly fanout: FanoutService,
     private readonly search: SearchService,
   ) {}
 
@@ -125,9 +125,10 @@ export class ListingsWriteService {
     // Fresh listing: compute its real trust from (zero) reviews + owner signal.
     await this.trust.recomputeListing(created.id);
     // If it went live immediately (verified/admin owner), alert matching saved
-    // searches now. Best-effort -- never blocks the create response.
+    // searches. SCALE-1: enqueued to a worker (inline fallback w/o Redis), so
+    // the create response never blocks on the fan-out.
     if (status === 'published') {
-      await this.notifications.notifyForNewListing(created.id);
+      await this.fanout.enqueue(created.id);
     }
     await this.search.indexById(created.id); // PROD-3: keep the search index in sync
     const fresh = await this.findRow(created.id);

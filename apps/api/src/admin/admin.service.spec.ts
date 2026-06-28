@@ -1,6 +1,6 @@
 import { PrismaService } from '../prisma/prisma.service';
 import { TrustService } from '../trust/trust.service';
-import { NotificationsService } from '../notifications/notifications.service';
+import { FanoutService } from '../notifications/fanout.service';
 import { SearchService } from '../search/search.service';
 import { AdminService } from './admin.service';
 
@@ -65,7 +65,7 @@ function makePrisma() {
 function makeStubs() {
   return {
     trust: {} as unknown as TrustService,
-    notifications: {} as unknown as NotificationsService,
+    fanout: {} as unknown as FanoutService,
     search: {} as unknown as SearchService,
   };
 }
@@ -94,11 +94,11 @@ describe('AdminService.platformStats', () => {
     (prisma.user.count as Mock).mockResolvedValue(12);
     (prisma.property.count as Mock).mockResolvedValue(9);
 
-    const { trust, notifications, search } = makeStubs();
+    const { trust, fanout, search } = makeStubs();
     service = new AdminService(
       prisma as unknown as PrismaService,
       trust,
-      notifications,
+      fanout,
       search,
     );
   });

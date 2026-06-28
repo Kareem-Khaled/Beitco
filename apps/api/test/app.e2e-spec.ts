@@ -363,12 +363,18 @@ describe('Beitco API (e2e)', () => {
         .expect(201);
       createdPropertyIds.push(created.body.data.id);
 
-      // The renter's feed now contains a saved_search alert for it.
-      const feed = await renterAgent.get('/api/v1/me/notifications').expect(200);
-      const alerts = (feed.body.data.items as { type: string; propertyId?: string }[]).filter(
-        (n) => n.type === 'saved_search',
-      );
-      expect(alerts.some((a) => a.propertyId === created.body.data.id)).toBe(true);
+      // The fan-out is async now (SCALE-1: BullMQ worker), so poll briefly for
+      // the alert to land in the renter's feed.
+      let found = false;
+      for (let i = 0; i < 20 && !found; i++) {
+        const feed = await renterAgent.get('/api/v1/me/notifications').expect(200);
+        const alerts = (feed.body.data.items as { type: string; propertyId?: string }[]).filter(
+          (n) => n.type === 'saved_search',
+        );
+        found = alerts.some((a) => a.propertyId === created.body.data.id);
+        if (!found) await new Promise((r) => setTimeout(r, 100));
+      }
+      expect(found).toBe(true);
     });
   });
 
