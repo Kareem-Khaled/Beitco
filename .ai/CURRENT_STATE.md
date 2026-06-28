@@ -71,7 +71,7 @@
 | `common` | Global response-envelope interceptor + all-exceptions filter (Sentry-reporting). |
 | `health` | Liveness (`GET /health`) + **readiness** (`GET /health/ready`, pings Postgres + Redis, 503 when either is down). |
 
-**Tests:** 182 Jest unit + **20 e2e** (Supertest, real Postgres/Redis; incl. the BUG-1 ban-lockout flow). Every service with real logic now has a mocked-Prisma spec. A **CI coverage floor** (`jest.config.js` `coverageThreshold`, ~57% stmts/45% branches on the logic files) blocks regressions. 0 hand-written `any`. Strict `ValidationPipe` (whitelist + forbidNonWhitelisted).
+**Tests:** 187 Jest unit + **20 e2e** (Supertest, real Postgres/Redis; incl. the BUG-1 ban-lockout flow). Every service with real logic now has a mocked-Prisma spec. A **CI coverage floor** (`jest.config.js` `coverageThreshold`, ~57% stmts/45% branches on the logic files) blocks regressions. 0 hand-written `any`. Strict `ValidationPipe` (whitelist + forbidNonWhitelisted).
 
 **Schema:** 24 models, 23 enums, UUID PKs, snake_case `@map`, soft deletes (incl. content moderation), 30+ indexes/uniques. 6 migrations applied (bed-level/trust, saved-search-notification, geo-point, admin-audit-and-ban, reports, content-moderation). Idempotent seed (12 users, 7 properties).
 

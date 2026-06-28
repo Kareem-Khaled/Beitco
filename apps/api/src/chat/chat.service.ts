@@ -34,6 +34,7 @@ export class ChatService {
     const rows = await this.prisma.thread.findMany({
       where: { OR: [{ ownerId: userId }, { renterId: userId }] },
       orderBy: { lastMessageAt: 'desc' },
+      take: 200, // SCALE-2: cap the conversation list (newest first).
       include: {
         property: threadProperty,
         messages: { orderBy: { createdAt: 'desc' }, take: 1 },
@@ -49,13 +50,16 @@ export class ChatService {
       where: { id: threadId },
       include: {
         property: threadProperty,
-        messages: { orderBy: { createdAt: 'asc' } },
+        // SCALE-2: bound the history to the most recent 500, then restore
+        // chronological order — a runaway thread can't pull unbounded rows.
+        messages: { orderBy: { createdAt: 'desc' }, take: 500 },
       },
     });
     if (!thread) throw new NotFoundException({ code: 'THREAD_NOT_FOUND', message: 'المحادثة دي مش موجودة.' });
     if (thread.ownerId !== userId && thread.renterId !== userId) {
       throw new ForbiddenException({ code: 'NOT_PARTICIPANT', message: 'مش من حقك تشوف المحادثة دي.' });
     }
+    thread.messages.reverse(); // back to ascending (oldest first) for display.
     // Mark read for the viewer.
     if (thread.unreadForId === userId) {
       await this.prisma.thread.update({ where: { id: threadId }, data: { unreadForId: null } });

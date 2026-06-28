@@ -102,6 +102,16 @@ describe('NotificationsService', () => {
       const feed = await service.feed('r1');
       expect(feed[0]?.id).toBe('new');
     });
+
+    it('SCALE-2: caps every per-user feed source with take', async () => {
+      prisma.user.findUnique.mockResolvedValue({ role: 'both', verificationStatus: 'unverified', createdAt: daysAgo(10) });
+      await service.feed('u1');
+      // owner leads + threads + tenancies + stored notifications all bounded.
+      expect(prisma.lead.findMany.mock.calls[0][0].take).toBe(50);
+      expect(prisma.thread.findMany.mock.calls[0][0].take).toBe(50);
+      expect(prisma.tenancy.findMany.mock.calls[0][0].take).toBe(50);
+      expect(prisma.notification.findMany.mock.calls[0][0].take).toBe(50);
+    });
   });
 
   describe('read-state (Redis-gated)', () => {

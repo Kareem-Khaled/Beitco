@@ -16,6 +16,10 @@ import {
 
 const REVIEW_GATE_DAYS = 30;
 const SEEN_KEY = (userId: string) => `notif:seen:${userId}`;
+// SCALE-2: the derived feed merges several per-user reads; cap each so a heavy
+// account can't turn one feed request into a giant scan. The feed is a recent
+// activity surface, not an archive — a bound of 50 per source is plenty.
+const FEED_SOURCE_LIMIT = 50;
 
 export interface AppNotification {
   id: string;
@@ -64,6 +68,8 @@ export class NotificationsService {
     if (user.role === 'owner' || user.role === 'both') {
       const leads = await this.prisma.lead.findMany({
         where: { status: 'pending', property: { ownerId: userId } },
+        orderBy: { createdAt: 'desc' },
+        take: FEED_SOURCE_LIMIT,
         include: { property: { select: { title: true } } },
       });
       for (const l of leads) {
@@ -81,6 +87,8 @@ export class NotificationsService {
     // 2) Both sides: threads with unread messages for me.
     const threads = await this.prisma.thread.findMany({
       where: { unreadForId: userId },
+      orderBy: { lastMessageAt: 'desc' },
+      take: FEED_SOURCE_LIMIT,
       include: {
         property: { select: { title: true } },
         messages: { orderBy: { createdAt: 'desc' }, take: 1 },
@@ -101,6 +109,8 @@ export class NotificationsService {
     // 3) Renter: tenancies that became review-eligible (>= 30 days).
     const tenancies = await this.prisma.tenancy.findMany({
       where: { userId },
+      orderBy: { moveInDate: 'desc' },
+      take: FEED_SOURCE_LIMIT,
       include: { property: { select: { title: true } } },
     });
     for (const ten of tenancies) {
@@ -140,6 +150,7 @@ export class NotificationsService {
     const stored = await this.prisma.notification.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
+      take: FEED_SOURCE_LIMIT,
     });
     for (const n of stored) {
       out.push({

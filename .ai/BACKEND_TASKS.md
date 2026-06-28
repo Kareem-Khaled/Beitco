@@ -19,6 +19,12 @@ _(**Build phase complete.** Backend B-0→MOD-1 + FE wiring (slices 1–6d) + T-
 
 ## ✅ Done
 
+### SCALE-2 · Cap the unbounded per-user reads ✅ (June 25)
+- **The risk:** ~30 of 37 `findMany` calls had no `take` — a user's saved listings/searches/leads, the derived notification feed (leads/threads/tenancies/stored), and the chat threads list + full message history. A power user (or a scraper) with thousands of rows turned one request into a full-table scan + a giant in-memory serialize.
+- **Fix:** a defensive `take` cap on every per-user **collection** read — `EngagementService.listSaved`/`listSearches`/`listRenterLeads`/`listOwnerLeads` (`MAX_USER_ROWS = 200`); the four `NotificationsService.feed` sub-queries (`FEED_SOURCE_LIMIT = 50` — it's a recent-activity surface, not an archive); `ChatService.listThreads` (200) and `getThread` (the most-recent 500 messages, then `reverse()`d back to chronological for display). The downstream `id: { in: [...] }` enrichment reads are bounded by these caps; the public listing list already paginates with `take: limit + 1`.
+- **Deliberately left:** `notifyForNewListing` still loads every `savedSearch` — that cross-user scan is **SCALE-1** (move to a BullMQ worker, not just cap). The admin analytics raw queries are operator-only + low-cardinality.
+- **Verified:** +5 unit assertions (the caps are applied); **187 unit + 20 e2e** green; `tsc`/`build`/`lint` clean.
+
 ### BUG-1 · Banned users could still log in 🐛 ✅ (June 25)
 - **The hole:** ADMIN-2's ban set `User.bannedAt` + notified the user, but `auth.service` (`verifyOtp`/`refresh`) and `jwt.strategy` only checked `deletedAt` — never `bannedAt`. A banned account kept access until its token expired **and** could re-login by OTP. For a trust-first product, a ban that doesn't ban is a real correctness + security hole.
 - **Fix (defense in depth):** `bannedAt` guards in **three** auth paths — `jwt.strategy.validate` (every authenticated request → 401 `ACCOUNT_BANNED`, even with a still-valid access token), `verifyOtp` (re-login → 403 with the ban reason in Arabic), `refresh` (→ 401). On ban, `AdminUsersService.ban` now calls the new **`AuthService.revokeAllSessions(userId)`** (deletes the `rt:userId:*` refresh keys in Redis) — `AdminModule` imports `AuthModule` (no circular dep; Auth doesn't import Admin). The public listings `list` + `findOne` exclude banned owners via `owner: { bannedAt: null }`.

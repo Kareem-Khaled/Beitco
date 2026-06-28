@@ -10,6 +10,7 @@ type Mock = jest.Mock;
 
 interface PrismaMock {
   savedListing: { findUnique: Mock; delete: Mock; create: Mock; findMany: Mock };
+  savedSearch: { findMany: Mock };
   property: { findFirst: Mock };
   lead: { create: Mock; findUnique: Mock; update: Mock; findMany: Mock };
   tenancy: { findFirst: Mock; create: Mock };
@@ -18,9 +19,10 @@ interface PrismaMock {
 
 function makePrisma(): PrismaMock {
   return {
-    savedListing: { findUnique: jest.fn(), delete: jest.fn(), create: jest.fn(), findMany: jest.fn() },
+    savedListing: { findUnique: jest.fn(), delete: jest.fn(), create: jest.fn(), findMany: jest.fn().mockResolvedValue([]) },
+    savedSearch: { findMany: jest.fn().mockResolvedValue([]) },
     property: { findFirst: jest.fn() },
-    lead: { create: jest.fn(), findUnique: jest.fn(), update: jest.fn(), findMany: jest.fn() },
+    lead: { create: jest.fn(), findUnique: jest.fn(), update: jest.fn(), findMany: jest.fn().mockResolvedValue([]) },
     tenancy: { findFirst: jest.fn(), create: jest.fn() },
     question: { create: jest.fn(), findUnique: jest.fn(), update: jest.fn() },
   };
@@ -204,6 +206,28 @@ describe('EngagementService', () => {
         }),
       );
       expect(res).toMatchObject({ id: 'q1', a: 'أيوة 200 ميجا', answerer: 'مالك' });
+    });
+  });
+
+  describe('SCALE-2: per-user reads are capped', () => {
+    it('listSaved caps the query with take', async () => {
+      await service.listSaved('u1');
+      expect(prisma.savedListing.findMany.mock.calls[0][0].take).toBe(200);
+    });
+
+    it('listSearches caps the query with take', async () => {
+      await service.listSearches('u1');
+      expect(prisma.savedSearch.findMany.mock.calls[0][0].take).toBe(200);
+    });
+
+    it('listRenterLeads caps the query with take', async () => {
+      await service.listRenterLeads('u1');
+      expect(prisma.lead.findMany.mock.calls[0][0].take).toBe(200);
+    });
+
+    it('listOwnerLeads caps the query with take', async () => {
+      await service.listOwnerLeads('o1');
+      expect(prisma.lead.findMany.mock.calls[0][0].take).toBe(200);
     });
   });
 });

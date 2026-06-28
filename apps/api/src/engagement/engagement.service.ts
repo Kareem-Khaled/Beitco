@@ -17,6 +17,11 @@ const summaryInclude = {
   rooms: { include: { beds: true } },
 };
 
+// SCALE-2: a defensive cap on per-user collection reads. A real user has dozens
+// of saved items/leads, not thousands — this bounds memory + serialization and
+// stops a runaway/abusive account from pulling its whole history in one request.
+const MAX_USER_ROWS = 200;
+
 interface LeadRow {
   id: string;
   propertyId: string;
@@ -68,6 +73,7 @@ export class EngagementService {
     const saved = await this.prisma.savedListing.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
+      take: MAX_USER_ROWS,
       include: { property: { include: summaryInclude } },
     });
     return saved
@@ -94,6 +100,7 @@ export class EngagementService {
     const rows = await this.prisma.savedSearch.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
+      take: MAX_USER_ROWS,
     });
     return rows.map((r) => ({
       id: r.id,
@@ -154,6 +161,7 @@ export class EngagementService {
     const rows = await this.prisma.lead.findMany({
       where: { renterId },
       orderBy: { createdAt: 'desc' },
+      take: MAX_USER_ROWS,
       include: { units: true },
     });
     return rows.map((r) => serializeLead(r as unknown as LeadRow));
@@ -163,6 +171,7 @@ export class EngagementService {
     const rows = await this.prisma.lead.findMany({
       where: { property: { ownerId } },
       orderBy: { createdAt: 'desc' },
+      take: MAX_USER_ROWS,
       include: { units: true },
     });
     const renterIds = [...new Set(rows.map((r) => r.renterId))];

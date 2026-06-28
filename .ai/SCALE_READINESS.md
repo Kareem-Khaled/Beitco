@@ -35,9 +35,9 @@
 **Severity: high at volume · Effort: ~1 day.** On publish, `notifyForNewListing` loads **every** `savedSearch` into memory (no limit), loops in JS, and does a **sequential** `findFirst` + `create` per match (N+1 awaited in a loop). Fine at 100s; at 1,000s a publish blocks for seconds + hammers Postgres.
 - **Fix:** a **BullMQ** queue — publish enqueues `{propertyId}`; a worker does the matching + inserts in batches. Needs a shared Redis (already have `RedisModule`). Add a `dead-letter` + retry. This also unblocks future async work (emails, SMS campaigns, reindex).
 
-### SCALE-2 · Paginate / cap the unbounded reads
-**Severity: high at volume · Effort: ~1 day.** ~30 of 37 `findMany` calls have **no `take`** — the notification feed, owner leads, saved searches, admin lists (some), chat threads. A power user (or scraper) with thousands of rows turns one request into a full scan.
-- **Fix:** add `take` + cursor pagination to the hot read paths (notifications feed, owner-leads, threads, saved-searches); the public listing list already paginates — extend the pattern. Bound the analytics raw queries.
+### SCALE-2 · Paginate / cap the unbounded reads — ✅ DONE (June 25)
+**Severity: high at volume · Effort: ~1 day.** ~30 of 37 `findMany` calls had **no `take`** — the notification feed, owner leads, saved searches, chat threads. A power user (or scraper) with thousands of rows turned one request into a full scan.
+- **Fixed:** a defensive **`take` cap** on every per-user collection read — engagement `listSaved`/`listSearches`/`listRenterLeads`/`listOwnerLeads` (200), the 4 notification-feed sub-queries (50 each), chat `listThreads` (200) + `getThread` history (most-recent 500, then reversed to chronological). The public listing list already paginates with `take: limit+1`; the trust/reviews/admin enrichment reads are bounded by `id: { in: [...] }`. **The remaining unbounded scan — `notifyForNewListing` loading every saved search — is SCALE-1** (move to a worker). +5 unit assertions; 187 unit + 20 e2e green.
 
 ### OBS-3 · Metrics + tracing (you're flying blind)
 **Severity: high · Effort: ~1–2 days.** Sentry catches errors, but there are **no metrics/traces** — you can't see p95 latency, request rate, error rate, or DB load. At scale that's operating blind.
