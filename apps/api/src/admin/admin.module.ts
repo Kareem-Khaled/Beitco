@@ -12,9 +12,10 @@ import { AdminListingsService } from './admin.listings.service';
 import { AdminContentService } from './admin.content.service';
 import { AdminAnalyticsService } from './admin.analytics.service';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [NotificationsModule],
+  imports: [NotificationsModule, AuthModule],
   controllers: [
     AdminController,
     AdminOverviewController,

@@ -73,16 +73,19 @@ describe('AdminUsersService', () => {
   let prisma: ReturnType<typeof makePrisma>;
   let trust: { recomputeOwner: Mock };
   let audit: { log: Mock };
+  let auth: { revokeAllSessions: Mock };
   let service: AdminUsersService;
 
   beforeEach(() => {
     prisma = makePrisma();
     trust = { recomputeOwner: jest.fn().mockResolvedValue(undefined) };
     audit = { log: jest.fn().mockResolvedValue(undefined) };
+    auth = { revokeAllSessions: jest.fn().mockResolvedValue(undefined) };
     service = new AdminUsersService(
       prisma as unknown as PrismaService,
       trust as unknown as TrustService,
       audit as unknown as AdminAuditService,
+      auth as unknown as import('../auth/auth.service').AuthService,
     );
   });
 
@@ -178,6 +181,8 @@ describe('AdminUsersService', () => {
       expect(prisma.notification.create).toHaveBeenCalledWith(
         expect.objectContaining({ data: expect.objectContaining({ userId: 'u1', type: 'verification' }) }),
       );
+      // BUG-1: active sessions are revoked on ban.
+      expect(auth.revokeAllSessions).toHaveBeenCalledWith('u1');
       expect(audit.log).toHaveBeenCalledWith(admin, 'user.ban', 'user', 'u1', { reason: 'سبام' });
     });
 

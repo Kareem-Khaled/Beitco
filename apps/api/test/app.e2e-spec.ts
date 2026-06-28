@@ -415,4 +415,34 @@ describe('Beitco API (e2e)', () => {
       expect(verifNote).toBe(true);
     });
   });
+
+  describe('Banned users are locked out (BUG-1)', () => {
+    const ADMIN = '+201000000000'; // u-admin (isAdmin)
+    const victimPhone = `0100${(Date.now() + 9).toString().slice(-7)}`;
+
+    it('admin ban -> the user\u2019s live session is 401 + re-login is 403', async () => {
+      // A normal user with a working session.
+      const { agent: victim, userId } = await login(victimPhone);
+      await victim.get('/api/v1/auth/me').expect(200);
+
+      // Admin bans them.
+      const { agent: admin } = await login(ADMIN);
+      await admin.post(`/api/v1/admin/users/${userId}/ban`).send({ reason: 'اختبار' }).expect(201);
+
+      // The existing access-token cookie no longer works.
+      await victim.get('/api/v1/auth/me').expect(401);
+
+      // And they can't re-authenticate via OTP.
+      const fresh = request.agent(server);
+      await fresh.post('/api/v1/auth/otp/send').send({ phone: victimPhone }).expect(201);
+      const verify = await fresh
+        .post('/api/v1/auth/otp/verify')
+        .send({ phone: victimPhone, code: DEV_OTP });
+      expect(verify.status).toBe(403);
+      expect(verify.body.error?.code).toBe('ACCOUNT_BANNED');
+
+      // Reinstate so the row is clean for re-runs.
+      await admin.post(`/api/v1/admin/users/${userId}/reinstate`).expect(201);
+    });
+  });
 });

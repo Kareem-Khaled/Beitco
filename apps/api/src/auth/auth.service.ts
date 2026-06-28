@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   Logger,
   UnauthorizedException,
@@ -128,6 +129,15 @@ export class AuthService {
       include: { profile: true },
     });
     if (existing) {
+      // BUG-1: a banned account can't re-authenticate via OTP.
+      if (existing.bannedAt) {
+        throw new ForbiddenException({
+          code: 'ACCOUNT_BANNED',
+          message: existing.banReason
+            ? `حسابك موقوف: ${existing.banReason}`
+            : 'حسابك موقوف. لو ده غلط كلّمنا.',
+        });
+      }
       const tokens = await this.issueTokens(existing.id, existing.phone);
       return { tokens, user: serializeUser(existing), isNewUser: false };
     }
@@ -183,6 +193,8 @@ export class AuthService {
 
     const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
     if (!user || user.deletedAt) throw new UnauthorizedException('User not found');
+    // BUG-1: a banned account can't refresh its access token either.
+    if (user.bannedAt) throw new UnauthorizedException({ code: 'ACCOUNT_BANNED', message: 'حسابك موقوف.' });
 
     const accessToken = this.signAccess(user.id, user.phone);
     return { accessToken, expiresIn: ACCESS_TOKEN_EXPIRY_SECONDS };
@@ -204,6 +216,19 @@ export class AuthService {
   }
 
   // ─── Helpers ───────────────────────────────────────────
+
+  // BUG-1: invalidate every active refresh token for a user (called when an
+  // admin bans them) so they can't mint new access tokens. Best-effort —
+  // the bannedAt checks above are the real guarantee.
+  async revokeAllSessions(userId: string): Promise<void> {
+    if (!this.redisService.ready) return;
+    try {
+      const keys = await this.redis.keys(`${REFRESH_KEY}${userId}:*`);
+      if (keys.length) await this.redis.del(...keys);
+    } catch (err) {
+      this.logger.warn(`revokeAllSessions(${userId}) failed: ${String(err)}`);
+    }
+  }
 
   private async issueTokens(userId: string, phone: string): Promise<AuthTokens> {
     const jti = randomUUID();

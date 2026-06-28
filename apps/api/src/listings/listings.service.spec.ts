@@ -69,6 +69,7 @@ describe('ListingsService', () => {
       expect(prisma.property.findMany.mock.calls[0][0].where).toMatchObject({
         status: 'published',
         deletedAt: null,
+        owner: { bannedAt: null },
       });
     });
 

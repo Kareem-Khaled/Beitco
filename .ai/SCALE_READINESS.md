@@ -10,7 +10,7 @@
 | Scale | Ready? | Gating work |
 |---|:--:|---|
 | **Demo / local** | ✅ today | nothing — fully works |
-| **Closed beta** (10s–100s, invited) | 🟡 ~2 days | BUG-1 (ban) + DEPLOY-1 (host) + provision managed DB/Redis/SMS + secrets |
+| **Closed beta** (10s–100s, invited) | 🟡 ~2 days | ~~BUG-1~~ ✅ + DEPLOY-1 (host) + provision managed DB/Redis/SMS + secrets |
 | **Public launch** (1,000s) | 🟠 ~1–2 wks | the above **+** SCALE-1 (BullMQ) + SCALE-2 (paginate) + OBS-3 (metrics) + OPS-4 (backups) + OPS-5 (load test) |
 | **Scale** (10,000s+) | 🔴 more | + read replicas/caching, image CDN, PgBouncer, DATA-1 (tx-race audit) |
 
@@ -20,9 +20,9 @@
 
 ## 🔴 Hard blockers — before ANY real users
 
-### BUG-1 · Banned users can still log in 🐛 (correctness)
-**Severity: high · Effort: ~½ day.** ADMIN-2's ban sets `User.bannedAt` + notifies — but `auth.service` (`verifyOtp`, `refresh`) and `jwt.strategy` only check `deletedAt`, **never `bannedAt`**. A banned user keeps access until their token expires AND can re-login by OTP. For a *trust-first* product, a ban that doesn't ban is a real hole.
-- **Fix:** add `bannedAt` to the `jwt.strategy` select → 401 if banned; block `verifyOtp` for a banned phone (friendly Arabic message + the ban reason); on ban, revoke the user's refresh tokens (Redis). Add an e2e: ban → existing token 401 → re-login blocked. _(Also: banned owners' published listings should drop from search/browse — fold into the takedown path or a ban hook.)_
+### BUG-1 · Banned users can still log in 🐛 (correctness) — ✅ FIXED (June 25)
+**Severity: high · Effort: ~½ day.** ADMIN-2's ban sets `User.bannedAt` + notifies — but `auth.service` (`verifyOtp`, `refresh`) and `jwt.strategy` only checked `deletedAt`, **never `bannedAt`**. A banned user kept access until their token expired AND could re-login by OTP.
+- **Fixed:** `bannedAt` guards in `jwt.strategy` (every request → 401 `ACCOUNT_BANNED`), `verifyOtp` (re-login → 403 + ban reason), and `refresh` (→ 401); `AdminUsersService.ban` calls `AuthService.revokeAllSessions` (clears `rt:userId:*`); the public listings `list`/`findOne` exclude banned owners. e2e: ban → live session 401 → re-login 403. _(Search-index sync on ban is a later nicety — the DB-fallback + list filter cover browse; a banned owner's id may linger in Meili until the next reindex.)_
 
 ### DEPLOY-1 · No live host (already tracked) 🟠
 **Severity: blocker · Effort: ~1 day + your account.** Nothing is deployed; `deploy-staging` is placeholder lines. Until this is done the user count is literally zero. Runbook in `PROD_READINESS.md`. _(Postponed by request — but it's the true #1 for going live.)_

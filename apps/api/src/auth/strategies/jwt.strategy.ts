@@ -48,11 +48,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         verified: true,
         verificationStatus: true,
         deletedAt: true,
+        bannedAt: true,
       },
     });
 
     if (!user || user.deletedAt) {
       throw new UnauthorizedException('User not found or account deleted');
+    }
+    // BUG-1: a suspended account (ADMIN-2) is blocked on every request, even
+    // with a still-valid access token.
+    if (user.bannedAt) {
+      throw new UnauthorizedException({ code: 'ACCOUNT_BANNED', message: 'حسابك موقوف.' });
     }
 
     // Returned object is attached to req.user (see @CurrentUser()).

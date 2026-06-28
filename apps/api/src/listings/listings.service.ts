@@ -40,7 +40,12 @@ export class ListingsService {
     const limit = query.limit ?? 24;
 
     // DB-level filters (everything except freeOnly, which is a computed count).
-    const where: Record<string, unknown> = { status: 'published', deletedAt: null };
+    // BUG-1: a banned owner's listings never surface publicly.
+    const where: Record<string, unknown> = {
+      status: 'published',
+      deletedAt: null,
+      owner: { bannedAt: null },
+    };
     if (query.type && TYPE_LATIN[query.type]) where.type = TYPE_LATIN[query.type];
     if (query.purpose) where.listingType = query.purpose;
     if (query.gender) where.rentToGender = query.gender;
@@ -159,7 +164,7 @@ export class ListingsService {
 
   async findOne(id: string): Promise<Record<string, unknown>> {
     const row = (await this.prisma.property.findFirst({
-      where: { id, deletedAt: null },
+      where: { id, deletedAt: null, owner: { bannedAt: null } },
       include: detailInclude,
     })) as unknown as PropertyRow | null;
 

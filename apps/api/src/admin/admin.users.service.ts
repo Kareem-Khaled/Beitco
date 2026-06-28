@@ -7,6 +7,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { TrustService } from '../trust/trust.service';
 import { AdminAuditService } from './admin.audit.service';
+import { AuthService } from '../auth/auth.service';
 import type { AuthUser } from '../auth/decorators/current-user.decorator';
 import { AdminUsersQueryDto, AdminUpdateUserDto, BanUserDto } from './dto/admin-users.dto';
 
@@ -58,6 +59,7 @@ export class AdminUsersService {
     private readonly prisma: PrismaService,
     private readonly trust: TrustService,
     private readonly audit: AdminAuditService,
+    private readonly auth: AuthService,
   ) {}
 
   // ── List (search + filter + cursor paginate) ──
@@ -176,6 +178,9 @@ export class AdminUsersService {
 
     const reason = dto.reason.trim() || 'مخالفة شروط الاستخدام.';
     await this.prisma.user.update({ where: { id }, data: { bannedAt: new Date(), banReason: reason } });
+    // BUG-1: kill their active sessions now (the bannedAt guards block re-login
+    // + every request; this just invalidates outstanding refresh tokens too).
+    await this.auth.revokeAllSessions(id);
     await this.prisma.notification.create({
       data: {
         userId: id,
