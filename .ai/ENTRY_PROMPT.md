@@ -114,6 +114,7 @@ See `.ai/CURRENT_STATE.md` for the authoritative description.
 - `.ai/CURRENT_STATE.md` — what's actually built right now (**start here**)
 - `.ai/NEXT_STEPS.md` — the prioritized backlog + audit scorecard
 - `.ai/PROD_READINESS.md` — go-live checklist + deploy runbook + go/no-go
+- `.ai/SCALE_READINESS.md` — scale & correctness review (thousands-of-users readiness)
 - `.ai/ADMIN_PLAN.md` — operator-portal feature spec (ADMIN-1…13)
 - `.ai/PROJECT_OVERVIEW.md` — product vision, personas, MVP scope
 - `.ai/PRD.md` — product requirements + feature inventory + roadmap

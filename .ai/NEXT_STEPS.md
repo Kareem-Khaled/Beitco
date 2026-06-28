@@ -66,9 +66,24 @@
 
 > P0→P2 hardening is done, but the app **isn't deployed anywhere** and the deepest business logic is only e2e-covered. These are the gates from "feature-complete + hardened" to "in production."
 
-- [ ] **DEPLOY-1 · Real deploy host.** Wire the `deploy-staging` placeholder to an actual target (Fly/Render/Railway/managed k8s): apply the pushed image tag → `prisma migrate deploy` → gate traffic on `GET /health/ready`. Provision managed Postgres+PostGIS / Redis / Meilisearch / object storage / an SMS provider, and load strong distinct secrets via the host's secret manager. **The last hard blocker.**
-- [~] **TEST-1 · Service unit tests + coverage floor.** 🔨 in progress (June 25) Added mocked-Prisma service specs for the three heaviest business services — **`verification` (13), `reviews` (16), `engagement` (11)** = **40 new tests** (suite **52 → 92**). They lock the branch logic the e2e only happy-paths: the KYC submit guards + "one active request" replacement + approve-transaction/trust-recompute + reject reason-defaulting; the review residency gate (30-day tenancy), helpful-vote toggle, owner-reply ownership, and the two-sided renter-review guards; the save toggle, the **lead→tenancy completion (idempotent)**, ownership 403s, and Q&A answer ownership. Remaining: `listings`/`admin`/`auth` service specs + a CI coverage floor. `tsc`/`lint` clean.
-- [ ] **TEST-3 · Web component tests.** `@testing-library/react` for the highest-risk surfaces: the flag-aware `queries.ts` hooks, `property.$id` actions, and the listing-wizard validation.
+- [ ] **DEPLOY-1 · Real deploy host.** Wire the `deploy-staging` placeholder to an actual target (Fly/Render/Railway/managed k8s): apply the pushed image tag → `prisma migrate deploy` → gate traffic on `GET /health/ready`. Provision managed Postgres+PostGIS / Redis / Meilisearch / object storage / an SMS provider, and load strong distinct secrets via the host's secret manager. **The last hard blocker.** _(Postponed by request.)_
+- [x] **TEST-1 · Service unit tests + coverage floor.** ✅ (June 25) Mocked-Prisma specs for every logic service (verification/reviews/engagement/admin-*/reports + listings/users/trust/notifications/matching/search) — **182 API unit** — plus a CI `coverageThreshold` ratchet run in the `quality` job.
+- [x] **TEST-3 · Web component tests.** ✅ first pass (June 25) `@testing-library/react` + jsdom; **62 web tests** — the flag-aware mock data layer + component renders (TrustBadge/EmptyState/BeitcoListingCard) + a real ReportButton interaction. _Tail (P0.5): the booking flow + the listing-wizard validation._
+
+## 🔴 P0.5 — Scale & correctness (before public launch) — see `.ai/SCALE_READINESS.md`
+
+> From the June-25 production review. The product is strong on security/data/quality but missing the **operational** layer. Items 1–2 are fully autonomous (no host needed); the rest stand up alongside the deploy.
+
+- [ ] **BUG-1 · Banned users can still log in** 🐛 (do first) — `auth`/`jwt.strategy` only check `deletedAt`, never `bannedAt`, so an ADMIN-2 ban doesn't actually block access or re-login. Add `bannedAt`→401 in the JWT strategy, block `verifyOtp` for a banned phone, revoke refresh tokens on ban, drop their listings from search. + an e2e. **~½ day.**
+- [ ] **SCALE-2 · Paginate the unbounded reads** — ~30 of 37 `findMany` have no `take` (notifications feed, owner-leads, threads, saved-searches). Add cursor pagination/caps to the hot paths. **~1 day.**
+- [ ] **SCALE-1 · BullMQ for saved-search fan-out** (was POLISH-4) — `notifyForNewListing` loads every saved search + does N+1 sequential writes on publish. Move to a queue + worker (shared `RedisModule`). **~1 day.**
+- [ ] **OBS-3 · Metrics + tracing + uptime alerting** — no p95/latency/DB visibility today. `prom-client` `/metrics` + a dashboard + uptime monitor on `/health/ready`. **~1–2 days.**
+- [ ] **OPS-4 · DB backups + a rehearsed restore.** **~½ day** (host-dependent).
+- [ ] **OPS-5 · Load test** (`k6`/`autocannon`) on the hot paths → set `connection_limit`. **~½ day.**
+- [ ] **SEC-6 · KYC PII handling** — private bucket + signed-URL access, encryption at rest, retention/deletion policy, access logging, privacy policy. Before taking real verification docs. **~1–2 days + legal.**
+- [ ] **DATA-1 · Transaction-race audit** — wrap the bed/room/whole occupancy + lead→tenancy transitions to prevent double-booking under concurrency. **~1 day.**
+- [ ] **SEC-5 · CSRF defense-in-depth** — double-submit token / `sameSite=strict`. **~½ day.**
+- [ ] **PERF-1 · Connection pool + Redis caching** of hot reads (listing detail, trust, analytics). **~½ day+.**
 
 ## 🟢 P3 — Polish & scale (nice-to-have)
 
@@ -95,7 +110,7 @@
 - [ ] **POLISH-1 · Decompose monolith files.** `list/new.tsx` (2,290 LOC) and `property.$id.tsx` (1,454 LOC) → step/section components.
 - [x] **POLISH-2 · Shared packages or delete them.** ✅ (June 25) The `@beitco/types|utils|validators` packages held **pre-pivot social-network types** (post/comment/group/video/feed) with **0 imports** anywhere — deleted (`packages/` removed, the 3 `workspace:*` deps dropped from `apps/api`, `pnpm-workspace.yaml` → `apps/*` only). Also removed **`apps/api/src/_unported/`** (1,082 LOC of dead pre-pivot modules, already excluded from both tsconfigs). The frontend `lib/beitco/types.ts` + the API serializers remain the shape contract. Verified: 182 API unit + 19 e2e + 62 web green; both apps `tsc`/`build` clean.
 - [x] **POLISH-3 · RedisModule provider.** ✅ (June 24) New `@Global()` `RedisModule` + `RedisService` (one lazily-connected `ioredis` client; eager connect at boot with graceful degradation; a **live `ready` getter** = `status === 'ready'`; a `ping()` for the readiness probe). `auth`, `notifications`, and `health` now inject it instead of each `new Redis(...)`-ing their own — `ioredis` is imported in **exactly one file**. auth/notifications keep their call sites via a private `redis` getter (→ `redisService.client`) and gate on `redisService.ready`; health delegates to `redis.ping()`. Bonus: the live `ready` getter means a post-boot outage now degrades with the friendly message (the old per-service boot flag went stale), and recovery is auto-detected. Verified: tsc/build/lint clean, 52 unit + 19 e2e green, live boot "Redis connected" + `/health/ready` redis:up + OTP send/verify both work through the shared client.
-- [ ] **POLISH-4 · BullMQ worker for saved-search alerts.** `notifyForNewListing` scans all saved searches synchronously on publish (correct + instant now). Move to a queue before volume grows.
+- [→] **POLISH-4 · BullMQ worker for saved-search alerts.** **Promoted to P0.5 SCALE-1** (it's a launch-scale concern, not just polish — see above).
 - [ ] **POLISH-5 · Occupant-link consent flow.** Owner registers a tenant on a bed/room → renter confirms the link (the `link` notification type + `LinkStatus` exist; the action flow isn't wired).
 - [ ] **POLISH-6 · a11y automation + i18n seam.** Add `axe`/`jest-axe` checks; if a second language is ever planned, introduce an i18n framework (strings are hardcoded Arabic today — fine for now).
 
@@ -108,15 +123,14 @@
 
 ## What's actually next (June 25)
 
-P0→P2 hardening is done; the operator portal is built (ADMIN-1…5, 9, 12). To move from "feature-complete + hardened" to "confidently in production," in order:
+P0→P2 hardening is done, the operator portal is built (ADMIN-1…5, 9, 12), and **TEST-1 + TEST-3 + POLISH-2 are done**. A June-25 **production review** (`.ai/SCALE_READINESS.md`) found the real gaps to "thousands of live users" — recommended order:
 
-1. **TEST-1 (✅ done June 25) · Service unit tests + coverage floor.** Every service with real logic now has a mocked-Prisma spec — `verification`, `reviews`, `engagement`, `admin-*`, `reports`, `uploads`, `sms`, **+ `listings`, `users`, `trust`, `notifications`, `matching`, `search`** (182 unit). A **CI coverage floor** (`coverageThreshold` in `jest.config.js`, run in the `quality` job) blocks regressions. _Thin/by-design remaining: `auth`, `chat`, `listings.write` are covered by the 19 e2e + can get specs later._
-2. **TEST-3 (✅ June 25) · Web component tests.** Stood up `@testing-library/react` + jsdom (own `vitest.config.ts` + setup), then **+31 tests** (31→62): the **flag-aware mock data layer** (browse + admin users/listings/content/analytics filters + takedown/restore round-trips), **component renders** (TrustBadge tone branches, EmptyState, BeitcoListingCard), and a **real interaction** (ReportButton: logged-out→login redirect; logged-in→dialog→reason→submit→mock-store write asserted). _Next slice (optional): the listing wizard's step validation + `property.$id` actions._
-3. **DEPLOY-1 · A real deploy host** — `deploy-staging` is still 6 placeholder lines. Wire it to an actual target (Fly/Render/Railway/k8s): apply the image tag → `prisma migrate deploy` → gate on `/health/ready`. **The last hard blocker.**
-4. **POLISH-2** ✅ done (deleted the 3 empty `@beitco/*` packages + `_unported/`).
-5. **Admin tail** (optional, by value): **ADMIN-12 RBAC roles** (split `isAdmin` → super_admin/moderator/support/finance so the audit log ties to roles), **ADMIN-6** (trust override + fraud signals), **ADMIN-7** (leads/tenancies oversight), **ADMIN-8** (billing, needs PAY-1), ADMIN-10/11/13.
-6. Then **P3** (POLISH-1 monoliths, POLISH-4 BullMQ, POLISH-5 occupant-link, POLISH-6 a11y) and **P4** (payments, mobile) as capacity allows.
+1. **BUG-1 · Banned users can still log in** 🐛 — the one real correctness bug; ~½ day, no host needed. **Do first.**
+2. **SCALE-2 (paginate) → SCALE-1 (BullMQ fan-out)** — the two "breaks at thousands" items; both fully autonomous (no deploy).
+3. **DEPLOY-1** + provisioning (when going live) → bundled with **OPS-4** (backups), **OBS-3** (metrics/alerting), **OPS-5** (load test). _(Postponed by request.)_
+4. **SEC-6** (KYC PII) before real verification docs; **DATA-1** (tx-race) + **PERF-1** (pool/cache) as concurrency rises.
+5. **Optional product/polish:** the **admin tail** (ADMIN-12 RBAC roles, ADMIN-6/7/8), **POLISH-1** (decompose monoliths), TEST-3 tail (booking/wizard), **P4** (payments, mobile).
 
-See **`.ai/PROD_READINESS.md`** for the go-live checklist + runbook, and **`.ai/ADMIN_PLAN.md`** for the operator-portal epics.
+See **`.ai/SCALE_READINESS.md`** (scale checklist), **`.ai/PROD_READINESS.md`** (go-live runbook), and **`.ai/ADMIN_PLAN.md`** (operator epics).
 
 > When you finish an item, move its one-line outcome into `.ai/BACKEND_TASKS.md` (build log) and tick the box here.

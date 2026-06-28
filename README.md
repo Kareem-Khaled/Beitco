@@ -92,6 +92,7 @@ The `.ai/` folder is the source of truth for product, business, and engineering 
 - **[.ai/PROJECT_OVERVIEW.md](./.ai/PROJECT_OVERVIEW.md)** — product vision, personas, MVP scope
 - **[.ai/CURRENT_STATE.md](./.ai/CURRENT_STATE.md)** — what's actually built today
 - **[.ai/PROD_READINESS.md](./.ai/PROD_READINESS.md)** — **go-live checklist + deploy runbook**
+- **[.ai/SCALE_READINESS.md](./.ai/SCALE_READINESS.md)** — scale review (will it survive thousands of users?)
 - **[.ai/ADMIN_PLAN.md](./.ai/ADMIN_PLAN.md)** — operator-portal feature spec (ADMIN-1…13)
 - **[.ai/NEXT_STEPS.md](./.ai/NEXT_STEPS.md)** — the prioritized backlog
 - **[.ai/BUSINESS_MODEL.md](./.ai/BUSINESS_MODEL.md)** — how Beitco makes money

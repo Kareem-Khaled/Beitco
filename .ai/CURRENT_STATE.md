@@ -114,6 +114,7 @@ Treat this section as the source of truth over any `@RequireTier` references els
 |---|---|
 | `NEXT_STEPS.md` | **The active backlog — what's next, prioritized.** |
 | `PROD_READINESS.md` | **Go-live checklist + deploy runbook + go/no-go.** |
+| `SCALE_READINESS.md` | **Scale review — thousands-of-users readiness + the P0.5 backlog.** |
 | `ADMIN_PLAN.md` | **Operator-portal feature spec (ADMIN-1…13).** |
 | `ROADMAP.md` | Phased plan (what's done / what's next). |
 | `PRD.md` | Product vision, personas, scope. |
