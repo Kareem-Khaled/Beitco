@@ -7,13 +7,17 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from 'nestjs-pino';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import { json, urlencoded } from 'express';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { ResponseEnvelopeInterceptor } from './common/interceptors/response-envelope.interceptor';
 
 async function bootstrap() {
   // bufferLogs so early startup logs flush through pino once it's ready.
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  // bodyParser:false — we register our own (below) with a larger limit so
+  // listing payloads carrying downscaled base64 images (the dev fallback when
+  // S3/R2 isn't configured) aren't rejected by the default 100kb cap.
+  const app = await NestFactory.create(AppModule, { bufferLogs: true, bodyParser: false });
   app.useLogger(app.get(Logger));
 
   // ─── Security headers (SEC-2) ──────────────────────
@@ -38,9 +42,26 @@ async function bootstrap() {
   // ─── Cookies (auth tokens) ─────────────────────────
   app.use(cookieParser());
 
+  // ─── Body parsing ──────────────────────────────────
+  // 10mb: a listing can carry several downscaled (1600px/0.82q) base64 images
+  // when object storage isn't configured. With S3/R2 on, bodies are just URLs,
+  // so this headroom is only ever used by the zero-setup dev path.
+  const BODY_LIMIT = process.env.BODY_LIMIT ?? '10mb';
+  app.use(json({ limit: BODY_LIMIT }));
+  app.use(urlencoded({ extended: true, limit: BODY_LIMIT }));
+
   // ─── CORS ──────────────────────────────────────────
+  // Production: strict allowlist from CORS_ORIGINS (comma-separated) or a safe
+  // default. Dev: also accept any localhost / 127.0.0.1 port so Vite port-hopping
+  // (e.g. 8080 taken → 8081) never triggers a confusing "CORS error" that's
+  // really just an unexpected origin.
+  const isProd = process.env.NODE_ENV === 'production';
   app.enableCors({
-    origin: process.env.CORS_ORIGINS?.split(',') ?? ['http://localhost:8080', 'http://localhost:3000'],
+    origin: process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()) ?? [
+      'http://localhost:8080',
+      'http://localhost:3000',
+      ...(isProd ? [] : [/^http:\/\/localhost:\d+$/, /^http:\/\/127\.0\.0\.1:\d+$/]),
+    ],
     credentials: true,
   });
 

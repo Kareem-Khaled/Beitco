@@ -42,6 +42,18 @@ export class AllExceptionsFilter implements ExceptionFilter {
           message: (resp.message as string) ?? (exception as HttpException).message,
         };
       }
+    } else if (typeof (exception as { status?: number }).status === 'number') {
+      // Errors thrown by Express middleware (e.g. body-parser's
+      // PayloadTooLargeError) carry an HTTP status but aren't Nest
+      // HttpExceptions — surface them cleanly instead of as a generic 500.
+      status = (exception as { status: number }).status;
+      errorResponse =
+        status === HttpStatus.PAYLOAD_TOO_LARGE
+          ? {
+              code: 'PAYLOAD_TOO_LARGE',
+              message: 'الحجم كبير أوي. صغّر الصور أو قلّل عددها وحاول تاني.',
+            }
+          : { code: this.statusToCode(status), message: (exception as Error).message };
     }
 
     // OBS-2: report genuine server faults (5xx / non-HTTP throws) to Sentry,
@@ -75,6 +87,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       403: 'FORBIDDEN',
       404: 'NOT_FOUND',
       409: 'CONFLICT',
+      413: 'PAYLOAD_TOO_LARGE',
       422: 'VALIDATION_ERROR',
       429: 'RATE_LIMITED',
       500: 'INTERNAL_ERROR',
