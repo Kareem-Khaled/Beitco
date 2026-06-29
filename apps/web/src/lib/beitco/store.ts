@@ -1516,7 +1516,15 @@ export function submitVerification(userId: string): User | undefined {
 
 export type AppNotification = {
   id: string;
-  type: "lead" | "message" | "review" | "verification" | "link" | "saved_search";
+  type:
+    | "lead"
+    | "message"
+    | "review"
+    | "verification"
+    | "link"
+    | "saved_search"
+    | "moderation"
+    | "listing_status";
   title: string;
   body: string;
   date: string; // ISO

@@ -23,7 +23,15 @@ const FEED_SOURCE_LIMIT = 50;
 
 export interface AppNotification {
   id: string;
-  type: 'lead' | 'message' | 'review' | 'verification' | 'link' | 'saved_search';
+  type:
+    | 'lead'
+    | 'message'
+    | 'review'
+    | 'verification'
+    | 'link'
+    | 'saved_search'
+    | 'moderation'
+    | 'listing_status';
   title: string;
   body: string;
   date: string; // ISO
@@ -59,10 +67,38 @@ export class NotificationsService {
   async feed(userId: string): Promise<AppNotification[]> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { role: true, verified: true, verificationStatus: true, createdAt: true },
+      select: { role: true, verified: true, verificationStatus: true, createdAt: true, isAdmin: true },
     });
     if (!user) return [];
     const out: AppNotification[] = [];
+
+    // 0) Admin: listings sitting in the moderation queue. Derived like every
+    // other source, so it auto-appears on a new pending listing and auto-clears
+    // the moment it's approved/rejected — no write needed at listing-create time.
+    // Uses updatedAt (not createdAt) as the date: it bumps whenever the listing
+    // (re)enters the queue, so an owner editing a rejected listing and resubmitting
+    // re-alerts the admin (a stale createdAt would stay "already seen").
+    if (user.isAdmin) {
+      const pending = await this.prisma.property.findMany({
+        where: { status: 'pending_approval', deletedAt: null },
+        orderBy: { updatedAt: 'desc' },
+        take: FEED_SOURCE_LIMIT,
+        select: { id: true, title: true, area: true, createdAt: true, updatedAt: true },
+      });
+      for (const p of pending) {
+        const resubmitted = +p.updatedAt - +p.createdAt > 60_000; // >1min after creation
+        out.push({
+          id: `mod-${p.id}`,
+          type: 'moderation',
+          title: resubmitted ? 'إعلان اتعدّل ومستني مراجعة تانية' : 'إعلان جديد مستني مراجعة',
+          body: resubmitted
+            ? `«${p.title}» في ${p.area} اتعدّل وصاحبه بعته تاني للمراجعة.`
+            : `«${p.title}» في ${p.area} محتاج موافقتك عشان يتنشر.`,
+          date: p.updatedAt.toISOString(),
+          propertyId: p.id,
+        });
+      }
+    }
 
     // 1) Owner: new pending viewing requests on their listings.
     if (user.role === 'owner' || user.role === 'both') {
@@ -80,6 +116,36 @@ export class NotificationsService {
           body: `${l.renterName} عايز يعاين «${l.property?.title ?? 'شقتك'}»`,
           date: l.createdAt.toISOString(),
           propertyId: l.propertyId,
+        });
+      }
+
+      // 1b) Owner: moderation outcomes on their listings. Derived from the
+      // listing's own state (moderatedAt is set ONLY by an admin approve/reject,
+      // so auto-published listings never trigger this). A rejection is an action
+      // item — it self-clears when the owner edits & resubmits (status flips back
+      // to pending_approval). Approval confirms the listing went live.
+      const moderated = await this.prisma.property.findMany({
+        where: {
+          ownerId: userId,
+          deletedAt: null,
+          moderatedAt: { not: null },
+          status: { in: ['rejected', 'published'] },
+        },
+        orderBy: { moderatedAt: 'desc' },
+        take: FEED_SOURCE_LIMIT,
+        select: { id: true, title: true, status: true, rejectionReason: true, moderatedAt: true },
+      });
+      for (const m of moderated) {
+        const rejected = m.status === 'rejected';
+        out.push({
+          id: `modres-${m.id}-${rejected ? 'rej' : 'pub'}`,
+          type: 'listing_status',
+          title: rejected ? 'إعلانك اترفض' : 'إعلانك اتنشر',
+          body: rejected
+            ? `«${m.title}» محتاج تعديل: ${m.rejectionReason ?? 'مخالف لشروط النشر.'} — عدّله وابعته تاني.`
+            : `«${m.title}» بقى منشور ومتاح للناس دلوقتي. 🎉`,
+          date: (m.moderatedAt ?? new Date()).toISOString(),
+          propertyId: m.id,
         });
       }
     }

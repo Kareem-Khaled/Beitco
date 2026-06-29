@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Bell, Inbox, MessageCircle, Star, ShieldCheck, Search, BadgeCheck } from "lucide-react";
+import { Bell, Inbox, MessageCircle, Star, ShieldCheck, Search, BadgeCheck, ShieldAlert, Home } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
 import { type AppNotification, timeAgo } from "@/lib/beitco/store";
 import { useNotifications, markNotificationsSeen } from "@/lib/beitco/queries";
@@ -24,6 +24,8 @@ const META: Record<
   verification: { icon: ShieldCheck, tone: "bg-trust-soft text-trust" },
   link: { icon: BadgeCheck, tone: "bg-amber-500/15 text-amber-600" },
   saved_search: { icon: Search, tone: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" },
+  moderation: { icon: ShieldAlert, tone: "bg-primary/10 text-primary" },
+  listing_status: { icon: Home, tone: "bg-trust-soft text-trust" },
 };
 
 function NotificationsPage() {
@@ -144,6 +146,20 @@ function NotificationsPage() {
                 return (
                   <li key={n.id}>
                     <Link to="/me/tenancies">{inner}</Link>
+                  </li>
+                );
+              }
+              if (n.type === "moderation") {
+                return (
+                  <li key={n.id}>
+                    <Link to="/dashboard/moderation">{inner}</Link>
+                  </li>
+                );
+              }
+              if (n.type === "listing_status") {
+                return (
+                  <li key={n.id}>
+                    <Link to="/dashboard/listings">{inner}</Link>
                   </li>
                 );
               }

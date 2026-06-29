@@ -15,6 +15,7 @@ function makePrisma() {
     thread: { findMany: jest.fn().mockResolvedValue([]) },
     tenancy: { findMany: jest.fn().mockResolvedValue([]) },
     notification: { findMany: jest.fn().mockResolvedValue([]) },
+    property: { findMany: jest.fn().mockResolvedValue([]) },
   };
 }
 
@@ -111,6 +112,80 @@ describe('NotificationsService', () => {
       expect(prisma.thread.findMany.mock.calls[0][0].take).toBe(50);
       expect(prisma.tenancy.findMany.mock.calls[0][0].take).toBe(50);
       expect(prisma.notification.findMany.mock.calls[0][0].take).toBe(50);
+    });
+
+    it('derives a moderation notification for an admin (pending listings)', async () => {
+      prisma.user.findUnique.mockResolvedValue({ role: 'both', verificationStatus: 'verified', createdAt: daysAgo(10), isAdmin: true });
+      // role 'both' means the owner moderated-listings source also queries
+      // property.findMany — distinguish the two by their where clause.
+      const created = daysAgo(1);
+      prisma.property.findMany.mockImplementation((args: { where?: { status?: string } }) =>
+        Promise.resolve(
+          args.where?.status === 'pending_approval'
+            ? [{ id: 'p-pending', title: 'شقة مستنية', area: 'المعادي', createdAt: created, updatedAt: created }]
+            : [],
+        ),
+      );
+      const feed = await service.feed('admin1');
+      const mod = feed.find((n) => n.type === 'moderation');
+      expect(mod?.id).toBe('mod-p-pending');
+      expect(mod?.propertyId).toBe('p-pending');
+      expect(mod?.title).toBe('إعلان جديد مستني مراجعة'); // fresh, not resubmitted
+      const adminCall = prisma.property.findMany.mock.calls.find(
+        (c: [{ where?: { status?: string } }]) => c[0]?.where?.status === 'pending_approval',
+      );
+      expect(adminCall?.[0]).toMatchObject({
+        where: { status: 'pending_approval', deletedAt: null },
+        take: 50,
+      });
+    });
+
+    it('re-alerts the admin with a "resubmitted" moderation notice (updatedAt >> createdAt)', async () => {
+      prisma.user.findUnique.mockResolvedValue({ role: 'admin', verificationStatus: 'verified', createdAt: daysAgo(30), isAdmin: true });
+      // Created 10 days ago, edited & resubmitted 1 day ago — the gap marks it a resubmit.
+      prisma.property.findMany.mockImplementation((args: { where?: { status?: string } }) =>
+        Promise.resolve(
+          args.where?.status === 'pending_approval'
+            ? [{ id: 'p-redo', title: 'إعلان متعدّل', area: 'الزمالك', createdAt: daysAgo(10), updatedAt: daysAgo(1) }]
+            : [],
+        ),
+      );
+      const feed = await service.feed('admin1');
+      const mod = feed.find((n) => n.id === 'mod-p-redo');
+      expect(mod?.title).toBe('إعلان اتعدّل ومستني مراجعة تانية');
+      // The notification date tracks the resubmit (updatedAt), so it counts as
+      // fresh/unread even though the listing was created long ago.
+      expect(new Date(mod!.date).getTime()).toBeCloseTo(+daysAgo(1), -5);
+    });
+
+    it('does not query the admin moderation queue for a non-admin', async () => {
+      prisma.user.findUnique.mockResolvedValue({ role: 'owner', verificationStatus: 'verified', createdAt: daysAgo(10), isAdmin: false });
+      await service.feed('owner1');
+      // The owner source may query property.findMany, but never with the admin
+      // pending_approval queue filter.
+      const adminCall = prisma.property.findMany.mock.calls.find(
+        (c: [{ where?: { status?: string } }]) => c[0]?.where?.status === 'pending_approval',
+      );
+      expect(adminCall).toBeUndefined();
+    });
+
+    it('derives listing_status notifications for an owner (approved + rejected)', async () => {
+      prisma.user.findUnique.mockResolvedValue({ role: 'owner', verificationStatus: 'verified', createdAt: daysAgo(10), isAdmin: false });
+      prisma.property.findMany.mockResolvedValue([
+        { id: 'p-rej', title: 'مرفوض', status: 'rejected', rejectionReason: 'السعر غالي', moderatedAt: daysAgo(1) },
+        { id: 'p-pub', title: 'منشور', status: 'published', rejectionReason: null, moderatedAt: daysAgo(2) },
+      ]);
+      const feed = await service.feed('owner1');
+      const rej = feed.find((n) => n.id === 'modres-p-rej-rej');
+      const pub = feed.find((n) => n.id === 'modres-p-pub-pub');
+      expect(rej?.type).toBe('listing_status');
+      expect(rej?.body).toContain('السعر غالي');
+      expect(rej?.propertyId).toBe('p-rej');
+      expect(pub?.type).toBe('listing_status');
+      expect(prisma.property.findMany.mock.calls[0][0]).toMatchObject({
+        where: { ownerId: 'owner1', deletedAt: null, moderatedAt: { not: null } },
+        take: 50,
+      });
     });
   });
 
