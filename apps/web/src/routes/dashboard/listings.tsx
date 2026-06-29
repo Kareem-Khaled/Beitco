@@ -165,25 +165,6 @@ function DashboardListings() {
                           : "متاحة للبيع"
                         : `فاضي ${p.beds.available} من ${p.beds.total}`}
                     </p>
-
-                    {/* Moderation feedback to the owner (MOD-1) */}
-                    {p.status === "pending_approval" ? (
-                      <p className="mt-2 inline-flex items-start gap-1.5 rounded-lg bg-blue-500/10 px-2.5 py-1.5 text-[11px] text-blue-600 dark:text-blue-400">
-                        <Clock className="mt-0.5 h-3 w-3 shrink-0" />
-                        بنراجع الإعلان دلوقتي — هيظهر للناس بعد ما نوافق عليه.
-                      </p>
-                    ) : p.status === "rejected" ? (
-                      <div className="mt-2 rounded-lg border-s-2 border-red-500 bg-red-500/10 px-2.5 py-1.5 text-[11px] text-red-600 dark:text-red-400">
-                        <span className="inline-flex items-center gap-1 font-medium">
-                          <AlertCircle className="h-3 w-3" />
-                          اترفض الإعلان
-                        </span>
-                        {p.rejectionReason ? (
-                          <p className="mt-0.5 text-foreground/80">{p.rejectionReason}</p>
-                        ) : null}
-                        <p className="mt-1">عدّل الإعلان وابعته تاني للمراجعة.</p>
-                      </div>
-                    ) : null}
                   </div>
 
                   <div className="flex flex-col items-end gap-2">
@@ -261,6 +242,45 @@ function DashboardListings() {
                     </button>
                   </div>
                 </div>
+
+                {/* Moderation feedback to the owner (MOD-1) — full-width banner */}
+                {p.status === "pending_approval" ? (
+                  <div className="mt-3 flex items-start gap-2.5 rounded-xl border border-blue-500/25 bg-blue-500/5 p-3">
+                    <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-500/15 text-blue-600 dark:text-blue-400">
+                      <Clock className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-blue-700 dark:text-blue-300">
+                        بنراجع الإعلان دلوقتي
+                      </p>
+                      <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                        هيظهر للناس بعد ما نوافق عليه — عادةً في خلال يوم.
+                      </p>
+                    </div>
+                  </div>
+                ) : p.status === "rejected" ? (
+                  <div className="mt-3 flex items-start gap-2.5 rounded-xl border border-red-500/30 bg-red-500/5 p-3">
+                    <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-red-500/15 text-red-600 dark:text-red-400">
+                      <AlertCircle className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-red-700 dark:text-red-300">
+                        اترفض الإعلان
+                      </p>
+                      {p.rejectionReason ? (
+                        <p className="mt-1 rounded-lg bg-red-500/10 px-2.5 py-1.5 text-xs leading-relaxed text-foreground/90">
+                          <span className="font-semibold text-red-700 dark:text-red-300">
+                            السبب:{" "}
+                          </span>
+                          {p.rejectionReason}
+                        </p>
+                      ) : null}
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        عدّل الإعلان وابعته تاني — هنراجعه تاني بعد التعديل.
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
 
                 {open ? (
                   <div className="mt-4 border-t border-border pt-4">
