@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { AuthLayout } from "@/components/beitco/AuthLayout";
 import { useAuth } from "@/lib/beitco/auth";
+import { USE_API } from "@/lib/beitco/api";
 
 export const Route = createFileRoute("/auth/verify")({
   component: VerifyPage,
@@ -45,17 +46,17 @@ function VerifyPage() {
   return (
     <AuthLayout
       title="ادخل الكود"
-      subtitle={`بعتنا كود من 4 أرقام على ${phone}. لو ما وصلش، جرّب تطلبه تاني.`}
+      subtitle={`بعتنا كود من 6 أرقام على ${phone}. لو ما وصلش، جرّب تطلبه تاني.`}
     >
       <div className="flex flex-col gap-6">
         <div className="flex flex-col items-center gap-3" dir="ltr">
           <InputOTP
-            maxLength={4}
+            maxLength={6}
             value={code}
             onChange={(v) => {
               setCode(v);
               setError(null);
-              if (v.length === 4) handleSubmit(v);
+              if (v.length === 6) handleSubmit(v);
             }}
             disabled={loading}
             autoFocus
@@ -65,6 +66,8 @@ function VerifyPage() {
               <InputOTPSlot index={1} />
               <InputOTPSlot index={2} />
               <InputOTPSlot index={3} />
+              <InputOTPSlot index={4} />
+              <InputOTPSlot index={5} />
             </InputOTPGroup>
           </InputOTP>
           {loading && (
@@ -84,7 +87,7 @@ function VerifyPage() {
         </p>
 
         <div className="rounded-lg bg-muted/40 p-3 text-center text-xs text-muted-foreground">
-          💡 وضع التجربة: اكتب أي 4 أرقام عشان تكمّل
+          💡 وضع التجربة: {USE_API ? "الكود هو 123456" : "اكتب أي 6 أرقام عشان تكمّل"}
         </div>
       </div>
     </AuthLayout>
