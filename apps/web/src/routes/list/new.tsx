@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Home,
   BedDouble,
@@ -97,6 +98,7 @@ const LAST_STEP = STEPS.length as StepId;
 function ListNewPage() {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const { edit: editId } = Route.useSearch();
   const isEdit = !!editId;
   const [step, setStep] = useState<StepId>(1);
@@ -183,6 +185,16 @@ function ListNewPage() {
       return;
     }
     if (!isEdit) clearDraft();
+
+    // Refresh the caches the destination pages read, so the listing's new state
+    // (e.g. rejected -> pending_approval after a resubmit) shows immediately
+    // instead of stale until a manual refresh. Covers the owner grid, the public
+    // detail loader's cached copy, and the admin moderation queue/count.
+    if (user) qc.invalidateQueries({ queryKey: ["ownerProperties", user.id] });
+    qc.invalidateQueries({ queryKey: ["property", saved.id] });
+    qc.invalidateQueries({ queryKey: ["pendingListings"] });
+    qc.invalidateQueries({ queryKey: ["moderationCount"] });
+    if (user) qc.invalidateQueries({ queryKey: ["notificationsUnread", user.id] });
 
     const pending = saved.status === "pending_approval";
     toast.success(

@@ -377,5 +377,23 @@ export function serializeSummary(p: PropertyRow): Record<string, unknown> {
     spec,
     priceFrom: p.priceFrom ?? p.price,
     createdAt: p.createdAt.toISOString(),
+    // Public room/bed layout so listing cards can group bed availability by room
+    // ("which beds share a room"). Intentionally omits occupant data — summaries
+    // are public. Empty for whole-apartment listings (the card uses spec there).
+    rooms: (p.rooms ?? []).map((r) => ({
+      id: r.id,
+      name: r.name,
+      features: r.features,
+      sizeM2: r.sizeM2 ?? undefined,
+      price: r.price ?? undefined,
+      status: r.status ?? undefined,
+      beds: (r.beds ?? []).map((b) => ({
+        id: b.id,
+        label: b.label,
+        status: b.status,
+        price: b.price,
+        features: b.features,
+      })),
+    })),
   };
 }

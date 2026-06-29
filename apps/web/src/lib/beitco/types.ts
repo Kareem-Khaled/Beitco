@@ -299,7 +299,11 @@ export type PropertySummary = Pick<
   | "spec"
   | "priceFrom"
   | "createdAt"
->;
+> & {
+  // Public room/bed layout (no occupant data) so listing cards can group bed
+  // availability by room. Optional: present from the API list + the mock store.
+  rooms?: Room[];
+};
 
 // Messaging
 export type Message = {
