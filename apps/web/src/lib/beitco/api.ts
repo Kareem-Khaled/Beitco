@@ -5,6 +5,8 @@
 // mirrors the frontend Property shape), so callers don't change.
 
 import type { Property, PropertySummary } from "./types";
+import { createIsomorphicFn } from "@tanstack/react-start";
+import { getRequestHeader } from "@tanstack/react-start/server";
 
 export const USE_API =
   (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_USE_API === "true";
@@ -23,9 +25,28 @@ type Envelope<T> = {
   error?: { code: string; message: string };
 };
 
+// SSR auth forwarding: a route loader runs on the SERVER during a hard
+// navigation, where fetch's `credentials: "include"` can't see the browser's
+// cookie jar — so authenticated reads (e.g. an owner/admin previewing a
+// not-yet-published listing) would hit the API anonymously and 404. On the
+// server we read the incoming request's Cookie header and forward it; on the
+// client it's a no-op (the browser already attaches cookies). createIsomorphicFn
+// splits the two arms so the server-only import is stripped from the client
+// bundle (and passes TanStack Start's import-protection).
+const ssrCookieHeader = createIsomorphicFn()
+  .client((): string | undefined => undefined)
+  .server((): string | undefined => {
+    try {
+      return getRequestHeader("cookie") ?? undefined;
+    } catch {
+      return undefined;
+    }
+  });
+
 async function getJSON<T>(path: string): Promise<Envelope<T>> {
+  const cookie = ssrCookieHeader();
   const res = await fetch(`${API_BASE}${path}`, {
-    headers: { Accept: "application/json" },
+    headers: { Accept: "application/json", ...(cookie ? { Cookie: cookie } : {}) },
     credentials: "include",
   });
   const body = (await res.json()) as Envelope<T>;

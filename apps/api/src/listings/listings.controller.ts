@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ListingsService } from './listings.service';
 import { ListingsWriteService } from './listings.write.service';
 import { ListPropertiesQueryDto } from './dto/list-properties-query.dto';
 import { CreateListingDto, ManageListingDto } from './dto/create-listing.dto';
 import { Public } from '../auth/decorators/public.decorator';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
 import { CurrentUser, type AuthUser } from '../auth/decorators/current-user.decorator';
 
 // Listings API (B-1 reads, B-2c writes). Reads are public; writes require auth.
@@ -32,10 +33,13 @@ export class ListingsController {
   }
 
   @Public()
+  @UseGuards(OptionalJwtAuthGuard)
   @Get(':id')
-  @ApiOperation({ summary: 'Get a single published property by id' })
-  findOne(@Param('id') id: string) {
-    return this.listings.findOne(id);
+  @ApiOperation({
+    summary: 'Get a single property by id (published; owner/admin may preview any status)',
+  })
+  findOne(@Param('id') id: string, @CurrentUser() me?: AuthUser) {
+    return this.listings.findOne(id, me);
   }
 
   @Post()

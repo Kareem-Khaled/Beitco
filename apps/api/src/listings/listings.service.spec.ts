@@ -171,5 +171,30 @@ describe('ListingsService', () => {
       const res = await service.findOne('p1');
       expect(res).toMatchObject({ id: 'p1', title: 'شقة', type: 'شقة' });
     });
+
+    it('lets the OWNER preview their own pending listing', async () => {
+      prisma.property.findFirst.mockResolvedValue(propRow({ ownerId: 'u-own', status: 'pending_approval' }));
+      const viewer = { id: 'u-own', isAdmin: false } as never;
+      const res = await service.findOne('p1', viewer);
+      expect(res).toMatchObject({ id: 'p1' });
+    });
+
+    it('lets an ADMIN preview any pending listing', async () => {
+      prisma.property.findFirst.mockResolvedValue(propRow({ ownerId: 'u-someone', status: 'pending_approval' }));
+      const admin = { id: 'u-admin', isAdmin: true } as never;
+      const res = await service.findOne('p1', admin);
+      expect(res).toMatchObject({ id: 'p1' });
+    });
+
+    it('does NOT let a different non-admin user preview a pending listing', async () => {
+      prisma.property.findFirst.mockResolvedValue(propRow({ ownerId: 'u-own', status: 'pending_approval' }));
+      const stranger = { id: 'u-other', isAdmin: false } as never;
+      await expect(service.findOne('p1', stranger)).rejects.toBeInstanceOf(NotFoundException);
+    });
+
+    it('hides a published listing whose owner is banned (BUG-1)', async () => {
+      prisma.property.findFirst.mockResolvedValue(propRow({ owner: { bannedAt: new Date() } }));
+      await expect(service.findOne('p1')).rejects.toBeInstanceOf(NotFoundException);
+    });
   });
 });

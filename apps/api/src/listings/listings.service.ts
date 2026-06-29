@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SearchService } from '../search/search.service';
 import { ListPropertiesQueryDto } from './dto/list-properties-query.dto';
+import type { AuthUser } from '../auth/decorators/current-user.decorator';
 import {
   serializeProperty,
   serializeSummary,
@@ -162,13 +163,20 @@ export class ListingsService {
     return { data: summaries, meta: { cursor, hasMore } };
   }
 
-  async findOne(id: string): Promise<Record<string, unknown>> {
+  async findOne(id: string, viewer?: AuthUser): Promise<Record<string, unknown>> {
     const row = (await this.prisma.property.findFirst({
-      where: { id, deletedAt: null, owner: { bannedAt: null } },
+      where: { id, deletedAt: null },
       include: detailInclude,
     })) as unknown as PropertyRow | null;
 
-    if (!row || row.status !== 'published') {
+    // Owner or admin may preview their listing at any status (e.g. from the
+    // moderation queue before it's published). Everyone else only sees a
+    // published listing whose owner isn't banned (BUG-1).
+    const isPrivileged = !!viewer && (viewer.isAdmin || viewer.id === row?.ownerId);
+    const bannedOwner = (row?.owner as { bannedAt?: Date | null } | undefined)?.bannedAt;
+    const publiclyVisible = !!row && row.status === 'published' && !bannedOwner;
+
+    if (!row || (!isPrivileged && !publiclyVisible)) {
       throw new NotFoundException({
         code: 'PROPERTY_NOT_FOUND',
         message: 'المكان ده مش موجود أو مش متاح.',
