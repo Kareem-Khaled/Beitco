@@ -11,6 +11,8 @@ import {
   Settings,
   Sun,
   Moon,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +23,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/lib/beitco/auth";
-import { useNotificationUnreadCount } from "@/lib/beitco/queries";
+import { useNotificationUnreadCount, useUnreadMessageCount } from "@/lib/beitco/queries";
+import { useNotificationSound, useNotifSoundPref } from "@/lib/beitco/notification-sound";
 import { getStoredTheme, resolveTheme, setTheme } from "@/lib/beitco/theme";
 
 export function UserMenu() {
@@ -29,6 +32,11 @@ export function UserMenu() {
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(false);
   const { data: unread = 0 } = useNotificationUnreadCount(user?.id);
+  const unreadMessages = useUnreadMessageCount(user?.id);
+  const [soundOn, setSoundOn] = useNotifSoundPref();
+
+  // Chime when the unread count rises (silent on first load / user switch).
+  useNotificationSound(unread, user?.id, soundOn);
 
   useEffect(() => {
     setIsDark(resolveTheme(getStoredTheme()) === "dark");
@@ -79,6 +87,19 @@ export function UserMenu() {
           </Button>
         </Link>
       )}
+
+      <Link
+        to="/messages"
+        className="relative flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-muted-foreground transition-colors hover:text-foreground"
+        aria-label="الرسايل"
+      >
+        <MessageCircle className="h-4 w-4" />
+        {unreadMessages > 0 && (
+          <span className="absolute -end-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+            {unreadMessages > 9 ? "9+" : unreadMessages.toLocaleString("ar-EG-u-nu-latn")}
+          </span>
+        )}
+      </Link>
 
       <Link
         to="/notifications"
@@ -150,6 +171,18 @@ export function UserMenu() {
           >
             {isDark ? <Sun className="me-2 h-4 w-4" /> : <Moon className="me-2 h-4 w-4" />}
             {isDark ? "بيتكو بالنهاري" : "بيتكو بالليل"}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={(e) => {
+              e.preventDefault();
+              setSoundOn(!soundOn);
+            }}
+          >
+            {soundOn ? <Volume2 className="me-2 h-4 w-4" /> : <VolumeX className="me-2 h-4 w-4" />}
+            صوت الإشعارات
+            <span className="ms-auto text-[10px] text-muted-foreground">
+              {soundOn ? "شغّال" : "مقفول"}
+            </span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem

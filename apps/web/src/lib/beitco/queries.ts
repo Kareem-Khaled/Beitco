@@ -864,7 +864,22 @@ export function useThreads(userId: string | undefined) {
     },
     initialData: USE_API || !userId ? undefined : () => getThreadsForUser(userId),
     staleTime: USE_API ? 10_000 : Infinity,
+    // Live like the notifications bell: poll while the tab is open and refetch on
+    // focus so the messages list + the header unread badge update without a
+    // manual refresh. New messages still arrive instantly via the chat socket
+    // (useChatSocket invalidates this key); polling is the fallback.
+    refetchInterval: USE_API ? 15_000 : false,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: USE_API,
   });
+}
+
+// Unread-thread count for the header messages badge (threads with messages I
+// haven't seen). Derived from the same live useThreads query.
+export function useUnreadMessageCount(userId: string | undefined): number {
+  const { data: threads = [] } = useThreads(userId);
+  if (!userId) return 0;
+  return threads.filter((t) => t.unreadFor === userId).length;
 }
 
 // One thread with its full message history. API marks it read server-side.
@@ -960,6 +975,14 @@ export function useNotificationUnreadCount(userId: string | undefined) {
     },
     initialData: USE_API || !userId ? undefined : () => getUnreadNotificationCount(userId),
     staleTime: USE_API ? 20_000 : Infinity,
+    // Live badge: poll while the tab is open and refetch the moment it regains
+    // focus, so notifications from every source (leads, moderation, listing
+    // status, reviews, saved searches) show up without a manual refresh. Chat
+    // messages still update instantly via the socket (useChatSocket). Mock mode
+    // is local, so no polling there.
+    refetchInterval: USE_API ? 20_000 : false,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: USE_API,
   });
 }
 
