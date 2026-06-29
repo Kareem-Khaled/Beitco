@@ -43,12 +43,18 @@ First run: `pnpm --filter @beitco/api exec prisma migrate deploy && pnpm --filte
 ```bash
 pnpm web                    # http://localhost:8080
 ```
-By default the web app runs on a **localStorage mock** (no backend needed). To read/write the live API, set `VITE_USE_API=true` in `apps/web/.env.local`.
+By default the web app runs on a **localStorage mock** (no backend needed). To read/write the live API, create `apps/web/.env` with `VITE_USE_API=true`.
 
 ### Run everything (Turbo)
 ```bash
 pnpm dev
 ```
+
+### Log in
+Dev OTP is always **`123456`**. Phone `+201000000000` = admin ("فريق بيتكو", `/admin` portal); any other phone = a regular user.
+
+> **Full local runbook (DB, OTP, ports, gotchas):** [.ai/RUN_LOCALLY.md](./.ai/RUN_LOCALLY.md)
+> ⚠️ Postgres runs in Docker on **5433** (a native pg may sit on 5432). Use 5433.
 
 ---
 
@@ -88,6 +94,7 @@ Beitco/
 
 The `.ai/` folder is the source of truth for product, business, and engineering context:
 
+- **[.ai/RUN_LOCALLY.md](./.ai/RUN_LOCALLY.md)** — **run the app + DB locally (recipe + every gotcha)**
 - **[.ai/ENTRY_PROMPT.md](./.ai/ENTRY_PROMPT.md)** — start here, canonical context
 - **[.ai/PROJECT_OVERVIEW.md](./.ai/PROJECT_OVERVIEW.md)** — product vision, personas, MVP scope
 - **[.ai/CURRENT_STATE.md](./.ai/CURRENT_STATE.md)** — what's actually built today
