@@ -78,7 +78,7 @@ function AdminOverview() {
         />
         <Kpi
           icon={BedDouble}
-          label="أسرّة فاضية"
+          label="سراير فاضية"
           value={ar(s.inventory.availableBeds)}
           sub={`من ${ar(s.inventory.totalBeds)} سرير`}
         />
@@ -112,7 +112,7 @@ function AdminOverview() {
           <div className="my-2 border-t border-border" />
           <Row label="شقق" value={ar(s.listings.byType["شقة"])} />
           <Row label="أوض" value={ar(s.listings.byType["أوضة"])} />
-          <Row label="أسرّة" value={ar(s.listings.byType["سرير"])} />
+          <Row label="سراير" value={ar(s.listings.byType["سرير"])} />
         </Panel>
 
         {/* Engagement + trust */}

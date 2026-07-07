@@ -1339,9 +1339,9 @@ function ByBedPricing({ draft, update }: StepProps) {
 
   return (
     <div>
-      <h1 className="font-display text-3xl font-bold leading-tight sm:text-4xl">الأوض والأسرّة</h1>
+      <h1 className="font-display text-3xl font-bold leading-tight sm:text-4xl">الأوض والسراير</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        قسّم كل أوضة لأسرّة، وحدّد سعر كل سرير. السرير المفرد أو اللي جنب الشباك ممكن يبقى أغلى.
+        قسّم كل أوضة لسراير، وحدّد سعر كل سرير. السرير المفرد أو اللي جنب الشباك ممكن يبقى أغلى.
       </p>
 
       <div className="mt-8 flex flex-col gap-4">

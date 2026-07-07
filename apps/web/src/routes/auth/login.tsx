@@ -21,7 +21,7 @@ function LoginPage() {
     e.preventDefault();
     setError(null);
     if (!isValidEgyptianPhone(phone)) {
-      setError("ادخل رقم موبايل مصري صح (مثال: 01012345678)");
+      setError("اكتب رقم موبايل مصري صح (مثال: 01012345678)");
       return;
     }
     setLoading(true);
@@ -37,7 +37,7 @@ function LoginPage() {
   };
 
   return (
-    <AuthLayout title="ادخل حسابك" subtitle="هنبعتلك كود على الموبايل عشان نتأكد إنك انت.">
+    <AuthLayout title="سجّل دخولك" subtitle="هنبعتلك كود على الموبايل عشان نتأكد إنك انت.">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label htmlFor="phone" className="mb-2 block text-sm font-medium">

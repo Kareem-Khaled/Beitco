@@ -45,7 +45,7 @@ function VerifyPage() {
 
   return (
     <AuthLayout
-      title="ادخل الكود"
+      title="اكتب الكود"
       subtitle={`بعتنا كود من 6 أرقام على ${phone}. لو ما وصلش، جرّب تطلبه تاني.`}
     >
       <div className="flex flex-col gap-6">

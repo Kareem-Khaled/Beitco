@@ -236,7 +236,7 @@ const properties: SeedProp[] = [
     lat: 30.0385, lng: 31.2118, type: 'سرير', status: 'published', price: 2800, priceFrom: 2800,
     trust: 8.5, verified: true, reviewsCount: 42, residents: 10,
     image: 'https://images.unsplash.com/photo-1554995207-c18c203602cb?w=600&h=400&fit=crop',
-    description: 'سكن طلبة منظّم، خمس دقايق من جامعة القاهرة. أسرّة في أوض لأربعة. مطبخ مشترك ومسؤول مقيم.',
+    description: 'سكن طلبة منظّم، خمس دقايق من جامعة القاهرة. سراير في أوض لأربعة. مطبخ مشترك ومسؤول مقيم.',
     quality: { internet: 8.8, safety: 8.4, noise: 7.0, maintenance: 8.2, cleanliness: 8.7 },
     amenities: ['نت 150 ميجا', 'تكييف', 'غسالة', 'مطبخ مشترك', 'مسؤول مقيم'],
     costs: [{ label: 'إيجار السرير', amount: 2800 }],

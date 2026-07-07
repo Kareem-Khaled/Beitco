@@ -118,7 +118,7 @@ export function ViewingRequestDialog({
               placeholder={
                 isBooking
                   ? "مثلاً: حابب أعاين الأول، أو أأكّد الحجز على طول..."
-                  : "مثلاً: هحب أعرف لو في أسرّة فاضية للشهر الجاي..."
+                  : "مثلاً: هحب أعرف لو في سراير فاضية للشهر الجاي..."
               }
               rows={4}
               className="resize-none"

@@ -285,7 +285,7 @@ function MeOverview() {
       <section className="rounded-2xl border border-dashed border-border bg-surface p-8 text-center">
         <h3 className="font-display text-lg font-semibold">لسه بتدوّر على بيت؟</h3>
         <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
-          فيه أماكن جديدة بتتحط كل يوم. دوّر باللي يناسبك ولاقي سريرك.
+          فيه أماكن جديدة بتتحط كل يوم. دوّر باللي يناسبك وهتلاقي سريرك.
         </p>
         <Button asChild className="mt-4">
           <Link to="/search">

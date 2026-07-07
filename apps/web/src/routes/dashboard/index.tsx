@@ -73,7 +73,7 @@ function DashboardOverview() {
             />
             <StatCard
               icon={<BedDouble className="h-4 w-4" />}
-              label="أسرّة فاضية"
+              label="سراير فاضية"
               value={`${freeBeds.toLocaleString("ar-EG-u-nu-latn")} / ${totalBeds.toLocaleString("ar-EG-u-nu-latn")}`}
             />
             <StatCard

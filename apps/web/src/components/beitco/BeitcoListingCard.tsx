@@ -198,7 +198,7 @@ function AvailabilityBlock({
       <div className="flex items-center justify-between gap-2">
         <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
           <Icon className="h-3.5 w-3.5 text-muted-foreground" />
-          {isRoom ? "أوض للإيجار" : "أسرّة للإيجار"}
+          {isRoom ? "أوض للإيجار" : "سراير للإيجار"}
         </span>
         {full ? (
           <span className="rounded-full bg-background px-2 py-0.5 text-[11px] font-medium text-muted-foreground">

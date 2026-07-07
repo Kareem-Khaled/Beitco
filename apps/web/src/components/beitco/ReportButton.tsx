@@ -55,7 +55,7 @@ export function ReportButton({
 
   const onClick = () => {
     if (!user) {
-      toast.error("ادخل حسابك الأول عشان تبلّغ");
+      toast.error("سجّل دخولك الأول عشان تبلّغ");
       navigate({ to: "/auth/login" });
       return;
     }

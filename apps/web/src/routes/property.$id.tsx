@@ -223,11 +223,11 @@ function PropertyGate({ p }: { p: Property }) {
             </span>
             <h2 className="font-display text-lg font-semibold">التفاصيل الكاملة للأعضاء</h2>
             <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
-              ادخل أو اعمل حساب بسرعة (بالموبايل بس) عشان تشوف الآراء، درجات الجودة، تفاصيل الأوض
-              والأسرّة، وتكلّم صاحب البيت.
+              سجّل دخولك أو اعمل حساب بسرعة (بالموبايل بس) عشان تشوف الآراء، درجات الجودة، تفاصيل الأوض
+              والسراير، وتكلّم صاحب البيت.
             </p>
             <Button asChild size="lg" className="mt-4">
-              <Link to="/auth/login">ادخل عشان تشوف التفاصيل</Link>
+              <Link to="/auth/login">سجّل دخولك عشان تشوف التفاصيل</Link>
             </Button>
             <p className="mt-3 text-xs text-muted-foreground">التسجيل مجاني وبياخد دقيقة.</p>
           </div>
@@ -1259,7 +1259,7 @@ function RoomsSection({
             <DoorOpen className="h-5 w-5 text-primary" />
           )}
           <h2 className="font-display text-lg font-semibold">
-            {isBed ? "الأسرّة وأسعارها" : "الأوض وأسعارها"}
+            {isBed ? "السراير وأسعارها" : "الأوض وأسعارها"}
           </h2>
         </div>
         <span className="text-sm text-muted-foreground">
@@ -1270,7 +1270,7 @@ function RoomsSection({
 
       {canBook && available > 0 && (
         <p className="mt-2 text-xs text-muted-foreground">
-          اختار {isBed ? "السرير أو الأسرّة" : "الأوضة أو الأوض"} اللي عايزها — تقدر تختار أكتر من
+          اختار {isBed ? "السرير أو السراير" : "الأوضة أو الأوض"} اللي عايزها — تقدر تختار أكتر من
           واحد.
         </p>
       )}
@@ -1477,7 +1477,7 @@ function ReviewCard({
 
   const onHelpful = async () => {
     if (!userId) {
-      toast.error("ادخل حسابك الأول");
+      toast.error("سجّل دخولك الأول");
       return;
     }
     await toggleHelpful(propertyId, review.id, userId);
