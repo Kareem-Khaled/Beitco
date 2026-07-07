@@ -50,14 +50,8 @@ export function UserMenu() {
     return (
       <div className="flex items-center gap-2">
         <Link to="/auth/login">
-          <Button variant="ghost" size="sm" className="hidden sm:inline-flex">
-            ادخل حسابك
-          </Button>
-        </Link>
-        <Link to="/list/new">
-          <Button size="sm" className="rounded-full gap-1">
-            <Plus className="h-4 w-4" />
-            حط شقتك
+          <Button size="sm" className="rounded-full">
+            سجّل دخولك
           </Button>
         </Link>
       </div>
@@ -79,14 +73,12 @@ export function UserMenu() {
 
   return (
     <div className="flex items-center gap-2">
-      {isOwner && (
-        <Link to="/list/new" className="hidden sm:inline-flex">
-          <Button size="sm" className="rounded-full gap-1">
-            <Plus className="h-4 w-4" />
-            حط شقتك
-          </Button>
-        </Link>
-      )}
+      <Link to="/list/new" className="hidden sm:inline-flex">
+        <Button size="sm" className="rounded-full gap-1">
+          <Plus className="h-4 w-4" />
+          حط شقتك
+        </Button>
+      </Link>
 
       <Link
         to="/messages"

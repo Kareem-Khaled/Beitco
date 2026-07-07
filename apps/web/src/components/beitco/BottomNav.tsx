@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Search, Plus, MessageCircle, User as UserIcon } from "lucide-react";
+import { Home, Search, Plus, MessageCircle, User as UserIcon, LogIn } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
 import { useThreads } from "@/lib/beitco/queries";
 
@@ -27,14 +27,25 @@ export function BottomNav() {
         <Tab to="/" label="الرئيسية" icon={Home} active={isActive("/")} />
         <Tab to="/search" label="دوّر" icon={Search} active={isActive("/search")} />
 
-        {/* Center CTA — raised */}
-        <Link
-          to="/list/new"
-          aria-label="حط شقتك"
-          className="relative -top-3 mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25 transition-transform active:scale-95"
-        >
-          <Plus className="h-6 w-6" />
-        </Link>
+        {/* Center CTA — raised. "حط شقتك" only when logged in; otherwise a
+            login prompt (keeps the 5-column grid balanced). */}
+        {user ? (
+          <Link
+            to="/list/new"
+            aria-label="حط شقتك"
+            className="relative -top-3 mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25 transition-transform active:scale-95"
+          >
+            <Plus className="h-6 w-6" />
+          </Link>
+        ) : (
+          <Link
+            to="/auth/login"
+            aria-label="سجّل دخولك"
+            className="relative -top-3 mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25 transition-transform active:scale-95"
+          >
+            <LogIn className="h-6 w-6" />
+          </Link>
+        )}
 
         <Tab
           to="/messages"

@@ -55,14 +55,6 @@ export function SiteHeader() {
         </nav>
 
         <div className="ms-auto flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => navigate({ to: "/search" })}
-            className="hidden items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-foreground/20 sm:flex"
-          >
-            <Search className="h-4 w-4" />
-            <span>دوّر على منطقة أو كومباوند…</span>
-          </button>
           <UserMenu />
 
           {/* Mobile menu */}
@@ -138,20 +130,10 @@ export function SiteHeader() {
                     حط شقتك
                   </Button>
                 ) : (
-                  <>
-                    <Button onClick={() => go("/auth/login")} className="w-full gap-1">
-                      <LogIn className="h-4 w-4" />
-                      ادخل حسابك
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => go("/list/new")}
-                      className="w-full gap-1"
-                    >
-                      <Plus className="h-4 w-4" />
-                      حط شقتك
-                    </Button>
-                  </>
+                  <Button onClick={() => go("/auth/login")} className="w-full gap-1">
+                    <LogIn className="h-4 w-4" />
+                    سجّل دخولك
+                  </Button>
                 )}
               </div>
             </SheetContent>
