@@ -47,7 +47,13 @@ const TARGET_LABEL: Record<ReportTargetType, string> = {
 
 function AdminReports() {
   const [status, setStatus] = useState<string | undefined>(undefined);
-  const { data: reports = [], isLoading } = useAdminReports({ status });
+  const {
+    items: reports,
+    isLoading,
+    hasMore,
+    fetchMore,
+    isFetchingMore,
+  } = useAdminReports({ status });
 
   return (
     <div className="space-y-5">
@@ -84,11 +90,25 @@ function AdminReports() {
           <p className="mt-3 text-sm text-muted-foreground">مفيش بلاغات هنا 🎉</p>
         </div>
       ) : (
-        <ul className="space-y-3">
-          {reports.map((r) => (
-            <ReportCard key={r.id} report={r} />
-          ))}
-        </ul>
+        <>
+          <ul className="space-y-3">
+            {reports.map((r) => (
+              <ReportCard key={r.id} report={r} />
+            ))}
+          </ul>
+          {hasMore ? (
+            <div className="mt-4 text-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fetchMore()}
+                disabled={isFetchingMore}
+              >
+                {isFetchingMore ? "بنحمّل…" : "شوف المزيد"}
+              </Button>
+            </div>
+          ) : null}
+        </>
       )}
     </div>
   );

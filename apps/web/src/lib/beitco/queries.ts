@@ -5,7 +5,7 @@
 //     is zero loading flash — behaviour is byte-identical to the pre-API app.
 //   - flag ON: data is fetched from the NestJS API.
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import {
   getPublishedProperties,
@@ -190,22 +190,66 @@ export type SearchResult =
   | { items: Property[]; mode: "client" }
   | { items: PropertySummary[]; mode: "server" };
 
-export function useSearchProperties(params: PropertyFilters) {
-  return useQuery<SearchResult>({
+// One fetched page (server mode carries the cursor; client mode is a single
+// synchronous page of the whole mock set).
+type SearchPage =
+  | { items: Property[]; mode: "client"; cursor: null; hasMore: false }
+  | { items: PropertySummary[]; mode: "server"; cursor: string | null; hasMore: boolean };
+
+const SEARCH_PAGE_SIZE = 24;
+
+// Returns the accumulated results across pages + infinite-scroll controls.
+// API mode pages through the server cursor; mock mode is one client-side page.
+export function useSearchProperties(params: PropertyFilters): SearchResult & {
+  hasMore: boolean;
+  fetchMore: () => void;
+  isFetchingMore: boolean;
+} {
+  const query = useInfiniteQuery<SearchPage>({
     // API mode keys by params (each filter set is a distinct server query); mock
     // mode is param-independent (the page filters in-memory) so it caches once.
     queryKey: USE_API ? ["search", "api", params] : ["search", "mock"],
-    queryFn: async () => {
+    initialPageParam: undefined as string | undefined,
+    queryFn: async ({ pageParam }) => {
       if (USE_API) {
-        const { items } = await apiListProperties({ ...params, limit: 50 });
-        return { items, mode: "server" };
+        const { items, cursor, hasMore } = await apiListProperties({
+          ...params,
+          limit: SEARCH_PAGE_SIZE,
+          cursor: pageParam as string | undefined,
+        });
+        return { items, mode: "server", cursor, hasMore };
       }
-      return { items: getPublishedProperties(), mode: "client" };
+      return { items: getPublishedProperties(), mode: "client", cursor: null, hasMore: false };
     },
+    getNextPageParam: (last) => (last.hasMore ? (last.cursor ?? undefined) : undefined),
     // Mock can hydrate synchronously (no flash); API fetches normally.
-    initialData: USE_API ? undefined : () => ({ items: getPublishedProperties(), mode: "client" }),
+    initialData: USE_API
+      ? undefined
+      : () => ({
+          pages: [
+            { items: getPublishedProperties(), mode: "client", cursor: null, hasMore: false },
+          ],
+          pageParams: [undefined],
+        }),
     staleTime: USE_API ? 15_000 : Infinity,
   });
+
+  const pages = query.data?.pages ?? [];
+  const mode = pages[0]?.mode ?? (USE_API ? "server" : "client");
+  // Flatten every fetched page into one list for the grid (memoized so the
+  // consuming page's filter/sort memo stays stable between renders).
+  const items = useMemo(
+    () => pages.flatMap((p) => p.items as (Property & PropertySummary)[]),
+    [pages],
+  );
+
+  return {
+    items,
+    mode,
+    hasMore: query.hasNextPage ?? false,
+    fetchMore: () => query.fetchNextPage(),
+    isFetchingMore: query.isFetchingNextPage,
+  } as SearchResult & { hasMore: boolean; fetchMore: () => void; isFetchingMore: boolean };
 }
 
 // Saved listings for /me/saved. Mock resolves ids -> properties synchronously;
@@ -604,20 +648,53 @@ export function useAdminStats() {
   });
 }
 
-// ADMIN-2: operator user management.
-export function useAdminUsers(params: AdminUsersParams) {
-  return useQuery<AdminUser[]>({
-    queryKey: ["adminUsers", params, { source: USE_API ? "api" : "mock" }],
-    queryFn: async () => {
-      if (USE_API) {
-        const { items } = await apiAdminUsers(params);
-        return items;
-      }
-      return getAdminUsers(params);
+// Shared infinite-list helper for the admin tables. API mode pages through the
+// server cursor (accumulating rows); mock mode returns everything in one page
+// (hasMore=false), so the "شوف المزيد" control simply never shows there.
+type AdminInfinite<T> = {
+  items: T[];
+  hasMore: boolean;
+  fetchMore: () => void;
+  isFetchingMore: boolean;
+  isLoading: boolean;
+};
+
+function useAdminInfinite<T, P extends object>(
+  key: string,
+  params: P,
+  apiFetch: (p: P & { cursor?: string }) => Promise<{ items: T[]; cursor: string | null; hasMore: boolean }>,
+  mockFetch: (p: P) => T[],
+): AdminInfinite<T> {
+  const query = useInfiniteQuery<{ items: T[]; cursor: string | null; hasMore: boolean }>({
+    queryKey: [key, params, { source: USE_API ? "api" : "mock" }],
+    initialPageParam: undefined as string | undefined,
+    queryFn: async ({ pageParam }) => {
+      if (USE_API) return apiFetch({ ...params, cursor: pageParam as string | undefined });
+      return { items: mockFetch(params), cursor: null, hasMore: false };
     },
-    initialData: USE_API ? undefined : () => getAdminUsers(params),
+    getNextPageParam: (last) => (last.hasMore ? (last.cursor ?? undefined) : undefined),
+    initialData: USE_API
+      ? undefined
+      : () => ({
+          pages: [{ items: mockFetch(params), cursor: null, hasMore: false }],
+          pageParams: [undefined],
+        }),
     staleTime: USE_API ? 15_000 : Infinity,
   });
+  const pages = query.data?.pages ?? [];
+  const items = useMemo(() => pages.flatMap((p) => p.items), [pages]);
+  return {
+    items,
+    hasMore: query.hasNextPage ?? false,
+    fetchMore: () => query.fetchNextPage(),
+    isFetchingMore: query.isFetchingNextPage,
+    isLoading: query.isLoading,
+  };
+}
+
+// ADMIN-2: operator user management.
+export function useAdminUsers(params: AdminUsersParams) {
+  return useAdminInfinite("adminUsers", params, (p) => apiAdminUsers(p), getAdminUsers);
 }
 
 export function useAdminUser(id: string | undefined) {
@@ -652,18 +729,7 @@ export async function adminUserAction(
 
 // ADMIN-3: operator listing management.
 export function useAdminListings(params: AdminListingsParams) {
-  return useQuery<AdminListing[]>({
-    queryKey: ["adminListings", params, { source: USE_API ? "api" : "mock" }],
-    queryFn: async () => {
-      if (USE_API) {
-        const { items } = await apiAdminListings(params);
-        return items;
-      }
-      return getAdminListings(params);
-    },
-    initialData: USE_API ? undefined : () => getAdminListings(params),
-    staleTime: USE_API ? 15_000 : Infinity,
-  });
+  return useAdminInfinite("adminListings", params, (p) => apiAdminListings(p), getAdminListings);
 }
 
 export function useAdminListing(id: string | undefined) {
@@ -724,18 +790,7 @@ export async function createReport(
 }
 
 export function useAdminReports(params: { status?: string; targetType?: string }) {
-  return useQuery<AdminReport[]>({
-    queryKey: ["adminReports", params, { source: USE_API ? "api" : "mock" }],
-    queryFn: async () => {
-      if (USE_API) {
-        const { items } = await apiAdminReports(params);
-        return items;
-      }
-      return getAdminReports(params);
-    },
-    initialData: USE_API ? undefined : () => getAdminReports(params),
-    staleTime: USE_API ? 15_000 : Infinity,
-  });
+  return useAdminInfinite("adminReports", params, (p) => apiAdminReports(p), getAdminReports);
 }
 
 export function useReportsCount() {

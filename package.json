@@ -22,6 +22,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
     "db:migrate": "pnpm --filter @beitco/api exec prisma migrate dev",
     "db:seed": "pnpm --filter @beitco/api exec prisma db seed",
+    "db:seed:extra": "pnpm --filter @beitco/api db:seed:extra",
     "db:studio": "pnpm --filter @beitco/api exec prisma studio"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import {
   Search,
   X,
@@ -91,8 +91,25 @@ function SearchPage() {
     navigate({ search: (prev) => ({ ...prev, ...next }) });
   };
 
-  const { data: result } = useSearchProperties(params);
+  const result = useSearchProperties(params);
+  const { hasMore, fetchMore, isFetchingMore } = result;
   const geoActive = params.lat != null && params.lng != null;
+
+  // Infinite scroll: auto-load the next page when the sentinel scrolls into view
+  // (server mode only — mock mode returns everything in one page, hasMore=false).
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = loadMoreRef.current;
+    if (!el || !hasMore) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && !isFetchingMore) fetchMore();
+      },
+      { rootMargin: "400px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [hasMore, isFetchingMore, fetchMore]);
 
   const filtered = useMemo(() => {
     if (!result) return [];
@@ -169,7 +186,7 @@ function SearchPage() {
 
   const onSaveSearch = async () => {
     if (!user) {
-      toast.error("ادخل حسابك الأول عشان تحفظ بحثك");
+      toast.error("سجّل دخولك الأول عشان تحفظ بحثك");
       navigate({ to: "/auth/login" });
       return;
     }
@@ -190,7 +207,7 @@ function SearchPage() {
         <header className="mb-5">
           <h1 className="font-display text-2xl font-semibold tracking-tight">دوّر على بيتك</h1>
           <p className="text-sm text-muted-foreground">
-            فلترلنا اللي عايزه ولاقي السرير أو الأوضة أو الشقة المناسبة.
+            فلترلنا اللي عايزه وهتلاقي السرير أو الأوضة أو الشقة المناسبة.
           </p>
         </header>
 
@@ -371,7 +388,7 @@ function SearchPage() {
                 <div className="space-y-2 text-sm">
                   <Toggle
                     icon={<BedDouble className="h-3.5 w-3.5" />}
-                    label="فيها أسرّة فاضية بس"
+                    label="فيها سراير فاضية بس"
                     checked={!!params.freeOnly}
                     onChange={(v) => submit({ freeOnly: v || undefined })}
                   />
@@ -441,6 +458,7 @@ function SearchPage() {
               <p className="text-sm text-muted-foreground" aria-live="polite" role="status">
                 <span className="font-medium text-foreground">
                   {filtered.length.toLocaleString("ar-EG-u-nu-latn")}
+                  {hasMore ? "+" : ""}
                 </span>{" "}
                 مكان متاح
               </p>
@@ -489,6 +507,27 @@ function SearchPage() {
                 ))}
               </div>
             )}
+
+            {/* Infinite scroll sentinel + explicit fallback button */}
+            {hasMore ? (
+              <div ref={loadMoreRef} className="mt-6 flex justify-center">
+                <Button
+                  variant="outline"
+                  onClick={() => fetchMore()}
+                  disabled={isFetchingMore}
+                  className="min-w-40"
+                >
+                  {isFetchingMore ? (
+                    <>
+                      <Loader2 className="me-1 h-4 w-4 animate-spin" />
+                      بنحمّل…
+                    </>
+                  ) : (
+                    "شوف المزيد"
+                  )}
+                </Button>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

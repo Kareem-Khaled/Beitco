@@ -51,7 +51,13 @@ function AdminUsers() {
   const [status, setStatus] = useState<string | undefined>(undefined);
   const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
 
-  const { data: users = [], isLoading } = useAdminUsers({ q: search || undefined, role, status });
+  const {
+    items: users,
+    isLoading,
+    hasMore,
+    fetchMore,
+    isFetchingMore,
+  } = useAdminUsers({ q: search || undefined, role, status });
 
   return (
     <div className="space-y-5">
@@ -102,7 +108,9 @@ function AdminUsers() {
       {/* Table */}
       <div className="overflow-hidden rounded-2xl border border-border bg-card">
         <div className="border-b border-border bg-muted/40 px-4 py-2 text-xs text-muted-foreground">
-          {isLoading ? "بنحمّل…" : `${users.length.toLocaleString("ar-EG-u-nu-latn")} حساب`}
+          {isLoading
+            ? "بنحمّل…"
+            : `${users.length.toLocaleString("ar-EG-u-nu-latn")}${hasMore ? "+" : ""} حساب`}
         </div>
         <ul className="divide-y divide-border">
           {users.map((u) => (
@@ -142,6 +150,13 @@ function AdminUsers() {
             <li className="px-4 py-8 text-center text-sm text-muted-foreground">ما لقيناش حد</li>
           ) : null}
         </ul>
+        {hasMore ? (
+          <div className="border-t border-border p-3 text-center">
+            <Button variant="outline" size="sm" onClick={() => fetchMore()} disabled={isFetchingMore}>
+              {isFetchingMore ? "بنحمّل…" : "شوف المزيد"}
+            </Button>
+          </div>
+        ) : null}
       </div>
 
       <UserDetailSheet

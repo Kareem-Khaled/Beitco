@@ -66,7 +66,7 @@ const TYPE_FILTERS = [
   { id: undefined, label: "كل الأنواع" },
   { id: "شقة", label: "شقق" },
   { id: "أوضة", label: "أوض" },
-  { id: "سرير", label: "أسرّة" },
+  { id: "سرير", label: "سراير" },
 ] as const;
 
 function AdminListings() {
@@ -76,7 +76,13 @@ function AdminListings() {
   const [type, setType] = useState<string | undefined>(undefined);
   const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
 
-  const { data: listings = [], isLoading } = useAdminListings({
+  const {
+    items: listings,
+    isLoading,
+    hasMore,
+    fetchMore,
+    isFetchingMore,
+  } = useAdminListings({
     q: search || undefined,
     status,
     type,
@@ -128,7 +134,9 @@ function AdminListings() {
 
       <div className="overflow-hidden rounded-2xl border border-border bg-card">
         <div className="border-b border-border bg-muted/40 px-4 py-2 text-xs text-muted-foreground">
-          {isLoading ? "بنحمّل…" : `${listings.length.toLocaleString("ar-EG-u-nu-latn")} إعلان`}
+          {isLoading
+            ? "بنحمّل…"
+            : `${listings.length.toLocaleString("ar-EG-u-nu-latn")}${hasMore ? "+" : ""} إعلان`}
         </div>
         <ul className="divide-y divide-border">
           {listings.map((p) => (
@@ -166,6 +174,13 @@ function AdminListings() {
             </li>
           ) : null}
         </ul>
+        {hasMore ? (
+          <div className="border-t border-border p-3 text-center">
+            <Button variant="outline" size="sm" onClick={() => fetchMore()} disabled={isFetchingMore}>
+              {isFetchingMore ? "بنحمّل…" : "شوف المزيد"}
+            </Button>
+          </div>
+        ) : null}
       </div>
 
       <ListingDetailSheet id={selectedId} onClose={() => setSelectedId(undefined)} />
@@ -280,7 +295,7 @@ function ListingDetailSheet({ id, onClose }: { id: string | undefined; onClose: 
                   <DetailRow label="السعر" value={`${p.price.toLocaleString("ar-EG")} ج.م`} />
                   <DetailRow label="الثقة" value={p.trust.toLocaleString("ar-EG")} />
                   <DetailRow
-                    label="الأسرّة"
+                    label="السراير"
                     value={`${p.beds.available.toLocaleString("ar-EG")} فاضي / ${p.beds.total.toLocaleString("ar-EG")}`}
                   />
                   <DetailRow label="اتعمل" value={formatDate(p.createdAt)} />
