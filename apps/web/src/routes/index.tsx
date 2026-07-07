@@ -12,7 +12,7 @@ import type { Property, PropertySummary } from "@/lib/beitco/types";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "بيتكو — لاقي بيتك في مصر" },
+      { title: "بيتكو — أجّر سرير، أوضة، أو شقة في مصر" },
       {
         name: "description",
         content:
@@ -42,11 +42,11 @@ function HomePage() {
       <main className="mx-auto max-w-7xl px-4 pb-24">
         <section className="py-12 text-center sm:py-16">
           <h1 className="font-display text-3xl font-bold leading-tight sm:text-5xl">
-            لاقي <span className="text-trust">بيتك</span> في مصر
+            أجّر <span className="text-trust">سرير</span>، أوضة، أو شقة كاملة
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground sm:text-lg">
-            بتدوّر على شقة، أوضة، أو سرير — أو شقة للبيع؟ هتلاقي أماكن موثّقة، بأسعار واضحة وآراء
-            ساكنين حقيقية.
+            بيتكو أول منصة في مصر تأجّرك بالسرير — سكن متأكدين منه، بأسعار واضحة وآراء ساكنين حقيقية
+            ودرجة ثقة لكل مكان.
           </p>
 
           <form
@@ -73,12 +73,12 @@ function HomePage() {
           <div className="mx-auto mt-3 flex max-w-2xl flex-wrap justify-center gap-2 text-xs">
             <QuickFilter onClick={() => onSearch({ type: "شقة" })}>شقق</QuickFilter>
             <QuickFilter onClick={() => onSearch({ type: "أوضة" })}>أوض</QuickFilter>
-            <QuickFilter onClick={() => onSearch({ type: "سرير" })}>أسرّة</QuickFilter>
+            <QuickFilter onClick={() => onSearch({ type: "سرير" })}>سراير</QuickFilter>
             <QuickFilter
               icon={<BedDouble className="h-3 w-3" />}
               onClick={() => onSearch({ freeOnly: true })}
             >
-              فيها أسرّة فاضية
+              فيها سراير فاضية
             </QuickFilter>
             <QuickFilter
               icon={<ShieldCheck className="h-3 w-3" />}

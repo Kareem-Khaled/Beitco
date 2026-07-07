@@ -83,15 +83,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "بيتكو — لاقي بيتك في مصر" },
+      { title: "بيتكو — أجّر سرير، أوضة، أو شقة في مصر" },
       {
         name: "description",
         content:
-          "بيتكو منصة السكن الموثوقة في مصر. لاقي شقة، أوضة، أو سرير للإيجار أو للبيع — بأسعار واضحة وآراء حقيقية ودرجة ثقة لكل مكان.",
+          "بيتكو أول منصة في مصر تأجّرك بالسرير — سرير، أوضة، أو شقة كاملة للإيجار أو للبيع. سكن متأكدين منه بأسعار واضحة وآراء حقيقية ودرجة ثقة لكل مكان.",
       },
       { name: "theme-color", content: "#14534c" },
       { property: "og:site_name", content: "بيتكو" },
-      { property: "og:title", content: "بيتكو — لاقي بيتك في مصر" },
+      { property: "og:title", content: "بيتكو — أجّر سرير، أوضة، أو شقة في مصر" },
       { property: "og:description", content: "منصة السكن الموثوقة في مصر." },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "ar_EG" },
@@ -99,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "بيتكو — لاقي بيتك في مصر" },
+      { name: "twitter:title", content: "بيتكو — أجّر سرير، أوضة، أو شقة في مصر" },
       { name: "twitter:description", content: "منصة السكن الموثوقة في مصر." },
       { name: "twitter:image", content: "/og.svg" },
     ],
