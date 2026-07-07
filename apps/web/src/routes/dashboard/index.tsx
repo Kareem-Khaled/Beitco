@@ -56,7 +56,7 @@ function DashboardOverview() {
         <Button asChild>
           <Link to="/list/new">
             <Plus className="me-1 h-4 w-4" />
-            حط شقة جديدة
+            اعرض مكان جديد
           </Link>
         </Button>
       </header>
@@ -364,7 +364,7 @@ function EmptyState() {
       <Button asChild className="mt-4">
         <Link to="/list/new">
           <Plus className="me-1 h-4 w-4" />
-          حط شقتك
+          اعرض مكانك
         </Link>
       </Button>
     </div>

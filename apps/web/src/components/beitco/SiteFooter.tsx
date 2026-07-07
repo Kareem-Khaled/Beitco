@@ -15,7 +15,7 @@ const groups: { title: string; items: FooterLink[] }[] = [
     title: "بيتكو",
     items: [
       { label: "عن بيتكو", to: "/about" },
-      { label: "حط شقتك", to: "/list/new" },
+      { label: "اعرض مكانك", to: "/list/new" },
       { label: "حسابي", to: "/me" },
     ],
   },

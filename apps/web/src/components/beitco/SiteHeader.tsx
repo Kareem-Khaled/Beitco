@@ -127,7 +127,7 @@ export function SiteHeader() {
                 {user ? (
                   <Button onClick={() => go("/list/new")} className="w-full gap-1">
                     <Plus className="h-4 w-4" />
-                    حط شقتك
+                    اعرض مكانك
                   </Button>
                 ) : (
                   <Button onClick={() => go("/auth/login")} className="w-full gap-1">

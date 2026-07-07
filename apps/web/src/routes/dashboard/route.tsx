@@ -122,7 +122,7 @@ function DashboardLayout() {
               <Button asChild className="w-full">
                 <Link to="/list/new">
                   <Plus className="me-1 h-4 w-4" />
-                  حط شقة جديدة
+                  اعرض مكان جديد
                 </Link>
               </Button>
             </div>

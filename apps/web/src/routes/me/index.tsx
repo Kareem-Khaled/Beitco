@@ -147,7 +147,7 @@ function MeOverview() {
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <Link to="/list/new">حط شقة</Link>
+              <Link to="/list/new">اعرض مكانك</Link>
             </Button>
           </div>
         </section>

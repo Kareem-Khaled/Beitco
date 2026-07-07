@@ -85,7 +85,7 @@ function AboutPage() {
               <Link to="/search">دوّر على بيت</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link to="/list/new">حط شقتك</Link>
+              <Link to="/list/new">اعرض مكانك</Link>
             </Button>
           </div>
         </section>

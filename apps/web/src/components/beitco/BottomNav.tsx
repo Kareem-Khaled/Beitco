@@ -5,7 +5,7 @@ import { useThreads } from "@/lib/beitco/queries";
 
 // Mobile-only bottom tab bar — the expected navigation pattern for a phone-first
 // Egyptian marketplace (and for the Capacitor shell later). Hidden on md+, where
-// the SiteHeader carries navigation. The center "حط شقتك" is the brand's
+// the SiteHeader carries navigation. The center "اعرض مكانك" is the brand's
 // signature CTA, raised as a FAB.
 export function BottomNav() {
   const { user } = useAuth();
@@ -27,12 +27,12 @@ export function BottomNav() {
         <Tab to="/" label="الرئيسية" icon={Home} active={isActive("/")} />
         <Tab to="/search" label="دوّر" icon={Search} active={isActive("/search")} />
 
-        {/* Center CTA — raised. "حط شقتك" only when logged in; otherwise a
+        {/* Center CTA — raised. "اعرض مكانك" only when logged in; otherwise a
             login prompt (keeps the 5-column grid balanced). */}
         {user ? (
           <Link
             to="/list/new"
-            aria-label="حط شقتك"
+            aria-label="اعرض مكانك"
             className="relative -top-3 mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25 transition-transform active:scale-95"
           >
             <Plus className="h-6 w-6" />

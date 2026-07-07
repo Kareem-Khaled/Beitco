@@ -12,7 +12,7 @@ import type { Property, PropertySummary } from "@/lib/beitco/types";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "بيتكو — أجّر سرير، أوضة، أو شقة في مصر" },
+      { title: "بيتكو — سكن بالسرير في مصر" },
       {
         name: "description",
         content:
@@ -111,10 +111,10 @@ function HomePage() {
           <EmptyState
             icon={Home}
             title="لسه ما فيش أماكن"
-            hint="كن أول واحد يحط شقته على بيتكو."
+            hint="كن أول واحد يعرض مكانه على بيتكو."
             action={
               <Button asChild>
-                <Link to="/list/new">حط شقتك</Link>
+                <Link to="/list/new">اعرض مكانك</Link>
               </Button>
             }
           />

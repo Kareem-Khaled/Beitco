@@ -76,7 +76,7 @@ export function UserMenu() {
       <Link to="/list/new" className="hidden sm:inline-flex">
         <Button size="sm" className="rounded-full gap-1">
           <Plus className="h-4 w-4" />
-          حط شقتك
+          اعرض مكانك
         </Button>
       </Link>
 

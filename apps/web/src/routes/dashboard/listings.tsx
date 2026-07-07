@@ -111,7 +111,7 @@ function DashboardListings() {
         <Button asChild>
           <Link to="/list/new">
             <Plus className="me-1 h-4 w-4" />
-            حط شقة جديدة
+            اعرض مكان جديد
           </Link>
         </Button>
       </header>
@@ -120,7 +120,7 @@ function DashboardListings() {
         <div className="rounded-2xl border border-dashed border-border bg-surface p-10 text-center">
           <p className="text-sm text-muted-foreground">لسه ما حطّيتش ولا شقة.</p>
           <Button asChild className="mt-4">
-            <Link to="/list/new">حط شقتك دلوقتي</Link>
+            <Link to="/list/new">اعرض مكانك دلوقتي</Link>
           </Button>
         </div>
       ) : (
