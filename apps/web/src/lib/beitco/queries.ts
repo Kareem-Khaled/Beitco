@@ -204,6 +204,7 @@ export function useSearchProperties(params: PropertyFilters): SearchResult & {
   hasMore: boolean;
   fetchMore: () => void;
   isFetchingMore: boolean;
+  isLoading: boolean;
 } {
   const query = useInfiniteQuery<SearchPage>({
     // API mode keys by params (each filter set is a distinct server query); mock
@@ -249,7 +250,15 @@ export function useSearchProperties(params: PropertyFilters): SearchResult & {
     hasMore: query.hasNextPage ?? false,
     fetchMore: () => query.fetchNextPage(),
     isFetchingMore: query.isFetchingNextPage,
-  } as SearchResult & { hasMore: boolean; fetchMore: () => void; isFetchingMore: boolean };
+    // True only on the very first fetch (no pages yet) — the page shows skeleton
+    // cards instead of a false "no results" flash.
+    isLoading: query.isLoading,
+  } as SearchResult & {
+    hasMore: boolean;
+    fetchMore: () => void;
+    isFetchingMore: boolean;
+    isLoading: boolean;
+  };
 }
 
 // Saved listings for /me/saved. Mock resolves ids -> properties synchronously;

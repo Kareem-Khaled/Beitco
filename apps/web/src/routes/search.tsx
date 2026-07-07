@@ -17,7 +17,7 @@ import {
 import { z } from "zod";
 import { SiteHeader } from "@/components/beitco/SiteHeader";
 import { SiteFooter } from "@/components/beitco/SiteFooter";
-import { BeitcoListingCard } from "@/components/beitco/BeitcoListingCard";
+import { BeitcoListingCard, ListingCardSkeleton } from "@/components/beitco/BeitcoListingCard";
 import { EmptyState } from "@/components/beitco/EmptyState";
 import { EGYPT_AREAS } from "@/lib/beitco/store";
 import {
@@ -92,7 +92,7 @@ function SearchPage() {
   };
 
   const result = useSearchProperties(params);
-  const { hasMore, fetchMore, isFetchingMore } = result;
+  const { hasMore, fetchMore, isFetchingMore, isLoading } = result;
   const geoActive = params.lat != null && params.lng != null;
 
   // Infinite scroll: auto-load the next page when the sentinel scrolls into view
@@ -456,11 +456,17 @@ function SearchPage() {
 
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm text-muted-foreground" aria-live="polite" role="status">
-                <span className="font-medium text-foreground">
-                  {filtered.length.toLocaleString("ar-EG-u-nu-latn")}
-                  {hasMore ? "+" : ""}
-                </span>{" "}
-                مكان متاح
+                {isLoading ? (
+                  "بنحمّل الأماكن…"
+                ) : (
+                  <>
+                    <span className="font-medium text-foreground">
+                      {filtered.length.toLocaleString("ar-EG-u-nu-latn")}
+                      {hasMore ? "+" : ""}
+                    </span>{" "}
+                    مكان متاح
+                  </>
+                )}
               </p>
               {geoActive ? (
                 <span className="inline-flex items-center gap-1.5 rounded-lg bg-trust-soft px-2.5 py-2 text-xs font-medium text-trust">
@@ -487,7 +493,14 @@ function SearchPage() {
               )}
             </div>
 
-            {filtered.length === 0 ? (
+            {isLoading ? (
+              // Initial load: skeleton grid (avoids a false "no results" flash).
+              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3" aria-busy="true">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <ListingCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : filtered.length === 0 ? (
               <EmptyState
                 icon={SearchX}
                 title="ما لقيناش حاجة تطابق طلبك"
@@ -505,6 +518,10 @@ function SearchPage() {
                 {filtered.map((p) => (
                   <BeitcoListingCard key={p.id} p={p} />
                 ))}
+                {/* Appending the next page: skeleton cards fill in as they load */}
+                {isFetchingMore
+                  ? Array.from({ length: 3 }).map((_, i) => <ListingCardSkeleton key={`sk-${i}`} />)
+                  : null}
               </div>
             )}
 

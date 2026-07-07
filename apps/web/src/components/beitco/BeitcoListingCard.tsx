@@ -13,10 +13,30 @@ import {
 } from "lucide-react";
 import { TrustBadge } from "./TrustBadge";
 import { OptimizedImage } from "./OptimizedImage";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { Property, PropertySummary, Room, BedStatus } from "@/lib/beitco/types";
 
 type CardProperty = PropertySummary | Property;
+
+// Loading placeholder that mirrors the card layout (image + text block), so the
+// grid keeps its shape while listings load or the next page is fetched.
+export function ListingCardSkeleton() {
+  return (
+    <div className="overflow-hidden rounded-2xl border border-border bg-surface" aria-hidden="true">
+      <Skeleton className="aspect-[4/3] w-full rounded-none" />
+      <div className="space-y-3 p-4">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-3 w-1/2" />
+        <Skeleton className="h-8 w-full rounded-lg" />
+        <div className="flex justify-between">
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="h-3 w-12" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function BeitcoListingCard({ p, className }: { p: CardProperty; className?: string }) {
   const isSale = p.listingType === "sale";
