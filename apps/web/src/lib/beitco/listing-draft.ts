@@ -20,7 +20,7 @@ export type ListingDraft = {
   // Step 1 — location
   area?: string;
   address?: string;
-  lat?: number; // exact map pin the owner sets (keyless Leaflet/OSM)
+  lat?: number; // exact map pin the owner sets (Google Maps)
   lng?: number;
   // Step 2 — apartment specs
   unitType?: UnitType;

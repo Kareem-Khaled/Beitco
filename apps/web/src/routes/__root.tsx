@@ -107,8 +107,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
       { rel: "apple-touch-icon", href: "/favicon.svg" },
       { rel: "manifest", href: "/manifest.webmanifest" },
-      // Leaflet map styles (keyless OpenStreetMap) for the listing location picker.
-      { rel: "stylesheet", href: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" },
       {
         rel: "preconnect",
         href: "https://fonts.googleapis.com",

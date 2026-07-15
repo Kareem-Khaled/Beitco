@@ -28,6 +28,13 @@ apps/web/.env
 ```
 > Without this file the web app runs on a **localStorage mock** (no backend). With it, the UI reads/writes the live API.
 
+**Optional — Google Maps (interactive pin on the listing wizard):**
+```
+apps/web/.env
+  VITE_GOOGLE_MAPS_API_KEY=your_maps_js_api_key
+```
+> Read-only map **views** (property page) use a keyless Google embed and need no key. The listing wizard's location **picker** becomes a fully interactive drag-the-pin map when the key is set; without it, it falls back to a keyless embed + "موقعي الحالي" (GPS). Get a key from Google Cloud → Maps JavaScript API.
+
 ---
 
 ## 2. Every-day run

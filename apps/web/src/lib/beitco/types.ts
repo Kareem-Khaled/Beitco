@@ -228,7 +228,7 @@ export type Property = {
   title: string;
   area: string;
   address: string;
-  lat?: number; // owner-set map location (keyless OSM/Leaflet pin)
+  lat?: number; // owner-set map location (Google Maps pin)
   lng?: number;
   type: PropertyType;
   status: PropertyStatus;
