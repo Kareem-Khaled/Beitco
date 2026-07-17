@@ -1,6 +1,6 @@
-// Beitco seed — ports apps/web/src/lib/beitco/seed-data.ts into Postgres so the
+// Beitoon seed — ports apps/web/src/lib/beitco/seed-data.ts into Postgres so the
 // API serves the same demo users + listings the frontend prototype shows today
-// (B-0.1 seed parity). Run with: pnpm --filter @beitco/api db:seed
+// (B-0.1 seed parity). Run with: pnpm --filter @beitoon/api db:seed
 //
 // Arabic display strings stay as data; only enum fields map to the schema's
 // Latin enum values (mappers below). Idempotent: wipes the demo tables first.
@@ -48,9 +48,9 @@ type SeedUser = {
 };
 
 const users: SeedUser[] = [
-  { id: 'u-admin', phone: '+201000000000', name: 'فريق بيتكو', role: 'both', verified: true, trust: 9.9, isAdmin: true, createdAt: '2024-01-01T00:00:00Z' },
+  { id: 'u-admin', phone: '+201000000000', name: 'فريق بيتون', role: 'both', verified: true, trust: 9.9, isAdmin: true, createdAt: '2024-01-01T00:00:00Z' },
   { id: 'u-mostafa', phone: '+201001234567', name: 'مصطفى حسن', role: 'owner', verified: true, trust: 9.4, responseRate: 97, createdAt: '2024-06-01T00:00:00Z' },
-  { id: 'u-coliving', phone: '+201005550001', name: 'بيتكو كولايفنج', role: 'owner', verified: true, trust: 8.6, responseRate: 92, createdAt: '2024-08-01T00:00:00Z' },
+  { id: 'u-coliving', phone: '+201005550001', name: 'بيتون كولايفنج', role: 'owner', verified: true, trust: 8.6, responseRate: 92, createdAt: '2024-08-01T00:00:00Z' },
   { id: 'u-zayed', phone: '+201005550002', name: 'أحمد عبده', role: 'owner', verified: false, trust: 8.5, responseRate: 88, createdAt: '2025-01-15T00:00:00Z' },
   { id: 'u-fam', phone: '+201005550003', name: 'هدى مراد', role: 'owner', verified: true, trust: 8.2, responseRate: 91, createdAt: '2024-10-01T00:00:00Z' },
   { id: 'u-students', phone: '+201005550004', name: 'سكن النيل', role: 'owner', verified: true, trust: 8.7, responseRate: 95, createdAt: '2024-07-01T00:00:00Z' },
@@ -316,7 +316,7 @@ const properties: SeedProp[] = [
 ];
 
 async function main() {
-  console.log('Seeding Beitco demo data...');
+  console.log('Seeding Beitoon demo data...');
 
   // Idempotent: clear demo tables, children first. Most FKs cascade from
   // Property/User, but a few are RESTRICT (e.g. renter_reviews.property_id),

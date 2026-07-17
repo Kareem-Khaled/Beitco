@@ -1,9 +1,9 @@
-# Project Overview — Beitco
+# Project Overview — Beitoon
 
 > 📄 **Vision doc.** This captures the product vision, personas, and MVP scope. For the **current feature inventory, domain model, gaps, and roadmap**, see the working source of truth: `.ai/PRD.md`. Note: the "NOT building (now): Buy/sell" line below is now an **open decision** — a `للبيع` flow has been prototyped (see PRD §9).
 
 ## One-Liner
-**Beitco is the trust-first housing marketplace for Egypt where you rent a bed, a room, or a whole apartment with confidence.**
+**Beitoon is the trust-first housing marketplace for Egypt where you rent a bed, a room, or a whole apartment with confidence.**
 
 ## The Problem
 Egyptian housing is a trust crisis:
@@ -73,7 +73,7 @@ Greater Cairo first, then Alexandria. Specifically:
 
 ## Key Differentiators vs Competition
 
-| | OLX | Property Finder | Aqarmap | **Beitco** |
+| | OLX | Property Finder | Aqarmap | **Beitoon** |
 |---|---|---|---|---|
 | Bed-level inventory | ❌ | ❌ | ❌ | ✅ |
 | Verified listings | partial | partial | partial | **core** |

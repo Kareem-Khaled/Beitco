@@ -1,4 +1,4 @@
-# Scale & Production Readiness — Beitco
+# Scale & Production Readiness — Beitoon
 
 > **"Will it survive thousands of real users, real money, and real attacks?"** · created June 25, 2026 · branch: `dev`
 > Companion to `.ai/PROD_READINESS.md` (the go-live runbook) and `.ai/NEXT_STEPS.md` (the backlog). Derived from an evidence-based code review (June 25). Each item is tracked in NEXT_STEPS under **P0.5 — Scale & correctness**.

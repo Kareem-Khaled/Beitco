@@ -39,7 +39,7 @@ function makePrisma(): PrismaMock {
 
 const admin: AuthUser = {
   id: 'admin1',
-  name: 'فريق بيتكو',
+  name: 'فريق بيتون',
   phone: '+20100',
   role: 'both',
   isAdmin: true,

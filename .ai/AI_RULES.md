@@ -1,4 +1,4 @@
-# Beitco — AI Development Rules
+# Beitoon — AI Development Rules
 
 > **Every AI assistant MUST read this file before writing any code.**
 
@@ -59,7 +59,7 @@ MANDATORY PRE-FLIGHT CHECKLIST:
 - Never use `any`. Use `unknown` if type is truly unknown.
 - Never use `@ts-ignore` or `@ts-expect-error` without a TODO comment
 - Never duplicate types between frontend and backend — use shared package
-- Never use relative imports across package boundaries — use `@beitco/types`
+- Never use relative imports across package boundaries — use `@beitoon/types`
 ```
 
 ### 3.2 Naming Conventions

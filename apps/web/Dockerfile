@@ -19,16 +19,18 @@ WORKDIR /app
 FROM base AS deps
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/web/package.json apps/web/
-COPY packages/types/package.json packages/types/
-COPY packages/utils/package.json packages/utils/
-COPY packages/validators/package.json packages/validators/
+COPY packages/shared/package.json packages/shared/
+# --ignore-scripts: shared's prepare (build) can't run in this deps-only layer
+# (src isn't copied yet); we build it explicitly in the build stage below.
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-  pnpm install --frozen-lockfile --filter "tanstack_start_ts..."
+  pnpm install --frozen-lockfile --filter "tanstack_start_ts..." --ignore-scripts
 
 # ---- build (node-server preset so it runs in a container) ----
 FROM deps AS build
 COPY apps/web apps/web
 COPY packages packages
+# Build the shared workspace package first (the web app imports @beitoon/shared).
+RUN pnpm --filter @beitoon/shared run build
 # VITE_USE_API + VITE_API_URL are baked at build time; override per environment.
 ARG VITE_USE_API=true
 ARG VITE_API_URL=http://localhost:3001/api/v1

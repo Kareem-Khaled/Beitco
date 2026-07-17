@@ -37,7 +37,7 @@ function LoginPage() {
   };
 
   return (
-    <AuthLayout title="سجّل دخولك" subtitle="هنبعتلك كود على الموبايل عشان نتأكد إنك انت.">
+    <AuthLayout title="أهلاً بيك في بيتون 👋" subtitle="سجّل دخولك في ثانية — برقم موبايلك بس.">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label htmlFor="phone" className="mb-2 block text-sm font-medium">
@@ -58,6 +58,11 @@ function LoginPage() {
             />
           </div>
           {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
+          {!error && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              هنبعتلك كود بالرسائل — مفيش باسورد تحفظه.
+            </p>
+          )}
         </div>
 
         <Button type="submit" size="lg" disabled={loading} className="w-full rounded-xl">

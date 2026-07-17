@@ -80,7 +80,7 @@ export function OccupancyDialog({
   const setField = (patch: Partial<Occupant>) => setOcc((o) => ({ ...o, ...patch }));
 
   // Privacy-safe invite: we never browse users or reveal whether a number has an
-  // account. The owner enters their tenant's exact phone; if a Beitco account
+  // account. The owner enters their tenant's exact phone; if a Beitoon account
   // exists, we attach a *pending* link the renter must confirm.
   const sendInvite = () => {
     const { valid, userId } = resolveInvitePhone(invitePhone);
@@ -96,7 +96,7 @@ export function OccupancyDialog({
     }));
     setInvitePhone("");
     // Same message whether or not an account exists (no existence oracle).
-    setInviteMsg("بعتنا دعوة للرقم ده. لو عنده حساب على بيتكو هيوصله طلب يأكّد إنه ساكن.");
+    setInviteMsg("بعتنا دعوة للرقم ده. لو عنده حساب على بيتون هيوصله طلب يأكّد إنه ساكن.");
   };
 
   const unlinkUser = () => {
@@ -168,7 +168,7 @@ export function OccupancyDialog({
                 بيانات المستأجر (كله اختياري — بتفضل خاصة بيك)
               </div>
 
-              {/* Link to a Beitco account — consent-based, by exact phone only.
+              {/* Link to a Beitoon account — consent-based, by exact phone only.
                   We never browse users or reveal who owns a number. */}
               {occ.userId ? (
                 <div className="flex items-center justify-between gap-2 rounded-lg border border-trust/40 bg-trust-soft px-3 py-2">
@@ -197,7 +197,7 @@ export function OccupancyDialog({
               ) : (
                 <div className="rounded-lg border border-dashed border-border bg-background p-2.5">
                   <div className="mb-1.5 text-[11px] text-muted-foreground">
-                    اربط الساكن بحساب بيتكو (اختياري) — اكتب رقمه وهنبعتله دعوة يأكّدها هو بنفسه.
+                    اربط الساكن بحساب بيتون (اختياري) — اكتب رقمه وهنبعتله دعوة يأكّدها هو بنفسه.
                   </div>
                   <div className="flex items-center gap-2">
                     <Input

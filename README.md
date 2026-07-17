@@ -1,4 +1,4 @@
-# بيتكو · Beitco
+# بيتون · Beitoon
 
 > **The trust-first housing marketplace for Egypt.** Rent a bed, a private room, or a whole apartment — with verification, real reviews, and quality scores you can actually trust.
 
@@ -8,7 +8,7 @@
 
 Most Egyptian housing today is rented through Facebook groups, ghost brokers, and 30%-fake OLX listings. Shared housing (the reality for most students and young professionals) is invisible — there's no platform built for it.
 
-Beitco changes that:
+Beitoon changes that:
 
 - **Bed-level inventory.** Owners list how many beds are available *right now*. Renters book a bed, a room, or a whole apartment — whatever fits.
 - **Trust as the product.** Every listing carries a verification badge, a 0–10 trust score, real reviews from past residents (gated by 30+ day tenancy), per-listing quality scores (internet / safety / noise / maintenance / cleanliness), landlord response rate, and a public Q&A.
@@ -37,7 +37,7 @@ docker compose up -d        # Postgres + PostGIS · Redis · Meilisearch
 ```bash
 pnpm api                    # NestJS on http://localhost:3001 (Swagger at /api/docs)
 ```
-First run: `pnpm --filter @beitco/api exec prisma migrate deploy && pnpm --filter @beitco/api db:seed` (12 users, 7 properties).
+First run: `pnpm --filter @beitoon/api exec prisma migrate deploy && pnpm --filter @beitoon/api db:seed` (12 users, 7 properties).
 
 ### Start the frontend
 ```bash
@@ -51,7 +51,7 @@ pnpm dev
 ```
 
 ### Log in
-Dev OTP is always **`123456`**. Phone `+201000000000` = admin ("فريق بيتكو", `/admin` portal); any other phone = a regular user.
+Dev OTP is always **`123456`**. Phone `+201000000000` = admin ("فريق بيتون", `/admin` portal); any other phone = a regular user.
 
 > **Full local runbook (DB, OTP, ports, gotchas):** [.ai/RUN_LOCALLY.md](./.ai/RUN_LOCALLY.md)
 > ⚠️ Postgres runs in Docker on **5433** (a native pg may sit on 5432). Use 5433.
@@ -61,7 +61,7 @@ Dev OTP is always **`123456`**. Phone `+201000000000` = admin ("فريق بيت�
 ## Repo Layout
 
 ```
-Beitco/
+Beitoon/
 ├── apps/
 │   ├── web/              ← TanStack Start frontend (live, fully wired)
 │   └── api/              ← NestJS backend (live, 16 modules)
@@ -102,7 +102,7 @@ The `.ai/` folder is the source of truth for product, business, and engineering 
 - **[.ai/SCALE_READINESS.md](./.ai/SCALE_READINESS.md)** — scale review (will it survive thousands of users?)
 - **[.ai/ADMIN_PLAN.md](./.ai/ADMIN_PLAN.md)** — operator-portal feature spec (ADMIN-1…13)
 - **[.ai/NEXT_STEPS.md](./.ai/NEXT_STEPS.md)** — the prioritized backlog
-- **[.ai/BUSINESS_MODEL.md](./.ai/BUSINESS_MODEL.md)** — how Beitco makes money
+- **[.ai/BUSINESS_MODEL.md](./.ai/BUSINESS_MODEL.md)** — how Beitoon makes money
 - **[.ai/ROADMAP.md](./.ai/ROADMAP.md)** — phased plan
 - **[.ai/AI_RULES.md](./.ai/AI_RULES.md)** — coding standards
 
@@ -120,4 +120,4 @@ See [`.ai/CURRENT_STATE.md`](./.ai/CURRENT_STATE.md) for the honest breakdown.
 
 ## License
 
-PROPRIETARY · © 2026 Beitco
+PROPRIETARY · © 2026 Beitoon

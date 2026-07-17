@@ -1,9 +1,9 @@
 {
-  "name": "beitco",
+  "name": "beitoon",
   "version": "0.1.0",
   "private": true,
   "description": "Egypt's first social network for real estate",
-  "author": "Beitco <hello@beitco.app>",
+  "author": "Beitoon <hello@beitoon.app>",
   "license": "PROPRIETARY",
   "engines": {
     "node": ">=20.0.0",
@@ -13,17 +13,17 @@
   "scripts": {
     "dev": "turbo run dev",
     "web": "pnpm --filter tanstack_start_ts dev",
-    "api": "pnpm --filter @beitco/api dev",
+    "api": "pnpm --filter @beitoon/api dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "type-check": "turbo run type-check",
     "test": "turbo run test",
     "clean": "turbo run clean && rm -rf node_modules",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
-    "db:migrate": "pnpm --filter @beitco/api exec prisma migrate dev",
-    "db:seed": "pnpm --filter @beitco/api exec prisma db seed",
-    "db:seed:extra": "pnpm --filter @beitco/api db:seed:extra",
-    "db:studio": "pnpm --filter @beitco/api exec prisma studio"
+    "db:migrate": "pnpm --filter @beitoon/api exec prisma migrate dev",
+    "db:seed": "pnpm --filter @beitoon/api exec prisma db seed",
+    "db:seed:extra": "pnpm --filter @beitoon/api db:seed:extra",
+    "db:studio": "pnpm --filter @beitoon/api exec prisma studio"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.0.0",

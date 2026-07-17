@@ -1,4 +1,4 @@
-# Beitco — AI Workflow Guide
+# Beitoon — AI Workflow Guide
 
 > **How to go from idea → task → implementation → documentation update.**
 
@@ -110,7 +110,7 @@ Step 5: Test
 
 ```
 Step 1: Types
-├── Import types from @beitco/types
+├── Import types from @beitoon/types
 └── Create component-specific types if needed
 
 Step 2: API Hook
@@ -162,7 +162,7 @@ Step 5: i18n
 3. Run `pnpm prisma migrate dev --name <description>`
 4. Update affected DTOs
 5. Update affected services
-6. Update affected types in @beitco/types
+6. Update affected types in @beitoon/types
 7. Update `.ai/API_SPEC.md` if response shape changed
 ```
 
@@ -173,7 +173,7 @@ Step 5: i18n
 2. Update DTO (request validation)
 3. Update Service (business logic)
 4. Update Controller (route handler)
-5. Update @beitco/types (response type)
+5. Update @beitoon/types (response type)
 6. Update frontend API hook
 7. Update frontend component
 ```

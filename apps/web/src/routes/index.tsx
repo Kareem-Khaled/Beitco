@@ -1,9 +1,17 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Search, SlidersHorizontal, BedDouble, ShieldCheck, Home } from "lucide-react";
+import {
+  Search,
+  SlidersHorizontal,
+  BedDouble,
+  ShieldCheck,
+  Home,
+  Building2,
+  DoorOpen,
+} from "lucide-react";
 import { SiteHeader } from "@/components/beitco/SiteHeader";
 import { SiteFooter } from "@/components/beitco/SiteFooter";
-import { BeitcoListingCard } from "@/components/beitco/BeitcoListingCard";
+import { BeitoonListingCard } from "@/components/beitco/BeitoonListingCard";
 import { EmptyState } from "@/components/beitco/EmptyState";
 import { Button } from "@/components/ui/button";
 import { usePublishedProperties } from "@/lib/beitco/queries";
@@ -12,11 +20,11 @@ import type { Property, PropertySummary } from "@/lib/beitco/types";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "بيتكو — سكن بالسرير في مصر" },
+      { title: "بيتون — سكن بالسرير في مصر" },
       {
         name: "description",
         content:
-          "بيتكو منصة سكن موثّقة في مصر. دوّر على شقة، أوضة، أو سرير — أو شقة للبيع — بأسعار واضحة وآراء ساكنين حقيقية.",
+          "بيتون منصة سكن موثّقة في مصر. دوّر على شقة، أوضة، أو سرير — أو شقة للبيع — بأسعار واضحة وآراء ساكنين حقيقية.",
       },
     ],
   }),
@@ -45,7 +53,7 @@ function HomePage() {
             أجّر <span className="text-trust">سرير</span>، أوضة، أو شقة كاملة
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground sm:text-lg">
-            بيتكو أول منصة في مصر تأجّرك بالسرير — سكن متأكدين منه، بأسعار واضحة وآراء ساكنين حقيقية
+            بيتون أول منصة في مصر تأجّرك بالسرير — سكن متأكدين منه، بأسعار واضحة وآراء ساكنين حقيقية
             ودرجة ثقة لكل مكان.
           </p>
 
@@ -71,14 +79,23 @@ function HomePage() {
           </form>
 
           <div className="mx-auto mt-3 flex max-w-2xl flex-wrap justify-center gap-2 text-xs">
-            <QuickFilter onClick={() => onSearch({ type: "شقة" })}>شقق</QuickFilter>
-            <QuickFilter onClick={() => onSearch({ type: "أوضة" })}>أوض</QuickFilter>
-            <QuickFilter onClick={() => onSearch({ type: "سرير" })}>سراير</QuickFilter>
+            <QuickFilter
+              icon={<Building2 className="h-3 w-3" />}
+              onClick={() => onSearch({ type: "شقة" })}
+            >
+              شقق
+            </QuickFilter>
+            <QuickFilter
+              icon={<DoorOpen className="h-3 w-3" />}
+              onClick={() => onSearch({ type: "أوضة" })}
+            >
+              أوض
+            </QuickFilter>
             <QuickFilter
               icon={<BedDouble className="h-3 w-3" />}
-              onClick={() => onSearch({ freeOnly: true })}
+              onClick={() => onSearch({ type: "سرير" })}
             >
-              فيها سراير فاضية
+              سراير
             </QuickFilter>
             <QuickFilter
               icon={<ShieldCheck className="h-3 w-3" />}
@@ -111,7 +128,7 @@ function HomePage() {
           <EmptyState
             icon={Home}
             title="لسه ما فيش أماكن"
-            hint="كن أول واحد يعرض مكانه على بيتكو."
+            hint="كن أول واحد يعرض مكانه على بيتون."
             action={
               <Button asChild>
                 <Link to="/list/new">اعرض مكانك</Link>
@@ -121,7 +138,7 @@ function HomePage() {
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {properties.slice(0, 9).map((p: Property | PropertySummary) => (
-              <BeitcoListingCard key={p.id} p={p} />
+              <BeitoonListingCard key={p.id} p={p} />
             ))}
           </div>
         )}

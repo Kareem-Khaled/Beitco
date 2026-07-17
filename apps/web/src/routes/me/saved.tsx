@@ -3,7 +3,7 @@ import { Heart, Search } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/beitco/auth";
 import { useSavedListings, toggleSavedListing } from "@/lib/beitco/queries";
-import { BeitcoListingCard } from "@/components/beitco/BeitcoListingCard";
+import { BeitoonListingCard } from "@/components/beitco/BeitoonListingCard";
 import { EmptyState } from "@/components/beitco/EmptyState";
 import { Button } from "@/components/ui/button";
 
@@ -52,7 +52,7 @@ function MeSaved() {
               className="group/saved overflow-hidden rounded-2xl border border-border bg-surface transition-all hover:shadow-[var(--shadow-elevated)]"
             >
               {/* Card without its own frame — merges into this one container */}
-              <BeitcoListingCard
+              <BeitoonListingCard
                 p={p}
                 className="rounded-none border-0 bg-transparent hover:translate-y-0 hover:shadow-none"
               />

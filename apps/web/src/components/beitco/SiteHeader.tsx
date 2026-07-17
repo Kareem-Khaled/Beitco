@@ -38,8 +38,8 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2">
-          <Logo className="h-7 w-7" />
-          <span className="font-display text-lg font-semibold tracking-tight">بيتكو</span>
+          <Logo className="h-10 w-10" />
+          <span className="font-display text-xl font-semibold tracking-tight">بيتون</span>
         </Link>
 
         <nav className="ms-4 hidden items-center gap-1 md:flex">
@@ -68,7 +68,7 @@ export function SiteHeader() {
               <SheetHeader>
                 <SheetTitle className="flex items-center gap-2">
                   <Logo className="h-6 w-6" />
-                  <span className="font-display text-base font-semibold">بيتكو</span>
+                  <span className="font-display text-base font-semibold">بيتون</span>
                 </SheetTitle>
               </SheetHeader>
 

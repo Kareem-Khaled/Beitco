@@ -86,7 +86,7 @@ function MeOverview() {
       <header>
         <h1 className="font-display text-2xl font-semibold tracking-tight">حسابي</h1>
         <p className="text-sm text-muted-foreground">
-          أهلاً يا {user.name.split(" ")[0]} — ده ملخص نشاطك على بيتكو.
+          أهلاً يا {user.name.split(" ")[0]} — ده ملخص نشاطك على بيتون.
         </p>
       </header>
 

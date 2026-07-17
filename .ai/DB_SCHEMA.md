@@ -1,4 +1,4 @@
-# Beitco — Database Schema
+# Beitoon — Database Schema
 
 > **Last updated:** June 25, 2026 · **Source of truth: `apps/api/prisma/schema.prisma`** (always defer to it). This is a navigable map, not a copy.
 > PostgreSQL 16 + PostGIS via Prisma 6. **24 models, 23 enums.** Migrations in `apps/api/prisma/migrations/`.

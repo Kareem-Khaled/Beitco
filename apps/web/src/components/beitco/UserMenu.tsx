@@ -162,7 +162,7 @@ export function UserMenu() {
             }}
           >
             {isDark ? <Sun className="me-2 h-4 w-4" /> : <Moon className="me-2 h-4 w-4" />}
-            {isDark ? "بيتكو بالنهاري" : "بيتكو بالليل"}
+            {isDark ? "بيتون بالنهاري" : "بيتون بالليل"}
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={(e) => {

@@ -1,4 +1,4 @@
-# Business Model — Beitco
+# Business Model — Beitoon
 
 ## TL;DR
 Free for renters, free to list for owners. Revenue from **(1) verified-owner subscriptions** and **(2) success fees on confirmed move-ins**, with optional **promoted-listing boosts** later.
@@ -8,7 +8,7 @@ Free for renters, free to list for owners. Revenue from **(1) verified-owner sub
 ## Why This Model
 - We can't charge listing fees out of the gate — supply is fragile in a new market.
 - We can't charge renters — they have free alternatives (OLX, Facebook).
-- The wedge that makes Beitco valuable (trust) is exactly what justifies a success fee: when a renter moves in, both sides won because of *our* trust layer.
+- The wedge that makes Beitoon valuable (trust) is exactly what justifies a success fee: when a renter moves in, both sides won because of *our* trust layer.
 
 ---
 

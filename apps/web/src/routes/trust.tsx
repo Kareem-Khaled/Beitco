@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/trust")({
   head: () => ({
     meta: [
-      { title: "إزاي بنبني الثقة — بيتكو" },
+      { title: "إزاي بنبني الثقة — بيتون" },
       {
         name: "description",
         content:
-          "اعرف إزاي بيتكو بتحسب درجة الثقة وبتوثّق الإعلانات عشان تطمن وانت بتدوّر على سكن.",
+          "اعرف إزاي بيتون بتحسب درجة الثقة وبتوثّق الإعلانات عشان تطمن وانت بتدوّر على سكن.",
       },
     ],
   }),

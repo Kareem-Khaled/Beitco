@@ -4,7 +4,7 @@
  * every listing it makes has a `bulk-` id prefix, and it deletes those first, so
  * you can re-run it freely. It does NOT touch the canonical seed data.
  *
- * Run:  pnpm --filter @beitco/api exec ts-node --transpile-only \
+ * Run:  pnpm --filter @beitoon/api exec ts-node --transpile-only \
  *         --compiler-options '{"module":"CommonJS"}' prisma/seed-extra.ts
  *   or:  pnpm db:seed:extra   (see package.json)
  */

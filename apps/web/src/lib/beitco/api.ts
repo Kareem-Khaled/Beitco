@@ -1,4 +1,4 @@
-// Typed API client for the Beitco backend (B-1). Behind the VITE_USE_API flag:
+// Typed API client for the Beitoon backend (B-1). Behind the VITE_USE_API flag:
 // when off (default), the app keeps reading from the localStorage mock so the
 // prototype works with no backend. When on, reads come from the NestJS API.
 // The returned shapes match lib/beitco/types.ts exactly (the API serializer

@@ -3,7 +3,7 @@ import { ShieldCheck, Star, Home, MessageCircle, CalendarDays } from "lucide-rea
 import { SiteHeader } from "@/components/beitco/SiteHeader";
 import { SiteFooter } from "@/components/beitco/SiteFooter";
 import { TrustBadgeExplained } from "@/components/beitco/TrustBadgeExplained";
-import { BeitcoListingCard } from "@/components/beitco/BeitcoListingCard";
+import { BeitoonListingCard } from "@/components/beitco/BeitoonListingCard";
 import { getPublicProfile, formatDate } from "@/lib/beitco/store";
 
 export const Route = createFileRoute("/u/$id")({
@@ -14,8 +14,8 @@ export const Route = createFileRoute("/u/$id")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData?.name ?? "حساب"} — بيتكو` },
-      { name: "description", content: "ملف عام على بيتكو — إعلانات وآراء حقيقية." },
+      { title: `${loaderData?.name ?? "حساب"} — بيتون` },
+      { name: "description", content: "ملف عام على بيتون — إعلانات وآراء حقيقية." },
     ],
   }),
   component: ProfilePage,
@@ -93,7 +93,7 @@ function ProfilePage() {
             ) : (
               <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {profile.listings.map((p) => (
-                  <BeitcoListingCard key={p.id} p={p} />
+                  <BeitoonListingCard key={p.id} p={p} />
                 ))}
               </div>
             )}

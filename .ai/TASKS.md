@@ -1,4 +1,4 @@
-# Task Board — Beitco (Frontend)
+# Task Board — Beitoon (Frontend)
 
 > Frontend (`apps/web`) board. **Last updated: June 24, 2026.**
 >
@@ -16,7 +16,7 @@ _(nothing in flight on the frontend — it's feature-complete and wired to the A
 
 ## ✅ Recently shipped (this cycle)
 
-- **Web component tests (TEST-3)** — stood up `@testing-library/react` + jsdom (own `vitest.config.ts` + `src/test/setup.ts` with jest-dom + a matchMedia stub), then **+31 tests** (31→62): the flag-aware **mock data layer** (`store.test.ts` — browse published, admin users/listings/content/analytics filters + takedown/restore round-trips), **component renders** (`TrustBadge`/`EmptyState`/`BeitcoListingCard` with the router `Link` mocked), and a **real interaction** (`ReportButton.test.tsx` — logged-out→login redirect; logged-in→dialog→pick reason→submit→assert the report landed in the mock store). Next: the listing wizard validation + `property.$id` actions.
+- **Web component tests (TEST-3)** — stood up `@testing-library/react` + jsdom (own `vitest.config.ts` + `src/test/setup.ts` with jest-dom + a matchMedia stub), then **+31 tests** (31→62): the flag-aware **mock data layer** (`store.test.ts` — browse published, admin users/listings/content/analytics filters + takedown/restore round-trips), **component renders** (`TrustBadge`/`EmptyState`/`BeitoonListingCard` with the router `Link` mocked), and a **real interaction** (`ReportButton.test.tsx` — logged-out→login redirect; logged-in→dialog→pick reason→submit→assert the report landed in the mock store). Next: the listing wizard validation + `property.$id` actions.
 - **Server-side search + "قريب مني" geo (FE wiring for PROD-3/PROD-4)** — the `/search` page now sends `q` + all filters + `lat`/`lng`/`radiusKm` to `GET /properties` in `VITE_USE_API` mode via a new `useSearchProperties` hook (server does typo-tolerant Meili text + PostGIS radius, returns the final set). A **"قريب مني"** control uses the browser geolocation API to drive a radius search (2/5/10/25 كم selector, distance-ordered, "مرتّبة بالأقرب ليك"). Mock mode keeps full client-side filtering + a **haversine** radius fallback (seed properties got real coords), so the prototype works offline. Saved-search params are unaffected (geo keys are whitelisted out by `normalizeSearchParams`).
 - **Trust engine — wedge complete (T-1 → T-5)** — `lib/beitco/trust.ts` + `store.ts`: Bayesian-smoothed listing, owner, **and renter** scores; verification cap; quality from review categories; **real response-rate** from message behavior (`ResponseEvent`); **two-sided renter reputation** (`RenterReview`, owner-side flow, privacy-safe lead badges). Recompute on review/reply/seed, persisted breakdowns. Acceptance verified on the real module. Only the owner "raise your score" checklist remains.
 - **Trust transparency (T-5)** — "ليه الدرجة دي؟" popover shows live computed contributions; owner "بترد بسرعة" dashboard card; renter "سمعتك كساكن" card.
@@ -69,8 +69,8 @@ _(nothing in flight on the frontend — it's feature-complete and wired to the A
 ### MOD-1 · Moderation / approval queue — ✅ Done
 - ✅ Unverified owners' listings → `pending_approval` instead of instant publish (`getInitialListingStatus`); verified owners/admins auto-publish. Pending/rejected listings never appear in public search.
 - ✅ Admin review queue at `/dashboard/moderation` (admin-gated): preview card + approve / reject-with-reason (quick-reason chips + free text). `approveListing` / `rejectListing` / `getPendingListings`.
-- ✅ Owner feedback: "بنراجعها" pending notice + "اترفض" notice with the reason on `/dashboard/listings`; `rejected` status added. Admin nav link shows a live pending-count badge. Seeded admin (`فريق بيتكو`, `+201000000000`) + a couple of pending demo listings.
-- Directly addresses the fake-listing pain Beitco claims to solve.
+- ✅ Owner feedback: "بنراجعها" pending notice + "اترفض" notice with the reason on `/dashboard/listings`; `rejected` status added. Admin nav link shows a live pending-count badge. Seeded admin (`فريق بيتون`, `+201000000000`) + a couple of pending demo listings.
+- Directly addresses the fake-listing pain Beitoon claims to solve.
 
 ---
 

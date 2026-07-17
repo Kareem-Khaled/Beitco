@@ -97,7 +97,7 @@ function MeTenancies() {
       {tenancies.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-surface p-12 text-center">
           <KeyRound className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">لسه ما سكنتش في أي مكان من خلال بيتكو.</p>
+          <p className="text-sm text-muted-foreground">لسه ما سكنتش في أي مكان من خلال بيتون.</p>
           <Button asChild className="mt-4">
             <Link to="/search">
               <Search className="me-1 h-4 w-4" />

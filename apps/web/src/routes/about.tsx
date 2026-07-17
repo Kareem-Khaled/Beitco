@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "عن بيتكو — منصة السكن اللي تقدر تثق فيها" },
+      { title: "عن بيتون — منصة السكن اللي تقدر تثق فيها" },
       {
         name: "description",
-        content: "بيتكو منصة سكن مصرية بتأجّر على مستوى السرير، مبنية على الثقة والشفافية.",
+        content: "بيتون منصة سكن مصرية بتأجّر على مستوى السرير، مبنية على الثقة والشفافية.",
       },
     ],
   }),
@@ -48,14 +48,14 @@ function AboutPage() {
         <section className="text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted-foreground">
             <ShieldCheck className="h-3.5 w-3.5 text-trust" />
-            عن بيتكو
+            عن بيتون
           </span>
           <h1 className="mt-5 font-display text-3xl font-bold leading-tight sm:text-4xl">
             بنخلّي السكن في مصر حاجة تقدر <span className="text-trust">تثق</span> فيها
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
             دوّرت على سكن في مصر قبل كده؟ تعرف القصة — صور مش حقيقية، أسعار بتتغيّر، ومحدش بيقولك
-            الحقيقة عن المكان قبل ما تروح. بيتكو اتعملت عشان تحل ده. إحنا منصة سكن بتأجّر على مستوى
+            الحقيقة عن المكان قبل ما تروح. بيتون اتعملت عشان تحل ده. إحنا منصة سكن بتأجّر على مستوى
             السرير، مبنية على الثقة والشفافية من أول يوم.
           </p>
         </section>
@@ -78,7 +78,7 @@ function AboutPage() {
         <section className="mt-12 rounded-3xl border border-border bg-gradient-to-br from-trust-soft/60 to-surface p-8 text-center">
           <h2 className="font-display text-2xl font-semibold">جاهز تبدأ؟</h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-            سواء بتدوّر على بيت أو عايز تأجّر مكانك، بيتكو معاك.
+            سواء بتدوّر على بيت أو عايز تأجّر مكانك، بيتون معاك.
           </p>
           <div className="mt-5 flex flex-wrap justify-center gap-3">
             <Button asChild size="lg">

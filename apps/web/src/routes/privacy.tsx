@@ -6,10 +6,10 @@ import { SiteFooter } from "@/components/beitco/SiteFooter";
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "سياسة الخصوصية — بيتكو" },
+      { title: "سياسة الخصوصية — بيتون" },
       {
         name: "description",
-        content: "إزاي بيتكو بتحمي بياناتك وبتستخدمها — بكل وضوح.",
+        content: "إزاي بيتون بتحمي بياناتك وبتستخدمها — بكل وضوح.",
       },
     ],
   }),

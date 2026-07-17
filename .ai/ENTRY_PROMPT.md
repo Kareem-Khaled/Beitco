@@ -1,12 +1,12 @@
-# Beitco — Entry Prompt (Single Source of Truth)
+# Beitoon — Entry Prompt (Single Source of Truth)
 
 > **Read this first.** Every other doc serves this one. If anything contradicts this file, this file wins.
 
 ---
 
-## What Beitco Is
+## What Beitoon Is
 
-**Beitco is a trust-first housing marketplace for Egypt that rents at the bed level, not just the apartment level.**
+**Beitoon is a trust-first housing marketplace for Egypt that rents at the bed level, not just the apartment level.**
 
 Think Airbnb meets Glassdoor for Egyptian housing — but the unit of inventory is a **bed in a shared apartment**, not the apartment itself. Owners list how many beds are available *right now*. Renters filter by what they actually need (budget, area, vibe) and book a bed, a private room, or a whole apartment.
 
@@ -21,7 +21,7 @@ Owner posts apartment + marks N beds available
             ↓
 Renter says "I need X" (budget, area, type, profile)
             ↓
-Beitco matches & ranks by trust score
+Beitoon matches & ranks by trust score
             ↓
 Renter sees real reviews + verification + quality scores
             ↓

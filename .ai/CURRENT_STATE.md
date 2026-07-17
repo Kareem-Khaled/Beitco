@@ -1,4 +1,4 @@
-# Current State — Beitco
+# Current State — Beitoon
 
 > **Last updated:** June 24, 2026 · branch: `dev`
 > Honest snapshot of what's actually built and verified. For the prioritized "what's next" read **`.ai/NEXT_STEPS.md`**; for the **go-live checklist + deploy runbook** read **`.ai/PROD_READINESS.md`**; for the product vision read `.ai/PRD.md`; for the backend build log read `.ai/BACKEND_TASKS.md`.
@@ -38,10 +38,10 @@
 - **Chat:** `/messages` + thread view, "كلّم صاحب الشقة", live updates via Socket.io.
 - **Notifications:** bell badge + `/notifications` feed (leads, messages, review-eligibility, verification, saved-search alerts).
 - **Verification (KYC):** `dashboard/verify` (upload ID/selfie/ownership docs → pending) + admin `dashboard/verifications` queue (approve/reject).
-- **Admin:** moderation queue (`/dashboard/moderation`) + verifications queue, gated on `isPlatformAdmin`. **Operator portal** (`/admin`) — a 7-section control room for the Beitco team: overview/KPIs, analytics (time-series/funnel/supply-demand), users (ban/verify/make-admin), listings (force-takedown), reviews (remove→recompute trust), reports triage; every action audit-logged.
+- **Admin:** moderation queue (`/dashboard/moderation`) + verifications queue, gated on `isPlatformAdmin`. **Operator portal** (`/admin`) — a 7-section control room for the Beitoon team: overview/KPIs, analytics (time-series/funnel/supply-demand), users (ban/verify/make-admin), listings (force-takedown), reviews (remove→recompute trust), reports triage; every action audit-logged.
 - **Platform:** dark mode, PWA manifest, mobile bottom-nav, accessibility pass (skip link, aria, focus management), maps (Leaflet pin-drop + Google embeds), public profiles.
 
-**Tests:** 62 Vitest — pure engines (trust + matching) + the **flag-aware mock data layer** (browse + admin users/listings/content/analytics) + **component tests** (Testing Library + jsdom: `TrustBadge`/`EmptyState` renders, `BeitcoListingCard` listing render, `ReportButton` full report-flow interaction). `tsc` clean.
+**Tests:** 62 Vitest — pure engines (trust + matching) + the **flag-aware mock data layer** (browse + admin users/listings/content/analytics) + **component tests** (Testing Library + jsdom: `TrustBadge`/`EmptyState` renders, `BeitoonListingCard` listing render, `ReportButton` full report-flow interaction). `tsc` clean.
 
 ---
 

@@ -92,7 +92,7 @@ async function bootstrap() {
 
   // ─── Swagger Docs ─────────────────────────────────
   const config = new DocumentBuilder()
-    .setTitle('Beitco API')
+    .setTitle('Beitoon API')
     .setDescription('Trust-first bed-level housing marketplace for Egypt')
     .setVersion('1.0')
     .addBearerAuth()
@@ -105,7 +105,7 @@ async function bootstrap() {
   const port = process.env.API_PORT ?? 3001;
   await app.listen(port);
   const logger = app.get(Logger);
-  logger.log(`Beitco API running on http://localhost:${port}`);
+  logger.log(`Beitoon API running on http://localhost:${port}`);
   logger.log(`Swagger docs at http://localhost:${port}/api/docs`);
 }
 

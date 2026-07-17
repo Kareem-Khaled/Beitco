@@ -1,7 +1,7 @@
-# Production Readiness — Beitco
+# Production Readiness — Beitoon
 
 > **The go-live checklist + deploy runbook.** · branch: `dev` · created June 24, 2026
-> Companion to `.ai/CURRENT_STATE.md` (what's built) and `.ai/NEXT_STEPS.md` (the backlog). This doc answers one question: **what does it take to safely put Beitco in front of real users, and are we there yet?**
+> Companion to `.ai/CURRENT_STATE.md` (what's built) and `.ai/NEXT_STEPS.md` (the backlog). This doc answers one question: **what does it take to safely put Beitoon in front of real users, and are we there yet?**
 
 ---
 

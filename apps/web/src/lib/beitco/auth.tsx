@@ -68,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (isBrowser) {
         localStorage.setItem(KEY_PENDING_PHONE, phone);
         // Surface the dev code so login is testable without an SMS gateway.
-        if (devCode) console.info(`[Beitco] dev OTP for ${phone}: ${devCode}`);
+        if (devCode) console.info(`[Beitoon] dev OTP for ${phone}: ${devCode}`);
       }
       return;
     }

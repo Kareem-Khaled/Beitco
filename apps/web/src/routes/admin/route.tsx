@@ -16,7 +16,7 @@ import { useAuth } from "@/lib/beitco/auth";
 import { isPlatformAdmin } from "@/lib/beitco/store";
 import { useModerationCount, useVerificationCount, useReportsCount } from "@/lib/beitco/queries";
 
-// ADMIN-1: the platform-operator portal (Beitco staff only). Separate from the
+// ADMIN-1: the platform-operator portal (Beitoon staff only). Separate from the
 // landlord dashboard at /dashboard. Bounces anyone without isAdmin.
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
@@ -53,7 +53,7 @@ function AdminLayout() {
             </span>
             <div>
               <p className="font-display text-sm font-semibold leading-tight">
-                بيتكو · لوحة الإدارة
+                بيتون · لوحة الإدارة
               </p>
               <p className="text-[11px] text-muted-foreground">للفريق بس</p>
             </div>

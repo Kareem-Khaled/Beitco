@@ -1,4 +1,4 @@
-# Beitco — Product Requirements Document (PRD)
+# Beitoon — Product Requirements Document (PRD)
 
 > **Status:** Living document · **Last updated:** June 16, 2026
 > **Scope:** This PRD captures the full business vision, every feature currently built in the prototype, and the gap between them. It is the working source of truth for planning. Where it contradicts older `.ai/` docs, prefer this file and `ENTRY_PROMPT.md`.
@@ -9,7 +9,7 @@
 
 ## 1. Product Summary
 
-**Beitco is a trust-first housing marketplace for Egypt that rents at the bed level — not just the apartment level.**
+**Beitoon is a trust-first housing marketplace for Egypt that rents at the bed level — not just the apartment level.**
 
 The unit of inventory can be a whole apartment (**شقة**), a private room (**أوضة**), or a single bed in a shared room (**سرير**). The defensible wedge is **trust**, made visible and earned: verification status, a trust score, real reviews from past residents (gated to 30+ days lived), per-listing quality scores, landlord response rate, and public Q&A.
 
@@ -39,7 +39,7 @@ The unit of inventory can be a whole apartment (**شقة**), a private room (**�
 
 ## 3. Personas
 
-| Persona | Needs | Beitco value |
+| Persona | Needs | Beitoon value |
 |---|---|---|
 | **University student** | Cheap, safe, shared housing near campus | Bed-level supply, area/university proximity, real reviews |
 | **Young professional (22–32)** | Private room in a good area, reliable flatmates | أوضة listings, gender policy, quality scores |
@@ -65,7 +65,7 @@ Source of truth: `apps/web/src/lib/beitco/types.ts`.
 - **Lead** — a viewing request (`pending | approved | declined | completed`).
 - **Tenancy** — records that a user lived at a property (gates review eligibility at ≥30 days).
 - **SavedListing** — renter bookmarks.
-- **Occupant** — owner-private record of who reserved/took a unit (optionally linked to a Beitco account).
+- **Occupant** — owner-private record of who reserved/took a unit (optionally linked to a Beitoon account).
 
 ### 4.2 Key enums / dimensions
 - **PropertyType:** `شقة | أوضة | سرير`
@@ -173,7 +173,7 @@ Source of truth: `apps/web/src/lib/beitco/types.ts`.
 ### 5.13 Legal & Static
 - ✅ About, Trust, Help pages (Egyptian dialect); Help has **real WhatsApp + email contact** (was a dead link).
 - ✅ **Privacy** (`/privacy`) and **Terms** (`/terms`) pages with real content; linked from the footer's "قانوني" group and the login consent line.
-- ✅ Footer cleaned to 3 real-destination columns (الثقة / بيتكو / قانوني); removed the redundant "اكتشف" filter-links group.
+- ✅ Footer cleaned to 3 real-destination columns (الثقة / بيتون / قانوني); removed the redundant "اكتشف" filter-links group.
 
 ### 5.14 Short-stay (nice-to-have)
 - ✅ Optional **nightly rate** toggle ("بتأجّر بالليلة كمان؟", defaults to لأ) in the pricing step for any rental mode; shown as a secondary "أو X ج.م/الليلة" pill on the property page. Deliberately minimal — no calendar/availability engine; monthly stays the focus.
@@ -195,7 +195,7 @@ Source of truth: `apps/web/src/lib/beitco/types.ts`.
 | 4 | **No supply-seeding path** — no bulk import / operator onboarding / FB-migration | Cold-start kills 2-sided marketplaces | Med |
 | 5 | **Backend not wired** — 100% mock/localStorage | Nothing is durable beyond the browser | High |
 | 6 | **Sale vs strategy conflict** — `للبيع` contradicts "rentals only" | Open decision (§9.1) — still unresolved | Decision |
-| 7 | **No moderation / approval pipeline** — anyone publishes instantly | Fake-listing risk is the exact pain Beitco claims to solve | Med |
+| 7 | **No moderation / approval pipeline** — anyone publishes instantly | Fake-listing risk is the exact pain Beitoon claims to solve | Med |
 | 8 | ~~No notifications~~ → **In-app done.** Bell + `/notifications` feed (leads, messages, reviews, verification, links). Still TODO: external delivery (SMS/email/push). | External delivery still needed for real-time reach | Med |
 | 9 | **No payments** — subscriptions & success fees unbuilt | No revenue mechanism | High |
 | 10 | **No owner analytics** (views/saves/lead funnel) | This is literally the paid-subscription value prop (§10) | Med |

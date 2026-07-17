@@ -1,4 +1,4 @@
-# Running Beitco Locally — the complete runbook
+# Running Beitoon Locally — the complete runbook
 
 > Battle-tested recipe + every gotcha we've hit. If something breaks, jump to **Troubleshooting** at the bottom — 9/10 issues are one of those five.
 
@@ -13,7 +13,7 @@
 
 ## 1. One-time setup
 ```bash
-cd /Users/kareemali/Desktop/Beitco
+cd /Users/kareemali/Desktop/Beitoon
 pnpm install                 # install all workspace deps
 docker compose up -d         # postgres(5433) · redis(6379) · meilisearch(7700)
 pnpm db:migrate              # create the schema
@@ -50,7 +50,7 @@ Or both at once: `pnpm dev`. Then open **http://localhost:8080**.
 ## 3. Log in
 | Phone | OTP | Who |
 |---|---|---|
-| `+201000000000` | `123456` | **Admin** ("فريق بيتكو") → can open `/admin` |
+| `+201000000000` | `123456` | **Admin** ("فريق بيتون") → can open `/admin` |
 | any other phone | `123456` | regular user |
 
 The dev OTP is **always `123456`**. Admin portal: **http://localhost:8080/admin** (type the URL; only `isAdmin` users get in).

@@ -1,4 +1,4 @@
-# Roadmap — Beitco
+# Roadmap — Beitoon
 
 > **Last updated:** June 24, 2026. Bias toward shipping the smallest thing that proves trust > supply.
 > For the granular, prioritized backlog see **`.ai/NEXT_STEPS.md`**; for the go-live checklist see **`.ai/PROD_READINESS.md`**. This file is the high-level phase view.

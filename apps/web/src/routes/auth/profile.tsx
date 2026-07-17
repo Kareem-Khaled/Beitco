@@ -79,7 +79,7 @@ function ProfilePage() {
             <RoleCard
               icon={Home}
               title="عندي شقة أجّرها"
-              subtitle="عايز أعرض شقتي على بيتكو"
+              subtitle="عايز أعرض شقتي على بيتون"
               active={role === "owner"}
               onClick={() => setRole("owner")}
             />

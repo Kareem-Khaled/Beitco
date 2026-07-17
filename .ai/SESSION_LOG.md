@@ -1,4 +1,4 @@
-# Beitco — Session Log
+# Beitoon — Session Log
 
 > **Log of all AI work sessions. Newest session at the top.**
 
@@ -643,7 +643,7 @@ This session completed the final two backend modules. The entire NestJS backend 
   - Added 9 new type files: comment, group, listing, video, notification, chat, feed, report, review
   - Extended enums.ts with 12 new enums + FeedTab (total: 19 enum types)
   - All types match Prisma schema exactly
-  - `pnpm --filter @beitco/types build` succeeds
+  - `pnpm --filter @beitoon/types build` succeeds
 
 #### Verification Results
 - ✅ `pnpm build` — 5/5 packages build clean (Turbo caching works)

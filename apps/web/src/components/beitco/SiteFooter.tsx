@@ -12,9 +12,9 @@ const groups: { title: string; items: FooterLink[] }[] = [
     ],
   },
   {
-    title: "بيتكو",
+    title: "بيتون",
     items: [
-      { label: "عن بيتكو", to: "/about" },
+      { label: "عن بيتون", to: "/about" },
       { label: "اعرض مكانك", to: "/list/new" },
       { label: "حسابي", to: "/me" },
     ],
@@ -34,8 +34,8 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.6fr_repeat(3,1fr)] lg:px-8">
         <div>
           <div className="flex items-center gap-2">
-            <Logo className="h-7 w-7" />
-            <span className="font-display text-lg font-semibold">بيتكو</span>
+            <Logo className="h-10 w-10" />
+            <span className="font-display text-xl font-semibold">بيتون</span>
           </div>
           <p className="mt-3 max-w-xs text-sm text-muted-foreground">
             منصة السكن اللي تقدر تثق فيها في مصر. خد قرارك وانت مرتاح.
@@ -64,8 +64,8 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-2 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:px-6 lg:px-8">
-          <span>© {new Date().getFullYear()} بيتكو. اتعملت عشان السكن في مصر.</span>
-          <span>متعمّلة بحب من القاهرة · إسكندرية</span>
+          <span>© {new Date().getFullYear()} بيتون. اتعملت عشان تحل مشاكل السكن في مصر.</span>
+          {/* <span>صنع في مصر ❤️</span> */}
         </div>
       </div>
     </footer>

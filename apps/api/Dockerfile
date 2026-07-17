@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# Multi-stage build for the Beitco NestJS API (OPS-2).
+# Multi-stage build for the Beitoon NestJS API (OPS-2).
 # Build context MUST be the repo root: `docker build -f apps/api/Dockerfile .`
 # (the pnpm lockfile + workspace manifest live at the root).
 
@@ -17,22 +17,24 @@ WORKDIR /app
 FROM base AS deps
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json tsconfig.base.json ./
 COPY apps/api/package.json apps/api/
-COPY packages/types/package.json packages/types/
-COPY packages/utils/package.json packages/utils/
-COPY packages/validators/package.json packages/validators/
+COPY packages/shared/package.json packages/shared/
+# --ignore-scripts: the shared package's prepare (build) can't run yet (its src
+# isn't copied in this deps-only layer); we build it explicitly in the next stage.
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-  pnpm install --frozen-lockfile --filter "@beitco/api..."
+  pnpm install --frozen-lockfile --filter "@beitoon/api..." --ignore-scripts
 
 # ---- build: generate the Prisma client + compile TS ----
 FROM deps AS build
 COPY apps/api apps/api
 COPY packages packages
-RUN pnpm --filter @beitco/api exec prisma generate
-RUN pnpm --filter @beitco/api run build
+# Build the shared workspace package first (the API imports @beitoon/shared).
+RUN pnpm --filter @beitoon/shared run build
+RUN pnpm --filter @beitoon/api exec prisma generate
+RUN pnpm --filter @beitoon/api run build
 # Produce a self-contained, production-only bundle in /app/out (real node_modules,
 # not a symlink farm — pnpm 9 `deploy` flattens it), then generate the Prisma
 # client INSIDE that bundle (prisma CLI is a prod dep, so it's present in /app/out).
-RUN pnpm --filter @beitco/api deploy --prod /app/out
+RUN pnpm --filter @beitoon/api deploy --prod /app/out
 RUN cd /app/out && pnpm exec prisma generate
 
 # ---- runtime: slim, non-root ----

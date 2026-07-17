@@ -32,7 +32,7 @@ export class SmsService {
   }
 
   async sendOtp(phone: string, code: string): Promise<SmsResult> {
-    const text = `كود بيتكو: ${code}\nالكود صالح 5 دقائق. متديهوش لحد.`;
+    const text = `كود بيتون: ${code}\nالكود صالح 5 دقائق. متديهوش لحد.`;
     return this.send(phone, text);
   }
 
@@ -56,7 +56,7 @@ export class SmsService {
       return false;
     }
     const token = this.config.get<string>('SMS_HTTP_TOKEN');
-    const sender = this.config.get<string>('SMS_SENDER_ID', 'Beitco');
+    const sender = this.config.get<string>('SMS_SENDER_ID', 'Beitoon');
     try {
       const res = await fetch(url, {
         method: 'POST',

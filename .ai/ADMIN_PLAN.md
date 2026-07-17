@@ -1,6 +1,6 @@
 # Admin / Operator Portal — Feature Plan
 
-> **What the Beitco team (platform operators) needs to run the marketplace.** · created June 25, 2026 · updated June 25 · branch: `dev`
+> **What the Beitoon team (platform operators) needs to run the marketplace.** · created June 25, 2026 · updated June 25 · branch: `dev`
 > Companion to `.ai/NEXT_STEPS.md` (backlog) + `.ai/BUSINESS_MODEL.md` (revenue) + `.ai/CURRENT_STATE.md` (built). Derived from a full scan of the schema (24 models), services, and business model.
 >
 > **Scope:** the `/admin` portal is **operators only** (`User.isAdmin`), separate from the *landlord* dashboard (`/dashboard`). It is the control room for moderation, trust, users, listings, money, and analytics.

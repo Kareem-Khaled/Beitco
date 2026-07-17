@@ -1,4 +1,4 @@
-# Beitco — Architecture
+# Beitoon — Architecture
 
 > **Last updated:** June 25, 2026 · Current system design (post-pivot, full-stack + operator portal).
 > Companion docs: `.ai/DB_SCHEMA.md` (data), `.ai/API_SPEC.md` (endpoints), `.ai/CURRENT_STATE.md` (status), `.ai/NEXT_STEPS.md` (backlog), `.ai/ADMIN_PLAN.md` (operator portal), `.ai/PROD_READINESS.md` (go-live).
@@ -17,7 +17,7 @@ infra:   docker-compose.yml  (Postgres 16+PostGIS, Redis 7, Meilisearch v1.11)
 .ai/     the documentation / knowledge base
 ```
 
-> A monorepo with no shared `packages/` today — the frontend `lib/beitco/types.ts` is the shape spec, the API serializers mirror it (the pre-pivot `@beitco/*` packages were unused and removed, POLISH-2). Add a shared package later only if a real contract emerges.
+> A monorepo with no shared `packages/` today — the frontend `lib/beitco/types.ts` is the shape spec, the API serializers mirror it (the pre-pivot `@beitoon/*` packages were unused and removed, POLISH-2). Add a shared package later only if a real contract emerges.
 
 Run: `pnpm web` (→ :8080) · `pnpm api` (→ :3001) · `pnpm dev` (both).
 

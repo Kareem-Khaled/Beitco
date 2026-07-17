@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 /**
- * Wraps every successful response in the Beitco envelope:
+ * Wraps every successful response in the Beitoon envelope:
  *   { success: true, data, meta? }
  *
  * Conventions:

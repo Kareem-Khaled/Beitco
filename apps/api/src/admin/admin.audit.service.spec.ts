@@ -9,7 +9,7 @@ type Mock = jest.Mock;
 
 const admin: AuthUser = {
   id: 'admin1',
-  name: 'فريق بيتكو',
+  name: 'فريق بيتون',
   phone: '+20100',
   role: 'both',
   isAdmin: true,
@@ -37,7 +37,7 @@ describe('AdminAuditService', () => {
     expect(prisma.adminAuditLog.create).toHaveBeenCalledWith({
       data: {
         adminId: 'admin1',
-        adminName: 'فريق بيتكو',
+        adminName: 'فريق بيتون',
         action: 'user.ban',
         targetType: 'user',
         targetId: 'u1',

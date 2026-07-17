@@ -32,7 +32,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       # The API's Prisma client must exist before tsc.
-      - run: pnpm --filter @beitco/api exec prisma generate
+      - run: pnpm --filter @beitoon/api exec prisma generate
       - run: pnpm type-check
       - run: pnpm lint
       - run: pnpm test
@@ -40,7 +40,7 @@ jobs:
       # ratchet that blocks regressions in the logic files (services/serializers/
       # engines/mappers).
       - name: API coverage floor
-        run: pnpm --filter @beitco/api run test:cov
+        run: pnpm --filter @beitoon/api run test:cov
 
   # ---- API e2e against real Postgres + Redis service containers ----
   e2e:
@@ -83,7 +83,7 @@ jobs:
           pnpm exec prisma migrate deploy
           pnpm run db:seed
       - name: Run e2e suite
-        run: pnpm --filter @beitco/api run test:e2e
+        run: pnpm --filter @beitoon/api run test:e2e
 
   # ---- Build the API image (validates the Dockerfile on every PR/branch) ----
   docker-build:

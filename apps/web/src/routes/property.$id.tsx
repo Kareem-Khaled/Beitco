@@ -94,20 +94,20 @@ export const Route = createFileRoute("/property/$id")({
     if (!p) {
       return {
         meta: [
-          { title: "بيت — بيتكو" },
+          { title: "بيت — بيتون" },
           {
             name: "description",
-            content: "سكن متأكدين منه، بآراء حقيقية ومعلومات عن المنطقة على بيتكو.",
+            content: "سكن متأكدين منه، بآراء حقيقية ومعلومات عن المنطقة على بيتون.",
           },
         ],
       };
     }
     const kind = p.listingType === "sale" ? "للبيع" : "للإيجار";
-    const title = `${p.title} — ${p.area} | بيتكو`;
+    const title = `${p.title} — ${p.area} | بيتون`;
     const priceNum = p.listingType === "sale" ? (p.salePrice ?? p.price) : (p.priceFrom ?? p.price);
     const price = priceNum.toLocaleString("ar-EG-u-nu-latn");
     const unit = p.listingType === "sale" ? "ج.م" : "ج.م/شهر";
-    const description = `${p.type} ${kind} في ${p.area} — ${price} ${unit}. درجة الثقة ${p.trust.toFixed(1)}، ${p.reviewsCount.toLocaleString("ar-EG-u-nu-latn")} رأي من ساكنين حقيقيين على بيتكو.`;
+    const description = `${p.type} ${kind} في ${p.area} — ${price} ${unit}. درجة الثقة ${p.trust.toFixed(1)}، ${p.reviewsCount.toLocaleString("ar-EG-u-nu-latn")} رأي من ساكنين حقيقيين على بيتون.`;
     const image = p.image || "/og.svg";
     return {
       meta: [
@@ -358,7 +358,7 @@ function PropertyDetail() {
     const url = typeof window !== "undefined" ? window.location.href : "";
     const shareData = {
       title: p.title,
-      text: `شوف الإعلان ده على بيتكو: ${p.title}`,
+      text: `شوف الإعلان ده على بيتون: ${p.title}`,
       url,
     };
     try {

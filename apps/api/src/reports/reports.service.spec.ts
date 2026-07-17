@@ -20,7 +20,7 @@ const user: AuthUser = {
   verificationStatus: 'unverified',
 };
 
-const admin: AuthUser = { ...user, id: 'admin1', name: 'فريق بيتكو', isAdmin: true };
+const admin: AuthUser = { ...user, id: 'admin1', name: 'فريق بيتون', isAdmin: true };
 
 function makePrisma() {
   return {

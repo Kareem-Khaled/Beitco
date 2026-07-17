@@ -169,7 +169,7 @@ const sample: Record<string, PropertyDetail> = {
     ],
     beds: { total: 8, occupied: 6 },
     landlord: {
-      name: "بيتكو كولايفنج",
+      name: "بيتون كولايفنج",
       initials: "ب.ك",
       trust: 8.6,
       responseRate: 92,

@@ -502,7 +502,7 @@ function OccupantLine({ occupant, status }: { occupant?: Occupant; status: BedSt
       {occupant.userId ? (
         <span className="inline-flex items-center gap-1 text-trust">
           <BadgeCheck className="h-3 w-3" />
-          حساب بيتكو
+          حساب بيتون
         </span>
       ) : null}
       {occupant.phone ? <span dir="ltr">{occupant.phone}</span> : null}

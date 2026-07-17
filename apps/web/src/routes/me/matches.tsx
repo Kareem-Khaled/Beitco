@@ -3,7 +3,7 @@ import { Sparkles, SlidersHorizontal, Check, X, SearchX } from "lucide-react";
 import { useAuth } from "@/lib/beitco/auth";
 import { profileCompleteness } from "@/lib/beitco/store";
 import { useMatches } from "@/lib/beitco/queries";
-import { BeitcoListingCard } from "@/components/beitco/BeitcoListingCard";
+import { BeitoonListingCard } from "@/components/beitco/BeitoonListingCard";
 import { MatchBadge } from "@/components/beitco/MatchBadge";
 import { EmptyState } from "@/components/beitco/EmptyState";
 import { Button } from "@/components/ui/button";
@@ -112,7 +112,7 @@ function MatchesPage() {
 
                 {/* Listing card */}
                 <div className="order-1 sm:order-2">
-                  <BeitcoListingCard p={property} />
+                  <BeitoonListingCard p={property} />
                 </div>
               </div>
             </div>

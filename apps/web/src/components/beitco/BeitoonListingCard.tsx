@@ -38,7 +38,7 @@ export function ListingCardSkeleton() {
   );
 }
 
-export function BeitcoListingCard({ p, className }: { p: CardProperty; className?: string }) {
+export function BeitoonListingCard({ p, className }: { p: CardProperty; className?: string }) {
   const isSale = p.listingType === "sale";
   return (
     <Link

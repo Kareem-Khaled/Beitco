@@ -50,7 +50,7 @@ const NOTIF_OPTIONS: { key: keyof NotificationPrefs; label: string; hint: string
   { key: "leads", label: "طلبات المعاينة", hint: "لما حد يطلب يعاين شقتك" },
   { key: "messages", label: "الرسايل", hint: "لما توصلك رسالة جديدة" },
   { key: "reviews", label: "الآراء", hint: "لما تقدر تكتب رأيك أو يجيلك رأي" },
-  { key: "marketing", label: "أخبار بيتكو", hint: "نصايح وتحديثات (بين الحين والحين)" },
+  { key: "marketing", label: "أخبار بيتون", hint: "نصايح وتحديثات (بين الحين والحين)" },
 ];
 
 const THEME_OPTIONS: { id: Theme; label: string; icon: typeof Sun }[] = [
@@ -145,14 +145,14 @@ function SettingsPage() {
               {user.phone}
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              رقم التليفون مش بيتغيّر — هو هويتك على بيتكو.
+              رقم التليفون مش بيتغيّر — هو هويتك على بيتون.
             </p>
           </div>
         </div>
       </Section>
 
       {/* Role */}
-      <Section icon={KeyRound} title="إنت على بيتكو إيه؟" hint="ده بيحدد شكل حسابك ولوحتك.">
+      <Section icon={KeyRound} title="إنت على بيتون إيه؟" hint="ده بيحدد شكل حسابك ولوحتك.">
         <div className="grid gap-2 sm:grid-cols-3">
           {ROLES.map((r) => {
             const active = user.role === r.id;
@@ -200,7 +200,7 @@ function SettingsPage() {
       </Section>
 
       {/* Appearance */}
-      <Section icon={Palette} title="المظهر" hint="عايز بيتكو يبان إزاي عندك؟">
+      <Section icon={Palette} title="المظهر" hint="عايز بيتون يبان إزاي عندك؟">
         <div className="grid gap-2 sm:grid-cols-3">
           {THEME_OPTIONS.map((t) => {
             const active = theme === t.id;

@@ -1,4 +1,4 @@
-// Beitco - Prisma schema (bed-level trust-first housing marketplace)
+// Beitoon - Prisma schema (bed-level trust-first housing marketplace)
 // Post-pivot schema (B-0). Mirrors apps/web/src/lib/beitco/types.ts.
 // UUID PKs; snake_case columns via @map; soft deletes via deletedAt.
 // Enums use Latin values; Arabic display is mapped in the app layer.

@@ -1,4 +1,4 @@
-// Seed data for the Beitco mock store — demo properties and users.
+// Seed data for the Beitoon mock store — demo properties and users.
 // Pure data (no behavior); imported by store.ts. Swap for a real DB seed later.
 
 import heroImg from "@/assets/hero-home.jpg";
@@ -214,7 +214,7 @@ export const seedProperties: Property[] = [
     ],
     landlord: {
       id: "u-coliving",
-      name: "بيتكو كولايفنج",
+      name: "بيتون كولايفنج",
       initials: "ب.ك",
       trust: 8.6,
       responseRate: 92,
@@ -554,7 +554,7 @@ export const seedUsers: User[] = [
   {
     id: "u-admin",
     phone: "+201000000000",
-    name: "فريق بيتكو",
+    name: "فريق بيتون",
     role: "both",
     trust: 9.9,
     verified: true,

@@ -1,4 +1,4 @@
-# Beitco — API Specification
+# Beitoon — API Specification
 
 > **Last updated:** June 25, 2026 · Live endpoint inventory (~93 routes across 18 controllers). **Interactive source of truth: Swagger at `http://localhost:3001/api/docs`.**
 > Base: `/api/v1` (URI versioning). All paths below are relative to it.
@@ -101,7 +101,7 @@
 
 ## Admin / operator portal — `/admin/*` (`AdminGuard`)
 
-> The Beitco-team control room. All routes are `AdminGuard`-gated (after the global `JwtAuthGuard`); **every mutation is written to the audit log**.
+> The Beitoon-team control room. All routes are `AdminGuard`-gated (after the global `JwtAuthGuard`); **every mutation is written to the audit log**.
 
 **Overview & audit**
 | Method | Path | Notes |

@@ -1,4 +1,4 @@
-// Theme management for Beitco. Supports light / dark / system, persisted to
+// Theme management for Beitoon. Supports light / dark / system, persisted to
 // localStorage and applied via the `.dark` class on <html> (Tailwind v4 strategy).
 
 export type Theme = "light" | "dark" | "system";

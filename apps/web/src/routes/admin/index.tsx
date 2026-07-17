@@ -39,7 +39,7 @@ function AdminOverview() {
     <div className="space-y-6">
       <header>
         <h1 className="font-display text-2xl font-semibold tracking-tight">نظرة عامة على المنصة</h1>
-        <p className="text-sm text-muted-foreground">كل اللي بيحصل في بيتكو في مكان واحد.</p>
+        <p className="text-sm text-muted-foreground">كل اللي بيحصل في بيتون في مكان واحد.</p>
       </header>
 
       {/* Action queues — what needs the team's attention */}

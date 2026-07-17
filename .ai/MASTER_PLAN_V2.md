@@ -1,10 +1,10 @@
-> ⚠️ **STALE — pre-pivot doc.** Beitco pivoted to a trust-first **bed-level housing marketplace** (June 2026). This doc was written before the pivot and references the old social-network/real-estate model. Trust `.ai/ENTRY_PROMPT.md`, `.ai/PROJECT_OVERVIEW.md`, `.ai/CURRENT_STATE.md`, `.ai/BUSINESS_MODEL.md`, `.ai/ROADMAP.md`, and `.ai/TASKS.md` instead. This file is kept for historical reference only and is on the cleanup list.
+> ⚠️ **STALE — pre-pivot doc.** Beitoon pivoted to a trust-first **bed-level housing marketplace** (June 2026). This doc was written before the pivot and references the old social-network/real-estate model. Trust `.ai/ENTRY_PROMPT.md`, `.ai/PROJECT_OVERVIEW.md`, `.ai/CURRENT_STATE.md`, `.ai/BUSINESS_MODEL.md`, `.ai/ROADMAP.md`, and `.ai/TASKS.md` instead. This file is kept for historical reference only and is on the cleanup list.
 
 ---
 
-# Beitco — Master Plan (V2)
+# Beitoon — Master Plan (V2)
 
-> **Based on: "Beitco Business Vision & Product Strategy V2"**  
+> **Based on: "Beitoon Business Vision & Product Strategy V2"**  
 > **Created: June 1, 2026**  
 > **Status: PLANNING — Nothing built until this is approved**
 
@@ -394,8 +394,8 @@ TrustScore          — Computed trust for any entity
 ### Product-Market Fit Signal:
 - Organic word-of-mouth (students sharing with each other)
 - Landlords proactively creating profiles
-- Users checking Beitco before signing a lease
-- "Is this on Beitco?" becoming a question
+- Users checking Beitoon before signing a lease
+- "Is this on Beitoon?" becoming a question
 
 ---
 

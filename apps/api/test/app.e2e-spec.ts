@@ -32,7 +32,7 @@ function listingPayload(area: string, title: string) {
   };
 }
 
-describe('Beitco API (e2e)', () => {
+describe('Beitoon API (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let server: import('http').Server;

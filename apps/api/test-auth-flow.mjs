@@ -35,7 +35,7 @@ function log(label, result) {
 
 async function main() {
   console.log('═══════════════════════════════════════');
-  console.log('  Beitco Auth Flow — E2E Test');
+  console.log('  Beitoon Auth Flow — E2E Test');
   console.log('═══════════════════════════════════════');
 
   // 1. Health (public)

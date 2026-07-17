@@ -58,7 +58,7 @@ function NotificationsPage() {
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-6 sm:px-6">
         <header className="mb-5">
           <h1 className="font-display text-2xl font-semibold tracking-tight">الإشعارات</h1>
-          <p className="text-sm text-muted-foreground">كل اللي محتاج تعرفه عن نشاطك على بيتكو.</p>
+          <p className="text-sm text-muted-foreground">كل اللي محتاج تعرفه عن نشاطك على بيتون.</p>
         </header>
 
         {items.length === 0 ? (

@@ -1,4 +1,4 @@
-# Next Steps — Beitco
+# Next Steps — Beitoon
 
 > **The active backlog. Start here.** · branch: `dev` · created June 23, 2026 · updated June 25
 > The product is **feature-complete end-to-end**, the **hardening backlog (P0→P2) is done**, and a full **operator portal** is built (ADMIN-1…5, 9, 12). What remains before launch is **test depth + a real deploy host** (go-live checklist: `.ai/PROD_READINESS.md`; operator portal: `.ai/ADMIN_PLAN.md`). Items are ordered by priority — check them off as you go.
@@ -68,7 +68,7 @@
 
 - [ ] **DEPLOY-1 · Real deploy host.** Wire the `deploy-staging` placeholder to an actual target (Fly/Render/Railway/managed k8s): apply the pushed image tag → `prisma migrate deploy` → gate traffic on `GET /health/ready`. Provision managed Postgres+PostGIS / Redis / Meilisearch / object storage / an SMS provider, and load strong distinct secrets via the host's secret manager. **The last hard blocker.** _(Postponed by request.)_
 - [x] **TEST-1 · Service unit tests + coverage floor.** ✅ (June 25) Mocked-Prisma specs for every logic service (verification/reviews/engagement/admin-*/reports + listings/users/trust/notifications/matching/search) — **182 API unit** — plus a CI `coverageThreshold` ratchet run in the `quality` job.
-- [x] **TEST-3 · Web component tests.** ✅ first pass (June 25) `@testing-library/react` + jsdom; **62 web tests** — the flag-aware mock data layer + component renders (TrustBadge/EmptyState/BeitcoListingCard) + a real ReportButton interaction. _Tail (P0.5): the booking flow + the listing-wizard validation._
+- [x] **TEST-3 · Web component tests.** ✅ first pass (June 25) `@testing-library/react` + jsdom; **62 web tests** — the flag-aware mock data layer + component renders (TrustBadge/EmptyState/BeitoonListingCard) + a real ReportButton interaction. _Tail (P0.5): the booking flow + the listing-wizard validation._
 
 ## 🔴 P0.5 — Scale & correctness (before public launch) — see `.ai/SCALE_READINESS.md`
 
@@ -89,7 +89,7 @@
 
 ### 🏢 Admin / Operator portal (ADMIN-1…13) — see `.ai/ADMIN_PLAN.md`
 
-> The control room for the **Beitco team** to run the marketplace (separate from the landlord dashboard). Full spec + API + new models in `.ai/ADMIN_PLAN.md`. Build order: ADMIN-12 → 2/3 → 4/5 → 6/9 → 7/8 → rest. Each ships as a vertical slice (endpoints + `AdminGuard` + audit log + `/admin/*` page + flag-aware FE + tests).
+> The control room for the **Beitoon team** to run the marketplace (separate from the landlord dashboard). Full spec + API + new models in `.ai/ADMIN_PLAN.md`. Build order: ADMIN-12 → 2/3 → 4/5 → 6/9 → 7/8 → rest. Each ships as a vertical slice (endpoints + `AdminGuard` + audit log + `/admin/*` page + flag-aware FE + tests).
 
 - [~] **ADMIN-1 · Portal shell + overview.** 🔨 slice 1 done (June 25) — `/admin` portal + platform-overview dashboard (`GET /admin/stats`). _Remaining: migrate the moderation + KYC queues under `/admin`; a time-range filter._
 - [x] **ADMIN-2 · User management** 🔴 ✅ (June 25) — `/admin/users`: search (name/phone) + filter (role/status/verified/admins) + cursor pagination; user-detail sheet (activity counts + KYC history); actions: manual **verify/unverify** (recomputes trust), **ban/reinstate** (notifies the user), **make/revoke admin**, role + trust override. Self-action + admin-ban guards. Every mutation is **audit-logged** (ADMIN-12). Flag-aware mock. (`GET/PATCH /admin/users…`, `/ban` `/reinstate` `/make-admin` `/revoke-admin`; `+bannedAt/banReason` on User.) 15 unit tests; live-verified (ban→reinstate→audit).
@@ -108,7 +108,7 @@
 
 
 - [ ] **POLISH-1 · Decompose monolith files.** `list/new.tsx` (2,290 LOC) and `property.$id.tsx` (1,454 LOC) → step/section components.
-- [x] **POLISH-2 · Shared packages or delete them.** ✅ (June 25) The `@beitco/types|utils|validators` packages held **pre-pivot social-network types** (post/comment/group/video/feed) with **0 imports** anywhere — deleted (`packages/` removed, the 3 `workspace:*` deps dropped from `apps/api`, `pnpm-workspace.yaml` → `apps/*` only). Also removed **`apps/api/src/_unported/`** (1,082 LOC of dead pre-pivot modules, already excluded from both tsconfigs). The frontend `lib/beitco/types.ts` + the API serializers remain the shape contract. Verified: 182 API unit + 19 e2e + 62 web green; both apps `tsc`/`build` clean.
+- [x] **POLISH-2 · Shared packages or delete them.** ✅ (June 25) The `@beitoon/types|utils|validators` packages held **pre-pivot social-network types** (post/comment/group/video/feed) with **0 imports** anywhere — deleted (`packages/` removed, the 3 `workspace:*` deps dropped from `apps/api`, `pnpm-workspace.yaml` → `apps/*` only). Also removed **`apps/api/src/_unported/`** (1,082 LOC of dead pre-pivot modules, already excluded from both tsconfigs). The frontend `lib/beitco/types.ts` + the API serializers remain the shape contract. Verified: 182 API unit + 19 e2e + 62 web green; both apps `tsc`/`build` clean.
 - [x] **POLISH-3 · RedisModule provider.** ✅ (June 24) New `@Global()` `RedisModule` + `RedisService` (one lazily-connected `ioredis` client; eager connect at boot with graceful degradation; a **live `ready` getter** = `status === 'ready'`; a `ping()` for the readiness probe). `auth`, `notifications`, and `health` now inject it instead of each `new Redis(...)`-ing their own — `ioredis` is imported in **exactly one file**. auth/notifications keep their call sites via a private `redis` getter (→ `redisService.client`) and gate on `redisService.ready`; health delegates to `redis.ping()`. Bonus: the live `ready` getter means a post-boot outage now degrades with the friendly message (the old per-service boot flag went stale), and recovery is auto-detected. Verified: tsc/build/lint clean, 52 unit + 19 e2e green, live boot "Redis connected" + `/health/ready` redis:up + OTP send/verify both work through the shared client.
 - [→] **POLISH-4 · BullMQ worker for saved-search alerts.** **Promoted to P0.5 SCALE-1** (it's a launch-scale concern, not just polish — see above).
 - [ ] **POLISH-5 · Occupant-link consent flow.** Owner registers a tenant on a bed/room → renter confirms the link (the `link` notification type + `LinkStatus` exist; the action flow isn't wired).

@@ -1,4 +1,4 @@
-// Shared types for Beitco mock data layer.
+// Shared types for Beitoon mock data layer.
 // These match the eventual API shape so we can swap mock → real with minimal changes.
 
 export type PropertyType = "شقة" | "أوضة" | "سرير";
@@ -32,7 +32,7 @@ export type FurnishedPref = "furnished" | "unfurnished" | "any";
 export type RentalGenderPolicy = "male_only" | "female_only";
 
 // What the renter is looking for + about them. All optional — the more
-// they fill, the better Beitco can match them to the right place.
+// they fill, the better Beitoon can match them to the right place.
 export type RenterProfile = {
   intent?: "rent" | "buy"; // looking to rent (default) or to buy a place
   budgetMin?: number;
@@ -57,7 +57,7 @@ export type RenterProfile = {
 // Optional details an owner records about who reserved/rented a unit.
 // Private — shown only to the owner in their dashboard, never publicly.
 export type Occupant = {
-  userId?: string; // linked Beitco account — set only after the renter consents
+  userId?: string; // linked Beitoon account — set only after the renter consents
   linkStatus?: "pending" | "confirmed"; // consent state of the account link
   name?: string;
   phone?: string;
