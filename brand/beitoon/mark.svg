@@ -1,0 +1,17 @@
+<svg width="128" height="128" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Beitoon mark">
+  <defs>
+    <linearGradient id="beitoonTeal" x1="12" y1="6" x2="52" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1c6b60"/>
+      <stop offset="1" stop-color="#0e3b36"/>
+    </linearGradient>
+  </defs>
+  <!-- House silhouette: roof + body merged (home = بيت) -->
+  <path d="M32 5.5 6.5 26.5a4 4 0 0 0-1.5 3.1V52a5 5 0 0 0 5 5h44a5 5 0 0 0 5-5V29.6a4 4 0 0 0-1.5-3.1L32 5.5Z"
+        fill="url(#beitoonTeal)"/>
+  <!-- Location-pin 'door' (find a place near you) in negative-space cream -->
+  <path d="M32 52c-8-10-11-13-11-18a11 11 0 1 1 22 0c0 5-3 8-11 18Z" fill="#FAF6EE"/>
+  <!-- Trust checkmark inside the pin (verified) -->
+  <path d="M26.7 33.4 30.3 37 38 28.8" stroke="#14534c" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Warm accent: little chimney dot = belonging/warmth -->
+  <circle cx="47" cy="17.5" r="3.1" fill="#E08A4B"/>
+</svg>

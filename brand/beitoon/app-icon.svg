@@ -1,0 +1,19 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Beitoon app icon">
+  <defs>
+    <linearGradient id="iconBg" x1="0" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1c6b60"/>
+      <stop offset="1" stop-color="#0e3b36"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded-square tile (iOS/Android superellipse-ish) -->
+  <rect width="256" height="256" rx="60" fill="url(#iconBg)"/>
+  <!-- House outline in white -->
+  <path d="M128 44 54 105a10 10 0 0 0-3.7 7.8V196a10 10 0 0 0 10 10h135.4a10 10 0 0 0 10-10v-83.2a10 10 0 0 0-3.7-7.8L128 44Z"
+        fill="none" stroke="#FAF6EE" stroke-width="12" stroke-linejoin="round"/>
+  <!-- Pin door -->
+  <path d="M128 190c-22-27-30-35-30-49a30 30 0 1 1 60 0c0 14-8 22-30 49Z" fill="#FAF6EE"/>
+  <!-- Trust check -->
+  <path d="M113.5 141.5 124 152l21-23" stroke="#14534c" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Warm accent dot -->
+  <circle cx="182" cy="86" r="9" fill="#E08A4B"/>
+</svg>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Beitoon — Logo concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal:#14534c; --teal-600:#1c6b60; --teal-800:#0e3b36;
+    --cream:#FAF6EE; --terracotta:#E08A4B; --amber:#F2B872;
+    --ink:#12211f; --dark-bg:#0C1B18;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Poppins',system-ui,sans-serif;color:var(--ink);background:#f3efe6}
+  header{padding:40px 32px 8px;text-align:center}
+  header h1{margin:0;font-weight:700;font-size:24px}
+  header p{margin:6px 0 0;color:#5b6b67}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;padding:24px 32px 56px;max-width:1200px;margin:0 auto}
+  .card{border-radius:20px;padding:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .card .tag{position:absolute;top:12px;inset-inline-start:14px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.55;font-weight:600}
+  .light{background:var(--cream);color:var(--ink)}
+  .dark{background:var(--dark-bg);color:var(--cream)}
+  .teal{background:var(--teal);color:var(--cream)}
+  /* Wordmark */
+  .lockup{display:flex;align-items:center;gap:16px}
+  .wordmark{font-weight:700;font-size:44px;letter-spacing:-.02em;line-height:1}
+  .wordmark .dot{color:var(--terracotta)}
+  .ar{font-family:'Cairo',sans-serif;font-weight:800;font-size:44px;line-height:1}
+  .stack{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+  .stack .ar{font-size:26px;opacity:.9}
+  .tagline{font-size:13px;margin-top:6px;opacity:.7;font-weight:500}
+  .ar-tag{font-family:'Cairo',sans-serif;direction:rtl;font-size:15px;margin-top:8px;opacity:.85}
+  /* icons row */
+  .icons{display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:center}
+  .chip{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:11px;opacity:.6}
+  /* palette */
+  .swatches{display:flex;gap:0;border-radius:14px;overflow:hidden;width:100%;max-width:520px}
+  .sw{flex:1;height:80px;display:flex;align-items:flex-end;padding:8px;font-size:10px;font-weight:600}
+  .sw.l{color:#12211f}.sw.d{color:#fff}
+  footer{text-align:center;padding:0 32px 48px;color:#5b6b67;font-size:13px;line-height:1.7}
+  code{background:#e6e0d3;border-radius:6px;padding:2px 7px;font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Beitoon — بيتون</h1>
+  <p>Trust-first bed-level housing for Egypt · logo concept v1</p>
+</header>
+
+<div class="grid">
+
+  <!-- PRIMARY LOCKUP LIGHT -->
+  <div class="card light">
+    <span class="tag">Primary · light</span>
+    <div class="lockup">
+      <span class="markbox" style="width:64px;height:64px"></span>
+      <div class="stack">
+        <span class="wordmark">beitoon<span class="dot">.</span></span>
+        <span class="ar" style="color:var(--teal)">بيتون</span>
+      </div>
+    </div>
+    <span class="ar-tag" style="color:var(--teal)">سكن تثق فيه.</span>
+  </div>
+
+  <!-- PRIMARY LOCKUP DARK -->
+  <div class="card dark">
+    <span class="tag">Primary · dark</span>
+    <div class="lockup">
+      <span class="markbox markwhite" style="width:64px;height:64px"></span>
+      <div class="stack">
+        <span class="wordmark">beitoon<span class="dot">.</span></span>
+        <span class="ar">بيتون</span>
+      </div>
+    </div>
+    <span class="tagline">Rent a bed, a room, or a home — with trust.</span>
+  </div>
+
+  <!-- MARK VARIATIONS -->
+  <div class="card light">
+    <span class="tag">The mark</span>
+    <div class="icons">
+      <div class="chip"><span class="markbox" style="width:72px;height:72px"></span>on light</div>
+      <div class="chip"><span class="markbox markwhite" style="width:72px;height:72px;background:var(--teal);border-radius:16px;padding:10px"></span>knockout</div>
+      <div class="chip"><span class="appicon" style="width:72px;height:72px"></span>app icon</div>
+    </div>
+  </div>
+
+  <!-- FAVICON SIZES -->
+  <div class="card teal">
+    <span class="tag">Scales down</span>
+    <div class="icons">
+      <div class="chip" style="color:rgba(250,246,238,.7)"><span class="appicon" style="width:48px;height:48px"></span>48</div>
+      <div class="chip" style="color:rgba(250,246,238,.7)"><span class="appicon" style="width:32px;height:32px"></span>32</div>
+      <div class="chip" style="color:rgba(250,246,238,.7)"><span class="appicon" style="width:16px;height:16px"></span>16</div>
+      <div class="stack" style="margin-inline-start:12px">
+        <span class="wordmark" style="font-size:30px">beitoon<span class="dot">.</span></span>
+        <span class="ar" style="font-size:20px">بيتون</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PALETTE -->
+  <div class="card light" style="grid-column:1/-1">
+    <span class="tag">Palette</span>
+    <div class="swatches">
+      <div class="sw d" style="background:#14534c">Teal · #14534C<br>brand / verified</div>
+      <div class="sw d" style="background:#0e3b36">Teal 800 · #0E3B36</div>
+      <div class="sw d" style="background:#E08A4B">Terracotta · #E08A4B<br>warmth / home</div>
+      <div class="sw l" style="background:#F2B872">Amber · #F2B872</div>
+      <div class="sw l" style="background:#FAF6EE">Cream · #FAF6EE</div>
+      <div class="sw d" style="background:#12211F">Ink · #12211F</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Domains verified free today: <code>beitoon.com</code> + <code>beitoon.co</code> — register before deciding.<br>
+  Wordmark shown in Poppins (Latin) + Cairo (Arabic) — swap Latin for a bespoke rounded cut at production. Assets: <code>mark.svg</code>, <code>app-icon.svg</code>.
+</footer>
+
+<!-- inline SVG templates cloned into .markbox / .appicon -->
+<template id="mark">
+<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block">
+  <defs><linearGradient id="t" x1="12" y1="6" x2="52" y2="58" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1c6b60"/><stop offset="1" stop-color="#0e3b36"/></linearGradient></defs>
+  <path d="M32 5.5 6.5 26.5a4 4 0 0 0-1.5 3.1V52a5 5 0 0 0 5 5h44a5 5 0 0 0 5-5V29.6a4 4 0 0 0-1.5-3.1L32 5.5Z" fill="url(#t)"/>
+  <path d="M32 52c-8-10-11-13-11-18a11 11 0 1 1 22 0c0 5-3 8-11 18Z" fill="#FAF6EE"/>
+  <path d="M26.7 33.4 30.3 37 38 28.8" stroke="#14534c" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="47" cy="17.5" r="3.1" fill="#E08A4B"/>
+</svg>
+</template>
+<template id="markw">
+<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block">
+  <path d="M32 5.5 6.5 26.5a4 4 0 0 0-1.5 3.1V52a5 5 0 0 0 5 5h44a5 5 0 0 0 5-5V29.6a4 4 0 0 0-1.5-3.1L32 5.5Z" fill="none" stroke="#FAF6EE" stroke-width="3.4" stroke-linejoin="round"/>
+  <path d="M32 52c-8-10-11-13-11-18a11 11 0 1 1 22 0c0 5-3 8-11 18Z" fill="#FAF6EE"/>
+  <path d="M26.7 33.4 30.3 37 38 28.8" stroke="#14534c" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="47" cy="17.5" r="3.1" fill="#E08A4B"/>
+</svg>
+</template>
+<template id="app">
+<svg viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block">
+  <defs><linearGradient id="b" x1="0" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1c6b60"/><stop offset="1" stop-color="#0e3b36"/></linearGradient></defs>
+  <rect width="256" height="256" rx="60" fill="url(#b)"/>
+  <path d="M128 44 54 105a10 10 0 0 0-3.7 7.8V196a10 10 0 0 0 10 10h135.4a10 10 0 0 0 10-10v-83.2a10 10 0 0 0-3.7-7.8L128 44Z" fill="none" stroke="#FAF6EE" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 190c-22-27-30-35-30-49a30 30 0 1 1 60 0c0 14-8 22-30 49Z" fill="#FAF6EE"/>
+  <path d="M113.5 141.5 124 152l21-23" stroke="#14534c" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="182" cy="86" r="9" fill="#E08A4B"/>
+</svg>
+</template>
+
+<script>
+  const mark=document.getElementById('mark').innerHTML;
+  const markw=document.getElementById('markw').innerHTML;
+  const app=document.getElementById('app').innerHTML;
+  document.querySelectorAll('.markbox').forEach(e=>e.innerHTML = e.classList.contains('markwhite')?markw:mark);
+  document.querySelectorAll('.appicon').forEach(e=>e.innerHTML=app);
+</script>
+</body>
+</html>

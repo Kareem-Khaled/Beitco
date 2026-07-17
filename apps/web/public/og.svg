@@ -15,17 +15,25 @@
   <!-- subtle corner glow -->
   <circle cx="120" cy="540" r="260" fill="#2bd49b" opacity="0.08"/>
 
-  <!-- brand mark (house) top-right -->
+  <!-- brand mark (bed-in-house) top-right -->
   <g transform="translate(960, 110)">
+    <mask id="ogbed">
+      <rect width="120" height="120" fill="white"/>
+      <g fill="black">
+        <rect x="38" y="51" width="9.5" height="32" rx="4"/>
+        <rect x="38" y="63" width="47" height="10" rx="5"/>
+        <rect x="77" y="63" width="8.5" height="20" rx="4"/>
+      </g>
+    </mask>
     <rect width="120" height="120" rx="28" fill="url(#mark)"/>
-    <path d="M60 22 L98 56 H22 Z" fill="#ffffff"/>
-    <rect x="31" y="54" width="58" height="48" rx="6" fill="#ffffff"/>
-    <rect x="50" y="72" width="20" height="30" rx="3" fill="#1c9c72"/>
+    <rect x="76" y="18.5" width="9" height="21" rx="3.2" fill="#ffffff"/>
+    <path d="M56 18a6 6 0 0 1 8 0l35.3 33a7.5 7.5 0 0 1 2.4 5.5V93a7.5 7.5 0 0 1-7.5 7.5H25.8A7.5 7.5 0 0 1 18.3 93V56.5a7.5 7.5 0 0 1 2.4-5.5Z" fill="#ffffff" mask="url(#ogbed)"/>
+    <circle cx="56.5" cy="55.5" r="6.7" fill="#e5a83a"/>
   </g>
 
   <!-- wordmark + tagline (RTL, right-aligned) -->
-  <text x="1080" y="330" text-anchor="end" font-family="'Cairo','IBM Plex Sans Arabic','Segoe UI',sans-serif" font-size="132" font-weight="800" fill="#ffffff">بيتكو</text>
-  <text x="1080" y="420" text-anchor="end" font-family="'Cairo','IBM Plex Sans Arabic','Segoe UI',sans-serif" font-size="52" font-weight="700" fill="#e8f6f0">لاقي بيتك في مصر — بثقة</text>
+  <text x="1080" y="330" text-anchor="end" font-family="'Cairo','IBM Plex Sans Arabic','Segoe UI',sans-serif" font-size="132" font-weight="800" fill="#ffffff">بيتون</text>
+  <text x="1080" y="420" text-anchor="end" font-family="'Cairo','IBM Plex Sans Arabic','Segoe UI',sans-serif" font-size="52" font-weight="700" fill="#e8f6f0">سكن بالسرير في مصر — بثقة</text>
   <text x="1080" y="492" text-anchor="end" font-family="'IBM Plex Sans Arabic','Segoe UI',sans-serif" font-size="38" font-weight="500" fill="#9ed0c1">شقة · أوضة · سرير — للإيجار والبيع</text>
 
   <!-- trust chips -->
