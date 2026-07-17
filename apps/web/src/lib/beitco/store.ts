@@ -390,7 +390,7 @@ export function deleteProperty(id: string) {
 // ---------- Moderation (MOD-1) ----------
 // Trust-first: a listing only goes live instantly if the owner is verified.
 // Everyone else's listings enter a review queue so we can catch fake/abusive
-// posts before renters ever see them — the core promise Beitco makes.
+// posts before renters ever see them — the core promise Beitoon makes.
 
 export function isPlatformAdmin(user?: Pick<User, "isAdmin"> | null): boolean {
   return !!user?.isAdmin;
@@ -1338,7 +1338,7 @@ function findUserByExactPhone(phone: string): User | undefined {
   );
 }
 
-// Owner invites a tenant to link their Beitco account by exact phone.
+// Owner invites a tenant to link their Beitoon account by exact phone.
 // Returns only whether the input was a valid phone — never whether an account
 // exists (no existence oracle). If an account exists, the caller stores the
 // occupant link as `pending` and the renter is notified to confirm.
@@ -2387,159 +2387,17 @@ export const EGYPT_AREAS = [
   "العاصمة الإدارية",
 ] as const;
 
-// Structured city → districts list for the listing wizard's area picker.
-// Stored `area` stays a single "المدينة · المنطقة" string (back-compatible with
-// search's substring match and the matching engine's "·" split).
-export const EGYPT_LOCATIONS: { city: string; districts: string[] }[] = [
-  {
-    city: "القاهرة الجديدة",
-    districts: [
-      "التجمع الخامس",
-      "التجمع الأول",
-      "التجمع الثالث",
-      "الرحاب",
-      "مدينتي",
-      "القرنفل",
-      "اللوتس",
-      "الأندلس",
-      "بيت الوطن",
-      "النرجس",
-      "جنوب الأكاديمية",
-    ],
-  },
-  {
-    city: "القاهرة",
-    districts: [
-      "المعادي",
-      "المقطم",
-      "مدينة نصر",
-      "مصر الجديدة",
-      "الزمالك",
-      "وسط البلد",
-      "جاردن سيتي",
-      "العباسية",
-      "شبرا",
-      "حلوان",
-      "عين شمس",
-      "النزهة",
-      "الماظة",
-      "حدائق القبة",
-    ],
-  },
-  {
-    city: "الجيزة",
-    districts: [
-      "المهندسين",
-      "الدقي",
-      "العجوزة",
-      "الهرم",
-      "فيصل",
-      "إمبابة",
-      "بولاق الدكرور",
-      "حدائق الأهرام",
-      "المنيب",
-      "العمرانية",
-    ],
-  },
-  {
-    city: "الشيخ زايد",
-    districts: [
-      "الحي الأول",
-      "الحي الثاني",
-      "الحي الثالث",
-      "الحي الرابع",
-      "بيفرلي هيلز",
-      "الكرمة",
-      "زايد 2000",
-      "داون تاون",
-    ],
-  },
-  {
-    city: "6 أكتوبر",
-    districts: [
-      "الحي الأول",
-      "الحي السابع",
-      "الحي المتميز",
-      "أشجار سيتي",
-      "حدائق أكتوبر",
-      "دريم لاند",
-      "الموازين",
-      "المحور المركزي",
-    ],
-  },
-  {
-    city: "الإسكندرية",
-    districts: [
-      "سموحة",
-      "سيدي جابر",
-      "ميامي",
-      "المنتزه",
-      "العجمي",
-      "سان ستيفانو",
-      "لوران",
-      "كامب شيزار",
-      "محطة الرمل",
-      "أبو قير",
-      "العصافرة",
-      "سيدي بشر",
-      "ستانلي",
-      "كليوباترا",
-    ],
-  },
-  {
-    city: "العاصمة الإدارية",
-    districts: ["R7", "R8", "الحي الحكومي", "داون تاون", "المجاورة الأولى"],
-  },
-  {
-    city: "الساحل الشمالي",
-    districts: ["مارينا", "العلمين الجديدة", "سيدي عبد الرحمن", "هاسيندا", "مراسي", "تيلال"],
-  },
-  {
-    city: "الغردقة",
-    districts: ["الممشى", "الكوثر", "السقالة", "الأحياء", "مبارك"],
-  },
-  {
-    city: "شرم الشيخ",
-    districts: ["نعمة باي", "هضبة أم السيد", "نبق", "رأس نصراني"],
-  },
-  { city: "المنصورة", districts: [] },
-  { city: "طنطا", districts: [] },
-  { city: "الزقازيق", districts: [] },
-  { city: "بنها", districts: [] },
-  { city: "دمنهور", districts: [] },
-  { city: "كفر الشيخ", districts: [] },
-  { city: "دمياط", districts: [] },
-  { city: "بورسعيد", districts: [] },
-  { city: "الإسماعيلية", districts: [] },
-  { city: "السويس", districts: [] },
-  { city: "الفيوم", districts: [] },
-  { city: "بني سويف", districts: [] },
-  { city: "المنيا", districts: [] },
-  { city: "أسيوط", districts: [] },
-  { city: "سوهاج", districts: [] },
-  { city: "قنا", districts: [] },
-  { city: "الأقصر", districts: [] },
-  { city: "أسوان", districts: [] },
-];
-
-// Build the canonical "المدينة · المنطقة" string the rest of the app stores.
-export function formatArea(city: string, district?: string): string {
-  return district && district.trim() ? `${city} · ${district.trim()}` : city;
-}
-
-// Split a stored area string back into its city / district parts.
-export function parseArea(area?: string): { city: string; district: string } {
-  const parts = (area ?? "").split("·").map((s) => s.trim());
-  return { city: parts[0] ?? "", district: parts[1] ?? "" };
-}
-
-// A flat, de-duplicated list of every city + district for the renter's
-// "preferred areas" picker — far richer than the small EGYPT_AREAS list.
-// Matching uses substring, so a district like "المعادي" still matches a
-// listing stored as "القاهرة · المعادي".
-export const AREA_OPTIONS: string[] = Array.from(
-  new Set(EGYPT_LOCATIONS.flatMap((l) => [l.city, ...l.districts])),
-);
+// Egypt locations + area helpers now live in @beitoon/shared — the single
+// source of truth shared with the API (so the two never drift). Re-exported
+// here so existing `@/lib/beitco/store` imports keep working unchanged.
+export {
+  EGYPT_LOCATIONS,
+  AREA_OPTIONS,
+  GOVERNORATES,
+  formatArea,
+  parseArea,
+  isValidArea,
+} from "@beitoon/shared";
 
 // Building / structural amenities — apply whether the place is furnished or not.
 export const GENERAL_AMENITIES = [

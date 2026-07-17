@@ -74,12 +74,29 @@ export class ListingsService {
         where.id = { in: ids };
         meiliOrder = ids;
       } else {
+        // DB fallback (Meili off): an Arabic-normalized id prefilter. Postgres
+        // translate() folds the same letters as @beitoon/shared normalizeArabic
+        // (آأإٱ→ا, ى→ي, ة→ه, ؤ→و, ئ→ي, drop ء + tatweel) on BOTH the column and
+        // the term, so "الاقصر" matches "الأقصر". Same shape as the Meili/geo
+        // prefilters: we get matching ids and constrain the main query to them.
         const q = query.q.trim();
-        where.OR = [
-          { title: { contains: q, mode: 'insensitive' } },
-          { area: { contains: q, mode: 'insensitive' } },
-          { address: { contains: q, mode: 'insensitive' } },
-        ];
+        const FOLD = 'آأإٱىةؤئءـ';
+        const TO = 'اااايهوي';
+        const matched = await this.prisma.$queryRaw<{ id: string }[]>`
+          SELECT id FROM properties
+          WHERE status = 'published' AND deleted_at IS NULL
+            AND (
+              translate(lower(title), ${FOLD}, ${TO}) LIKE '%' || translate(lower(${q}), ${FOLD}, ${TO}) || '%'
+              OR translate(lower(area), ${FOLD}, ${TO}) LIKE '%' || translate(lower(${q}), ${FOLD}, ${TO}) || '%'
+              OR translate(lower(address), ${FOLD}, ${TO}) LIKE '%' || translate(lower(${q}), ${FOLD}, ${TO}) || '%'
+            )
+          LIMIT 200`;
+        const ids = matched.map((r) => r.id);
+        if (ids.length === 0) {
+          return { data: [], meta: { cursor: null, hasMore: false } };
+        }
+        where.id = { in: ids };
+        meiliOrder = ids; // reuse the relevance-order slot (constrains, not re-sorts)
       }
     }
 

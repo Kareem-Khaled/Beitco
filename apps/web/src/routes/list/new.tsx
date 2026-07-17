@@ -70,6 +70,7 @@ import {
   NEARBY_TYPES,
   CAIRO_METRO_LINES,
 } from "@/lib/beitco/store";
+import { arabicIncludes } from "@beitoon/shared";
 import { USE_API, apiGetProperty } from "@/lib/beitco/api";
 import { saveListing } from "@/lib/beitco/queries";
 import { uploadImage } from "@/lib/beitco/uploads";
@@ -233,7 +234,7 @@ function ListNewPage() {
       <header className="border-b border-border bg-background/95">
         <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-4">
           <Link to="/" className="font-display text-2xl font-bold text-trust">
-            بيتكو
+            بيتون
           </Link>
           <div className="flex items-center gap-4">
             <span className="text-xs text-muted-foreground">
@@ -390,10 +391,10 @@ function AreaPicker({ value, onChange }: { value?: string; onChange: (area: stri
   const districts = selected?.districts ?? [];
 
   const filteredCities = cityQuery.trim()
-    ? EGYPT_LOCATIONS.filter((l) => l.city.includes(cityQuery.trim()))
+    ? EGYPT_LOCATIONS.filter((l) => arabicIncludes(l.city, cityQuery))
     : EGYPT_LOCATIONS;
   const filteredDistricts = districtQuery.trim()
-    ? districts.filter((d) => d.includes(districtQuery.trim()))
+    ? districts.filter((d) => arabicIncludes(d, districtQuery))
     : districts;
 
   const chooseCity = (c: string) => {
@@ -423,7 +424,7 @@ function AreaPicker({ value, onChange }: { value?: string; onChange: (area: stri
             onClick={() => setEditingCity(true)}
             className="text-xs font-medium text-trust hover:underline"
           >
-            غيّر المدينة
+            غيّر المحافظة
           </button>
         </div>
       ) : null}
@@ -436,7 +437,7 @@ function AreaPicker({ value, onChange }: { value?: string; onChange: (area: stri
             <Input
               value={cityQuery}
               onChange={(e) => setCityQuery(e.target.value)}
-              placeholder="دوّر على المدينة (القاهرة، الجيزة، إسكندرية…)"
+              placeholder="دوّر على المحافظة (القاهرة، الجيزة، إسكندرية…)"
               className="pe-9"
             />
           </div>
@@ -462,7 +463,7 @@ function AreaPicker({ value, onChange }: { value?: string; onChange: (area: stri
             ))}
             {filteredCities.length === 0 ? (
               <p className="col-span-full p-2 text-xs text-muted-foreground">
-                مفيش مدينة بالاسم ده.
+                مفيش محافظة بالاسم ده.
               </p>
             ) : null}
           </div>

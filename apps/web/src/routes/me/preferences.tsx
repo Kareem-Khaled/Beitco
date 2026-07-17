@@ -29,6 +29,7 @@ import {
   CAIRO_METRO_LINES,
   profileCompleteness,
 } from "@/lib/beitco/store";
+import { arabicIncludes } from "@beitoon/shared";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,7 +83,7 @@ function PreferencesPage() {
   const filteredAreas = AREA_OPTIONS.filter(
     (a) =>
       !selectedAreas.includes(a) &&
-      (areaQuery.trim() ? a.toLowerCase().includes(areaQuery.trim().toLowerCase()) : true),
+      (areaQuery.trim() ? arabicIncludes(a, areaQuery) : true),
   );
 
   const addArea = (area: string) => {

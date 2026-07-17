@@ -3,6 +3,7 @@
 // saved-search alerts (NOTIF-2) fire on precisely the listings the renter would
 // have seen had they re-run the search. Runs against the SERIALIZED property
 // (Arabic `type`, computed `beds`), so it reuses listings.serializer's mapping.
+import { arabicIncludes } from '@beitoon/shared';
 
 // The fields the matcher reads off a serialized property.
 export interface MatchableListing {
@@ -36,17 +37,16 @@ export function propertyMatchesSavedSearch(
   params: SavedSearchParams,
 ): boolean {
   if (params.q) {
-    const needle = params.q.trim().toLowerCase();
     const hit =
-      p.title.toLowerCase().includes(needle) ||
-      p.area.toLowerCase().includes(needle) ||
-      p.address.toLowerCase().includes(needle);
+      arabicIncludes(p.title, params.q) ||
+      arabicIncludes(p.area, params.q) ||
+      arabicIncludes(p.address, params.q);
     if (!hit) return false;
   }
   if (params.type && p.type !== params.type) return false;
   if (params.purpose && (p.listingType ?? 'rent') !== params.purpose) return false;
   if (params.gender && p.rentToGender !== params.gender) return false;
-  if (params.area && !p.area.includes(params.area)) return false;
+  if (params.area && !arabicIncludes(p.area, params.area)) return false;
   if (params.freeOnly && !(p.beds.available > 0)) return false;
   if (params.verifiedOnly && !p.verified) return false;
   if (params.minPrice != null && !(p.price >= params.minPrice)) return false;

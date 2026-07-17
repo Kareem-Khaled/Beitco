@@ -17,9 +17,10 @@ import {
 import { z } from "zod";
 import { SiteHeader } from "@/components/beitco/SiteHeader";
 import { SiteFooter } from "@/components/beitco/SiteFooter";
-import { BeitcoListingCard, ListingCardSkeleton } from "@/components/beitco/BeitcoListingCard";
+import { BeitoonListingCard, ListingCardSkeleton } from "@/components/beitco/BeitoonListingCard";
 import { EmptyState } from "@/components/beitco/EmptyState";
 import { EGYPT_AREAS } from "@/lib/beitco/store";
+import { arabicIncludes } from "@beitoon/shared";
 import {
   useSearchProperties,
   useSavedSearches,
@@ -120,18 +121,17 @@ function SearchPage() {
     // Mock mode: filter/sort/rank client-side so the prototype works offline.
     let list = [...result.items];
     if (params.q) {
-      const needle = params.q.trim().toLowerCase();
       list = list.filter(
         (p) =>
-          p.title.toLowerCase().includes(needle) ||
-          p.area.toLowerCase().includes(needle) ||
-          p.address.toLowerCase().includes(needle),
+          arabicIncludes(p.title, params.q!) ||
+          arabicIncludes(p.area, params.q!) ||
+          arabicIncludes(p.address, params.q!),
       );
     }
     if (params.type) list = list.filter((p) => p.type === params.type);
     if (params.purpose) list = list.filter((p) => (p.listingType ?? "rent") === params.purpose);
     if (params.gender) list = list.filter((p) => p.rentToGender === params.gender);
-    if (params.area) list = list.filter((p) => p.area.includes(params.area!));
+    if (params.area) list = list.filter((p) => arabicIncludes(p.area, params.area!));
     if (params.freeOnly) list = list.filter((p) => p.beds.available > 0);
     if (params.verifiedOnly) list = list.filter((p) => p.verified);
     if (params.nightly) list = list.filter((p) => (p.nightlyPrice ?? 0) > 0);
@@ -516,7 +516,7 @@ function SearchPage() {
             ) : (
               <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                 {filtered.map((p) => (
-                  <BeitcoListingCard key={p.id} p={p} />
+                  <BeitoonListingCard key={p.id} p={p} />
                 ))}
                 {/* Appending the next page: skeleton cards fill in as they load */}
                 {isFetchingMore

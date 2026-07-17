@@ -11,6 +11,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+import { IsEgyptArea } from '../../common/validators/is-egypt-area.validator';
 
 class SpecDto {
   @ApiProperty({ enum: ['شقة', 'استوديو', 'دوبلكس', 'روف', 'فيلا'] })
@@ -149,6 +150,7 @@ export class CreateListingDto {
 
   @ApiProperty()
   @IsString()
+  @IsEgyptArea()
   area!: string;
 
   @ApiPropertyOptional()

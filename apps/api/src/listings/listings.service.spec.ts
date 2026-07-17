@@ -90,14 +90,22 @@ describe('ListingsService', () => {
       });
     });
 
-    it('uses a DB contains OR across title/area/address for `q` when Meili is off', async () => {
+    it('uses an Arabic-normalized $queryRaw id prefilter for `q` when Meili is off', async () => {
+      // The DB fallback folds Arabic letters via translate() and returns matching
+      // ids, which constrain the main query (same pattern as the Meili/geo paths).
+      prisma.$queryRaw.mockResolvedValueOnce([{ id: 'p1' }, { id: 'p2' }]);
       await service.list({ q: 'معادي' });
+      expect(prisma.$queryRaw).toHaveBeenCalled();
       const where = prisma.property.findMany.mock.calls[0][0].where;
-      expect(where.OR).toEqual([
-        { title: { contains: 'معادي', mode: 'insensitive' } },
-        { area: { contains: 'معادي', mode: 'insensitive' } },
-        { address: { contains: 'معادي', mode: 'insensitive' } },
-      ]);
+      expect(where.id).toEqual({ in: ['p1', 'p2'] });
+      expect(where.OR).toBeUndefined();
+    });
+
+    it('returns empty when the normalized `q` prefilter matches nothing', async () => {
+      prisma.$queryRaw.mockResolvedValueOnce([]);
+      const res = await service.list({ q: 'حاجة مش موجودة' });
+      expect(res.data).toEqual([]);
+      expect(prisma.property.findMany).not.toHaveBeenCalled();
     });
 
     it('area is a substring filter; nightly requires a nightlyPrice', async () => {
