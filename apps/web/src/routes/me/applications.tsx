@@ -68,7 +68,7 @@ function MeApplications() {
                           {p.title}
                         </Link>
                       ) : (
-                        <span className="font-display text-base font-semibold">—</span>
+                        <span className="font-display text-base font-semibold"> - </span>
                       )}
                       <StatusPill status={l.status} />
                     </div>
@@ -94,7 +94,7 @@ function MeApplications() {
                 </div>
                 {l.status === "approved" ? (
                   <p className="mt-2 rounded-lg bg-trust-soft px-3 py-2 text-xs text-foreground">
-                    صاحب المكان وافق على المعاينة — كلّمه وحدّدوا الميعاد.
+                    صاحب المكان وافق على المعاينة  -  كلّمه وحدّدوا الميعاد.
                   </p>
                 ) : null}
                 {l.status === "declined" ? (

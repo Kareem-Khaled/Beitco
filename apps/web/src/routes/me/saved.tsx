@@ -51,12 +51,12 @@ function MeSaved() {
               key={p.id}
               className="group/saved overflow-hidden rounded-2xl border border-border bg-surface transition-all hover:shadow-[var(--shadow-elevated)]"
             >
-              {/* Card without its own frame — merges into this one container */}
+              {/* Card without its own frame  -  merges into this one container */}
               <BeitoonListingCard
                 p={p}
                 className="rounded-none border-0 bg-transparent hover:translate-y-0 hover:shadow-none"
               />
-              {/* Remove footer — part of the same unified card */}
+              {/* Remove footer  -  part of the same unified card */}
               <button
                 type="button"
                 onClick={() => unsave(p.id)}

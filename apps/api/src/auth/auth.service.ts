@@ -86,7 +86,7 @@ export class AuthService {
 
     // Deliver via the configured SMS provider (console logs in dev; HTTP gateway
     // in prod). Best-effort: a gateway failure is logged but the OTP still lives
-    // in Redis (the user can retry / contact support) — we don't 500 the login.
+    // in Redis (the user can retry / contact support)  -  we don't 500 the login.
     const result = await this.sms.sendOtp(phone, code);
     if (!result.delivered) {
       this.logger.error(`OTP send failed via ${result.provider} for ${phone}`);
@@ -211,14 +211,14 @@ export class AuthService {
       if (ttl > 0) await this.redis.set(`${BLACKLIST_KEY}${payload.jti}`, '1', 'EX', ttl);
       await this.redis.del(`${REFRESH_KEY}${userId}:${payload.jti}`);
     } catch {
-      // already invalid — nothing to revoke
+      // already invalid  -  nothing to revoke
     }
   }
 
   // ─── Helpers ───────────────────────────────────────────
 
   // BUG-1: invalidate every active refresh token for a user (called when an
-  // admin bans them) so they can't mint new access tokens. Best-effort —
+  // admin bans them) so they can't mint new access tokens. Best-effort  - 
   // the bannedAt checks above are the real guarantee.
   async revokeAllSessions(userId: string): Promise<void> {
     if (!this.redisService.ready) return;
@@ -253,7 +253,7 @@ export class AuthService {
     );
   }
 
-  // Guaranteed present by validateEnv (SEC-1) — no inline dev fallback here.
+  // Guaranteed present by validateEnv (SEC-1)  -  no inline dev fallback here.
   private refreshSecret(): string {
     return this.config.get<string>('JWT_REFRESH_SECRET')!;
   }

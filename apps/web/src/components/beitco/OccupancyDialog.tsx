@@ -132,7 +132,7 @@ export function OccupancyDialog({
         <DialogHeader>
           <DialogTitle className="font-display">حالة {unitLabel}</DialogTitle>
           <DialogDescription>
-            غيّر الحالة، ولو حابب سجّل بيانات المستأجر (اختياري — بتفضل خاصة بيك).
+            غيّر الحالة، ولو حابب سجّل بيانات المستأجر (اختياري  -  بتفضل خاصة بيك).
           </DialogDescription>
         </DialogHeader>
 
@@ -165,10 +165,10 @@ export function OccupancyDialog({
             <div className="space-y-3 rounded-xl border border-border bg-surface p-3">
               <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                 <User className="h-3.5 w-3.5" />
-                بيانات المستأجر (كله اختياري — بتفضل خاصة بيك)
+                بيانات المستأجر (كله اختياري  -  بتفضل خاصة بيك)
               </div>
 
-              {/* Link to a Beitoon account — consent-based, by exact phone only.
+              {/* Link to a Beitoon account  -  consent-based, by exact phone only.
                   We never browse users or reveal who owns a number. */}
               {occ.userId ? (
                 <div className="flex items-center justify-between gap-2 rounded-lg border border-trust/40 bg-trust-soft px-3 py-2">
@@ -197,7 +197,7 @@ export function OccupancyDialog({
               ) : (
                 <div className="rounded-lg border border-dashed border-border bg-background p-2.5">
                   <div className="mb-1.5 text-[11px] text-muted-foreground">
-                    اربط الساكن بحساب بيتون (اختياري) — اكتب رقمه وهنبعتله دعوة يأكّدها هو بنفسه.
+                    اربط الساكن بحساب بيتون (اختياري)  -  اكتب رقمه وهنبعتله دعوة يأكّدها هو بنفسه.
                   </div>
                   <div className="flex items-center gap-2">
                     <Input

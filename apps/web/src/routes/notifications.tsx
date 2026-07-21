@@ -65,7 +65,7 @@ function NotificationsPage() {
           <EmptyState
             icon={Bell}
             title="مفيش إشعارات لسه"
-            hint="أول ما يحصل نشاط على حسابك — طلب معاينة، رسالة، أو رأي — هتلاقيه هنا."
+            hint="أول ما يحصل نشاط على حسابك  -  طلب معاينة، رسالة، أو رأي  -  هتلاقيه هنا."
             action={
               <Button asChild variant="outline">
                 <Link to="/search">

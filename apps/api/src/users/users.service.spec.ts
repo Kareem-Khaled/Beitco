@@ -1,7 +1,7 @@
 import { PrismaService } from '../prisma/prisma.service';
 import { UsersService } from './users.service';
 
-// TEST-1: UsersService.updateMe — profile + preferences. Mocked Prisma; the
+// TEST-1: UsersService.updateMe  -  profile + preferences. Mocked Prisma; the
 // real renter-profile mapper runs (it's a pure function), so we also exercise
 // the Arabic↔Latin enum translation it does.
 

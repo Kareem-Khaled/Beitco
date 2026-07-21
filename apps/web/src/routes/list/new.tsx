@@ -106,7 +106,7 @@ function ListNewPage() {
   const [draft, setDraft] = useState<ListingDraft>({});
   const [hydrated, setHydrated] = useState(false);
   const [notFound, setNotFound] = useState(false);
-  // The existing listing when editing — fetched once (flag-aware) and reused by
+  // The existing listing when editing  -  fetched once (flag-aware) and reused by
   // the ownership guard + publish (instead of re-reading the store each time).
   const [existingProp, setExistingProp] = useState<Property | undefined>(undefined);
   const [publishing, setPublishing] = useState(false);
@@ -202,7 +202,7 @@ function ListNewPage() {
       isEdit
         ? "اتحفظت التعديلات"
         : pending
-          ? "بعتنا إعلانك للمراجعة — هيظهر للناس بعد ما نوافق عليه (عادة خلال ساعات)."
+          ? "بعتنا إعلانك للمراجعة  -  هيظهر للناس بعد ما نوافق عليه (عادة خلال ساعات)."
           : "اتنشر الإعلان",
     );
     // Replace the wizard in history so the browser Back button skips the form
@@ -379,7 +379,7 @@ function AreaPicker({ value, onChange }: { value?: string; onChange: (area: stri
   const [districtQuery, setDistrictQuery] = useState("");
   const [customDistrict, setCustomDistrict] = useState("");
   // Free-text district (for cities with no preset list). Kept in local state so
-  // typing — spaces included — isn't clobbered by the trimmed area round-trip.
+  // typing  -  spaces included  -  isn't clobbered by the trimmed area round-trip.
   const [freeDistrict, setFreeDistrict] = useState(district);
   // Reset the free-text field whenever the chosen city changes.
   useEffect(() => {
@@ -807,7 +807,7 @@ function CustomSpecsSection({ draft, update }: StepProps) {
         <span className="text-sm font-medium">مواصفات إضافية من عندك</span>
       </div>
       <p className="mb-3 text-xs text-muted-foreground">
-        أي حاجة مميزة مش موجودة فوق — زي اتجاه الشمس، نوع المطبخ، التشطيب...
+        أي حاجة مميزة مش موجودة فوق  -  زي اتجاه الشمس، نوع المطبخ، التشطيب...
       </p>
 
       <div className="flex flex-col gap-2">
@@ -928,7 +928,7 @@ function StepRentalMode({ draft, update }: StepProps) {
     {
       id: "by_bed",
       title: "أجّر بالسرير",
-      subtitle: "سكن مشترك — كل سرير في الأوضة بسعر مختلف.",
+      subtitle: "سكن مشترك  -  كل سرير في الأوضة بسعر مختلف.",
       icon: BedDouble,
     },
   ];
@@ -1016,7 +1016,7 @@ function StepRentalMode({ draft, update }: StepProps) {
             <div className="mt-6 rounded-2xl border border-border bg-surface p-5">
               <h3 className="font-display text-base font-semibold">هتأجّر لمين؟</h3>
               <p className="mt-1 text-xs text-muted-foreground">
-                السكن المشترك لازم يكون لجنس واحد. اختار مين ممكن يسكن — ده بيظهر في الإعلان وبيحدد
+                السكن المشترك لازم يكون لجنس واحد. اختار مين ممكن يسكن  -  ده بيظهر في الإعلان وبيحدد
                 المطابقة.
               </p>
               <div className="mt-4 grid gap-2 sm:grid-cols-2">
@@ -1075,7 +1075,7 @@ function StepRoomsPricing({ draft, update }: StepProps) {
   );
 }
 
-// Optional short-stay rate — monthly is the focus, this is a nice-to-have.
+// Optional short-stay rate  -  monthly is the focus, this is a nice-to-have.
 // Shown for every rental mode so an owner can offer nightly even for a bed/room.
 // Defaults to "لأ" (no): only a positive saved rate starts it on "نعم".
 function NightlyToggle({ draft, update }: StepProps) {
@@ -1484,7 +1484,7 @@ function StepAmenities({ draft, update }: StepProps) {
       amenities: selected.includes(a) ? selected.filter((x) => x !== a) : [...selected, a],
     });
 
-  // When the apartment isn't furnished, appliances/furniture don't apply —
+  // When the apartment isn't furnished, appliances/furniture don't apply  - 
   // drop any that were selected while it was furnished.
   useEffect(() => {
     if (furnished) return;
@@ -1538,13 +1538,13 @@ function StepAmenities({ draft, update }: StepProps) {
         المميزات اللي في الشقة كلها أو العمارة (مش الأوضة الواحدة).
       </p>
 
-      {/* Building / general amenities — always shown */}
+      {/* Building / general amenities  -  always shown */}
       <div className="mt-8">
         <h2 className="mb-3 text-sm font-medium text-foreground">مميزات العمارة والمكان</h2>
         <Grid items={GENERAL_AMENITIES} />
       </div>
 
-      {/* Appliances & furniture — only relevant for furnished places */}
+      {/* Appliances & furniture  -  only relevant for furnished places */}
       {furnished ? (
         <div className="mt-6">
           <h2 className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-foreground">
@@ -2162,7 +2162,7 @@ function validateStep(step: StepId, d: ListingDraft): boolean {
       // For sale, the offer choice alone is enough; price is validated in step 4.
       if (d.listingType === "sale") return true;
       if (!d.rentalMode) return false;
-      // Shared rentals must target one gender — no "anyone" option.
+      // Shared rentals must target one gender  -  no "anyone" option.
       if (d.rentalMode !== "whole")
         return d.rentToGender === "male_only" || d.rentToGender === "female_only";
       return true;
@@ -2239,7 +2239,7 @@ function draftToProperty(
     status: existing?.status ?? "published",
     price: summary.priceFrom,
     priceFrom: summary.priceFrom,
-    // Preserve trust / reputation / reviews when editing — these are earned, not set.
+    // Preserve trust / reputation / reviews when editing  -  these are earned, not set.
     trust: existing?.trust ?? 6.5,
     verified: existing?.verified ?? false,
     reviewsCount: existing?.reviewsCount ?? 0,

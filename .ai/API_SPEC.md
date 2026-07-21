@@ -1,4 +1,4 @@
-# Beitoon — API Specification
+# Beitoon  -  API Specification
 
 > **Last updated:** June 25, 2026 · Live endpoint inventory (~93 routes across 18 controllers). **Interactive source of truth: Swagger at `http://localhost:3001/api/docs`.**
 > Base: `/api/v1` (URI versioning). All paths below are relative to it.
@@ -7,16 +7,16 @@
 
 ## Conventions
 
-- **Response envelope (every endpoint):** `{ success: boolean, data: T, meta?: { cursor: string|null, hasMore: boolean }, error?: { code, message } }` — applied globally by `ResponseEnvelopeInterceptor` + `AllExceptionsFilter`.
+- **Response envelope (every endpoint):** `{ success: boolean, data: T, meta?: { cursor: string|null, hasMore: boolean }, error?: { code, message } }`  -  applied globally by `ResponseEnvelopeInterceptor` + `AllExceptionsFilter`.
 - **Auth:** global `JwtAuthGuard`. Routes are **authenticated by default**; only `@Public()` ones are open. Session = access+refresh JWTs in **httpOnly cookies** (`beitco_at`); browsers send them automatically (`credentials: include`).
 - **Authz failures:** `401` (no/invalid session), `403` (authenticated but not owner/participant/admin).
-- **Validation:** strict (`whitelist` + `forbidNonWhitelisted`) — unknown body fields are rejected.
+- **Validation:** strict (`whitelist` + `forbidNonWhitelisted`)  -  unknown body fields are rejected.
 - **Pagination:** cursor-based via `meta.cursor` / `meta.hasMore` (no offset).
 - **Errors carry an Arabic `message`** (user-facing) + a stable `code`.
 
 ---
 
-## Auth — `/auth`
+## Auth  -  `/auth`
 | Method | Path | Auth | Notes |
 |---|---|---|---|
 | POST | `/auth/otp/send` | Public | Send OTP (Redis, 5-min TTL, 60s cooldown; dev returns `123456`). |
@@ -26,7 +26,7 @@
 | POST | `/auth/refresh` | Public | Rotate access token from the refresh cookie. |
 | POST | `/auth/logout` | Auth | Revoke (Redis blacklist) + clear cookies. |
 
-## Listings — `/properties`
+## Listings  -  `/properties`
 | Method | Path | Auth | Notes |
 |---|---|---|---|
 | GET | `/properties` | Public | Cursor-paginated; filters: `type`,`purpose`,`gender`,`area`,`minPrice`,`maxPrice`,`verifiedOnly`,`nightly`,`freeOnly`,`sort`. **Text:** `q` (Meilisearch typo-tolerant, relevance-ordered; DB `contains` fallback). **Geo:** `lat`,`lng`,`radiusKm` (PostGIS `ST_DWithin`, default 5 km / max 50, distance-ordered; composes with `q` + `freeOnly`). |
@@ -67,7 +67,7 @@
 | GET | `/me/matches` | Auth | Ranked, explainable matches from saved preferences. |
 | PATCH | `/users/me` | Auth | Update name/role/avatar/notifications **and `profile`** (preferences; upserts `RenterProfile`). |
 
-## Verification (KYC) — `/me/verification` + `/admin/verifications`
+## Verification (KYC)  -  `/me/verification` + `/admin/verifications`
 | Method | Path | Auth | Notes |
 |---|---|---|---|
 | POST | `/me/verification` | Auth | Submit `idDocUrl`/`selfieUrl`/optional `ownershipDocUrl` → pending request (`verificationStatus=pending`). |
@@ -77,13 +77,13 @@
 | POST | `/admin/verifications/:id/approve` | Admin | → `verified` + `verificationStatus=verified` + **trust recompute** (T-2 bonus) + notification. |
 | POST | `/admin/verifications/:id/reject` | Admin | `{ reason }` → `unverified` + notification. |
 
-## Uploads (images) — `/uploads`
+## Uploads (images)  -  `/uploads`
 | Method | Path | Auth | Notes |
 |---|---|---|---|
 | POST | `/uploads/presign` | Auth | → presigned **S3/R2** PUT URL + final public URL (validates content-type ∈ {jpeg,png,webp,avif} + ≤10 MB; keys namespaced `listings/<userId>/…`). |
-| GET | `/uploads/config` | Auth | `{ configured }` — when `false`, the client falls back to downscaled base64. |
+| GET | `/uploads/config` | Auth | `{ configured }`  -  when `false`, the client falls back to downscaled base64. |
 
-## Chat — REST + WebSocket
+## Chat  -  REST + WebSocket
 | Method | Path | Auth | Notes |
 |---|---|---|---|
 | GET | `/me/threads` | Auth | My conversations (+ embedded property summary). |
@@ -92,14 +92,14 @@
 | POST | `/threads/:id/messages` | Participant | Send; maintains `ResponseEvent` (T-3) + emits live. |
 | WS | `/ws/chat` | Cookie JWT | Socket.io namespace. Joins `user:<id>`; server emits `message:new { threadId, message }`. |
 
-## Notifications — `/me/notifications`
+## Notifications  -  `/me/notifications`
 | Method | Path | Auth | Notes |
 |---|---|---|---|
 | GET | `/me/notifications` | Auth | Derived feed + persisted alerts + `lastSeen`. |
 | GET | `/me/notifications/unread-count` | Auth | Bell badge count. |
 | POST | `/me/notifications/seen` | Auth | Set the last-seen marker. |
 
-## Admin / operator portal — `/admin/*` (`AdminGuard`)
+## Admin / operator portal  -  `/admin/*` (`AdminGuard`)
 
 > The Beitoon-team control room. All routes are `AdminGuard`-gated (after the global `JwtAuthGuard`); **every mutation is written to the audit log**.
 
@@ -149,7 +149,7 @@
 | GET | `/admin/analytics/funnel` | Browse→lead→approved→move-in + conversion rates. |
 | GET | `/admin/analytics/areas` | Supply vs demand per area (gap-sorted). |
 
-## Reports & abuse (ADMIN-5) — `/reports` + `/admin/reports`
+## Reports & abuse (ADMIN-5)  -  `/reports` + `/admin/reports`
 | Method | Path | Auth | Notes |
 |---|---|---|---|
 | POST | `/reports` | Auth | File a report `{targetType, targetId, reason, details?}` (target-validated; dedup → `ALREADY_REPORTED`). |
@@ -160,7 +160,7 @@
 | Method | Path | Auth | Notes |
 |---|---|---|---|
 | GET | `/health` | Public | Liveness (`status`, uptime). |
-| GET | `/health/ready` | Public | Readiness — pings Postgres (`SELECT 1`) + Redis (`PING`); **503** when either is down (for the orchestrator's traffic gate). |
+| GET | `/health/ready` | Public | Readiness  -  pings Postgres (`SELECT 1`) + Redis (`PING`); **503** when either is down (for the orchestrator's traffic gate). |
 
 ---
 

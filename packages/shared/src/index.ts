@@ -1,4 +1,4 @@
-// @beitoon/shared — single source of truth for Beitoon domain constants, imported
+// @beitoon/shared  -  single source of truth for Beitoon domain constants, imported
 // by BOTH the web app and the API so the two never drift. Pure data + pure
 // functions only (zero runtime deps), so it's safe in any environment.
 
@@ -26,7 +26,7 @@ export function normalizeArabic(input: string): string {
     .toLowerCase();
 }
 
-// Arabic-aware "does haystack contain needle?" — normalizes both sides so
+// Arabic-aware "does haystack contain needle?"  -  normalizes both sides so
 // "الاقصر" matches "الأقصر", "شقه" matches "شقة", etc.
 export function arabicIncludes(haystack: string, needle: string): boolean {
   const n = normalizeArabic(needle);

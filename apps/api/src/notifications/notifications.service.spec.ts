@@ -2,7 +2,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { NotificationsService } from './notifications.service';
 
-// TEST-1: NotificationsService — the derived feed (leads/messages/review-gate/
+// TEST-1: NotificationsService  -  the derived feed (leads/messages/review-gate/
 // verification/persisted) + the Redis-gated read-state (lastSeen/unreadCount/
 // markSeen). Mocked Prisma + RedisService.
 
@@ -117,7 +117,7 @@ describe('NotificationsService', () => {
     it('derives a moderation notification for an admin (pending listings)', async () => {
       prisma.user.findUnique.mockResolvedValue({ role: 'both', verificationStatus: 'verified', createdAt: daysAgo(10), isAdmin: true });
       // role 'both' means the owner moderated-listings source also queries
-      // property.findMany — distinguish the two by their where clause.
+      // property.findMany  -  distinguish the two by their where clause.
       const created = daysAgo(1);
       prisma.property.findMany.mockImplementation((args: { where?: { status?: string } }) =>
         Promise.resolve(
@@ -142,7 +142,7 @@ describe('NotificationsService', () => {
 
     it('re-alerts the admin with a "resubmitted" moderation notice (updatedAt >> createdAt)', async () => {
       prisma.user.findUnique.mockResolvedValue({ role: 'admin', verificationStatus: 'verified', createdAt: daysAgo(30), isAdmin: true });
-      // Created 10 days ago, edited & resubmitted 1 day ago — the gap marks it a resubmit.
+      // Created 10 days ago, edited & resubmitted 1 day ago  -  the gap marks it a resubmit.
       prisma.property.findMany.mockImplementation((args: { where?: { status?: string } }) =>
         Promise.resolve(
           args.where?.status === 'pending_approval'

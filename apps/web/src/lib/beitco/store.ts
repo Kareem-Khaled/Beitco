@@ -1,4 +1,4 @@
-// Mock data store — localStorage-backed, simulates the API shape.
+// Mock data store  -  localStorage-backed, simulates the API shape.
 // In production, swap these functions for real fetch calls.
 
 import { seedProperties, seedUsers } from "./seed-data";
@@ -90,7 +90,7 @@ function ensureSeeded() {
   if (!isBrowser) return;
 
   // Version refresh: when the seed data changes, re-apply seed records by id so
-  // demo listings/users pick up new fields — while preserving user-created data.
+  // demo listings/users pick up new fields  -  while preserving user-created data.
   const storedVersion = localStorage.getItem(STORAGE_KEYS.seedVersion);
   if (storedVersion !== SEED_VERSION) {
     const seedPropIds = new Set(seedProperties.map((p) => p.id));
@@ -390,7 +390,7 @@ export function deleteProperty(id: string) {
 // ---------- Moderation (MOD-1) ----------
 // Trust-first: a listing only goes live instantly if the owner is verified.
 // Everyone else's listings enter a review queue so we can catch fake/abusive
-// posts before renters ever see them — the core promise Beitoon makes.
+// posts before renters ever see them  -  the core promise Beitoon makes.
 
 export function isPlatformAdmin(user?: Pick<User, "isAdmin"> | null): boolean {
   return !!user?.isAdmin;
@@ -1032,7 +1032,7 @@ function recordResponseEvent(thread: Thread, senderId: string, atISO: string): v
   const existing = all.find((e) => e.threadId === thread.id);
 
   if (senderId === thread.renterId) {
-    // Renter message — open an event if none exists yet for this thread.
+    // Renter message  -  open an event if none exists yet for this thread.
     if (!existing) {
       all.push({
         id: `re-${Date.now()}`,
@@ -1046,7 +1046,7 @@ function recordResponseEvent(thread: Thread, senderId: string, atISO: string): v
   }
 
   if (senderId === thread.ownerId && existing && !existing.firstOwnerReplyAt) {
-    // Owner's first reply — close the event and refresh their trust.
+    // Owner's first reply  -  close the event and refresh their trust.
     existing.firstOwnerReplyAt = atISO;
     writeJSON(STORAGE_KEYS.responseEvents, all);
     recomputeOwnerTrust(thread.ownerId);
@@ -1163,7 +1163,7 @@ export function getOwnerAnalytics(ownerId: string): {
 }
 
 // API-mode analytics: there's no events/views table yet, so views & saves stay
-// deterministic estimates (same as mock), but LEADS are real — passed in from
+// deterministic estimates (same as mock), but LEADS are real  -  passed in from
 // the owner-leads API response. Keeps the dashboard believable without a mock
 // localStorage dependency. Mirrors getOwnerAnalytics' shape.
 export function ownerAnalyticsFromData(
@@ -1257,7 +1257,7 @@ export function getUser(id: string): User | undefined {
 
 // Public-facing profile for an owner/landlord: derived from their account + the
 // listings they own + reviews on those listings. Renter-only accounts (no
-// listings) get a minimal profile. Phone is never included — it's private.
+// listings) get a minimal profile. Phone is never included  -  it's private.
 export type PublicProfile = {
   id: string;
   name: string;
@@ -1339,7 +1339,7 @@ function findUserByExactPhone(phone: string): User | undefined {
 }
 
 // Owner invites a tenant to link their Beitoon account by exact phone.
-// Returns only whether the input was a valid phone — never whether an account
+// Returns only whether the input was a valid phone  -  never whether an account
 // exists (no existence oracle). If an account exists, the caller stores the
 // occupant link as `pending` and the renter is notified to confirm.
 export function resolveInvitePhone(phone: string): { valid: boolean; userId?: string } {
@@ -1500,7 +1500,7 @@ export function getVerificationStatus(
   return u.verificationStatus ?? (u.verified ? "verified" : "unverified");
 }
 
-// Submit account for verification (mock — in production this uploads docs for review).
+// Submit account for verification (mock  -  in production this uploads docs for review).
 export function submitVerification(userId: string): User | undefined {
   const u = getUser(userId);
   if (!u) return undefined;
@@ -1579,7 +1579,7 @@ export function getNotificationsForUser(userId: string): AppNotification[] {
       id: `rev-${ten.id}`,
       type: "review",
       title: "تقدر تكتب رأيك دلوقتي",
-      body: `عدّى 30 يوم على سكنك في «${p?.title ?? "المكان"}» — رأيك بيساعد ناس كتير.`,
+      body: `عدّى 30 يوم على سكنك في «${p?.title ?? "المكان"}»  -  رأيك بيساعد ناس كتير.`,
       date: ten.moveInDate,
       propertyId: ten.propertyId,
     });
@@ -1636,7 +1636,7 @@ export function markNotificationsSeen(userId: string) {
   localStorage.setItem(KEY_NOTIF_SEEN + userId, String(Date.now()));
 }
 
-// 0–100 measure of how filled-in a renter profile is — drives the "complete your profile" nudge.
+// 0–100 measure of how filled-in a renter profile is  -  drives the "complete your profile" nudge.
 const PROFILE_FIELDS: (keyof RenterProfile)[] = [
   "budgetMax",
   "areas",
@@ -1699,7 +1699,7 @@ export function canUserReview(userId: string, propertyId: string): boolean {
 // ---------- Renter reputation (two-sided trust, T-4) ----------
 // Owners review renters they've actually hosted (a confirmed tenancy). The
 // reputation SCORE is visible to owners on leads, but the individual review
-// TEXT from other owners is never exposed (anti-retaliation) — TRUST_SPEC §6.
+// TEXT from other owners is never exposed (anti-retaliation)  -  TRUST_SPEC §6.
 
 export function getRenterReviews(renterId: string): RenterReview[] {
   ensureSeeded();
@@ -2066,7 +2066,7 @@ function seedRenterReviews(): void {
       propertyId: "5",
       rating: 9,
       scores: { reliability: 9, cleanliness: 10, communication: 9 },
-      body: "من أحسن الساكنين اللي مرّوا عليّا — نضيفة ومنظّمة وبتحترم المواعيد.",
+      body: "من أحسن الساكنين اللي مرّوا عليّا  -  نضيفة ومنظّمة وبتحترم المواعيد.",
     },
     {
       renterId: "u-renter-mona",
@@ -2162,7 +2162,7 @@ function seedModerationQueue(): void {
     },
     {
       id: "pending-2",
-      title: "أوضة للإيجار في فيصل — لسه بتتراجع",
+      title: "أوضة للإيجار في فيصل  -  لسه بتتراجع",
       area: "الجيزة · فيصل",
       address: "شارع فيصل الرئيسي، الجيزة",
       price: 4500,
@@ -2362,7 +2362,7 @@ export function timeAgo(iso: string): string {
   return `من ${Math.floor(days / 365)} سنين`;
 }
 
-// Absolute publish date — "د/شهر/سنة" in Arabic with Latin digits.
+// Absolute publish date  -  "د/شهر/سنة" in Arabic with Latin digits.
 export function formatDate(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
@@ -2387,7 +2387,7 @@ export const EGYPT_AREAS = [
   "العاصمة الإدارية",
 ] as const;
 
-// Egypt locations + area helpers now live in @beitoon/shared — the single
+// Egypt locations + area helpers now live in @beitoon/shared  -  the single
 // source of truth shared with the API (so the two never drift). Re-exported
 // here so existing `@/lib/beitco/store` imports keep working unchanged.
 export {
@@ -2399,7 +2399,7 @@ export {
   isValidArea,
 } from "@beitoon/shared";
 
-// Building / structural amenities — apply whether the place is furnished or not.
+// Building / structural amenities  -  apply whether the place is furnished or not.
 export const GENERAL_AMENITIES = [
   "نت 100 ميجا",
   "نت 200 ميجا",
@@ -2418,7 +2418,7 @@ export const GENERAL_AMENITIES = [
   "إطلالة بحر",
 ] as const;
 
-// Appliances & furniture — only relevant when the apartment is furnished.
+// Appliances & furniture  -  only relevant when the apartment is furnished.
 export const APPLIANCE_AMENITIES = [
   "غسالة",
   "نشافة",

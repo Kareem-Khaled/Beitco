@@ -19,7 +19,7 @@ function MessagesIndex() {
   if (!user) return null;
 
   // No active thread: the shell shows the conversations list. This placeholder
-  // only appears on the desktop (lg+) second pane — on mobile the list is the
+  // only appears on the desktop (lg+) second pane  -  on mobile the list is the
   // whole screen until a conversation is opened.
   return (
     <MessagesShell>

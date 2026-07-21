@@ -1,4 +1,4 @@
-# Roadmap — Beitoon
+# Roadmap  -  Beitoon
 
 > **Last updated:** June 24, 2026. Bias toward shipping the smallest thing that proves trust > supply.
 > For the granular, prioritized backlog see **`.ai/NEXT_STEPS.md`**; for the go-live checklist see **`.ai/PROD_READINESS.md`**. This file is the high-level phase view.
@@ -7,7 +7,7 @@
 
 ## Where we are
 
-Phases 0–3 are **functionally done** — the trust-first bed-level marketplace works end-to-end against a real NestJS + Postgres backend (behind the `VITE_USE_API` flag). The trust wedge is computed and proven (reviews and response-rate move scores). What's left to launch is **hardening** (Phase 3.5), then **payments** (Phase 4) and **mobile** (Phase 5).
+Phases 0–3 are **functionally done**  -  the trust-first bed-level marketplace works end-to-end against a real NestJS + Postgres backend (behind the `VITE_USE_API` flag). The trust wedge is computed and proven (reviews and response-rate move scores). What's left to launch is **hardening** (Phase 3.5), then **payments** (Phase 4) and **mobile** (Phase 5).
 
 ---
 
@@ -20,15 +20,15 @@ Phases 0–3 are **functionally done** — the trust-first bed-level marketplace
 - ✅ Frontend wired via TanStack Query behind `VITE_USE_API` (mock kept as the default fallback).
 - ✅ Phone-OTP auth + JWT in httpOnly cookies; profile completion.
 - ✅ Post/edit listing (the `حط شقتك` wizard) → DB → moderation gate.
-- ✅ **Photo upload** — presigned S3/R2 pipeline with a downscaled-base64 fallback (**PROD-1**).
+- ✅ **Photo upload**  -  presigned S3/R2 pipeline with a downscaled-base64 fallback (**PROD-1**).
 
 ## Phase 2 · Make It Trustworthy ✅
 **Trust is computed, not hardcoded; reviews are gated by real residency.**
 - ✅ Tenancy model (lead-complete → confirmed tenancy).
-- ✅ Resident review posting, gated by a 30-day tenancy — **and it moves the score**.
+- ✅ Resident review posting, gated by a 30-day tenancy  -  **and it moves the score**.
 - ✅ Trust engine (T-1→T-5): listing/owner/renter scores, Bayesian smoothing, verification cap, real response-rate (T-3 `ResponseEvent`s), two-sided reputation (T-4), transparency popover (T-5). Recompute on the relevant writes.
 - ✅ Q&A on property pages.
-- ✅ **Verification (KYC)** — submit ID/selfie/ownership docs → admin review → `verified` + trust bonus (**PROD-5**).
+- ✅ **Verification (KYC)**  -  submit ID/selfie/ownership docs → admin review → `verified` + trust bonus (**PROD-5**).
 
 ## Phase 3 · Make It Match ✅
 **Search + messaging close the loop from browse to move-in.**
@@ -37,16 +37,16 @@ Phases 0–3 are **functionally done** — the trust-first bed-level marketplace
 - ✅ Notifications: in-app derived feed + **saved-search "هنبلّغك" alerts** on publish/approve.
 - ✅ Owner dashboard: leads, response-rate, listing management + analytics.
 - ✅ Matching engine: ranked, explainable `/me/matches` from saved renter preferences.
-- ✅ **Meilisearch** (typo-tolerant Arabic `q`, **PROD-3**) + **PostGIS geo** radius / "قريب مني" (`lat`/`lng`/`radiusKm`, **PROD-4**) — both **live**. **SMS** gateway on OTP — **PROD-2**.
+- ✅ **Meilisearch** (typo-tolerant Arabic `q`, **PROD-3**) + **PostGIS geo** radius / "قريب مني" (`lat`/`lng`/`radiusKm`, **PROD-4**)  -  both **live**. **SMS** gateway on OTP  -  **PROD-2**.
 
 ---
 
 ## Phase 3.5 · Make It Solid ✅
-**Goal:** production-grade hardening so the end-to-end app can safely go live. **The full hardening backlog (P0→P2) is complete — see `.ai/NEXT_STEPS.md`.**
+**Goal:** production-grade hardening so the end-to-end app can safely go live. **The full hardening backlog (P0→P2) is complete  -  see `.ai/NEXT_STEPS.md`.**
 - ✅ **P0 security:** secrets fail-fast, `helmet`, readiness health (DB+Redis), OTP rate-limit.
 - ✅ **P1 shippable:** API ESLint + fixed CI, Dockerfiles (boot-verified), CD + migrations-on-deploy, e2e suite (19), structured pino logging + Sentry.
 - ✅ **P2 product:** image-upload pipeline (PROD-1), real OTP/SMS gateway (PROD-2), Meilisearch (PROD-3), PostGIS geo (PROD-4), verification/KYC (PROD-5).
-- **Definition of done:** a tagged release builds images, runs migrations + an e2e suite against a real DB, deploys to staging, and reports errors/metrics. _(Remaining: a real deploy host + P3 polish — both optional.)_
+- **Definition of done:** a tagged release builds images, runs migrations + an e2e suite against a real DB, deploys to staging, and reports errors/metrics. _(Remaining: a real deploy host + P3 polish  -  both optional.)_
 
 ## Phase 4 · Make It Pay (after hardening) 💸
 - Paymob/Stripe (EGP) for verified-owner subscriptions; success-fee plumbing; move-in/match events; SEO landing pages for top areas (Maadi, 5th Settlement…). See `.ai/BUSINESS_MODEL.md`.

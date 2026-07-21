@@ -1,4 +1,4 @@
-// Circular match-score badge — shows how well a listing fits the renter.
+// Circular match-score badge  -  shows how well a listing fits the renter.
 export function MatchBadge({ score, size = "md" }: { score: number; size?: "sm" | "md" }) {
   const tone =
     score >= 80

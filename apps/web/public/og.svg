@@ -33,8 +33,8 @@
 
   <!-- wordmark + tagline (RTL, right-aligned) -->
   <text x="1080" y="330" text-anchor="end" font-family="'Cairo','IBM Plex Sans Arabic','Segoe UI',sans-serif" font-size="132" font-weight="800" fill="#ffffff">بيتون</text>
-  <text x="1080" y="420" text-anchor="end" font-family="'Cairo','IBM Plex Sans Arabic','Segoe UI',sans-serif" font-size="52" font-weight="700" fill="#e8f6f0">سكن بالسرير في مصر — بثقة</text>
-  <text x="1080" y="492" text-anchor="end" font-family="'IBM Plex Sans Arabic','Segoe UI',sans-serif" font-size="38" font-weight="500" fill="#9ed0c1">شقة · أوضة · سرير — للإيجار والبيع</text>
+  <text x="1080" y="420" text-anchor="end" font-family="'Cairo','IBM Plex Sans Arabic','Segoe UI',sans-serif" font-size="52" font-weight="700" fill="#e8f6f0">سكن بالسرير في مصر  -  بثقة</text>
+  <text x="1080" y="492" text-anchor="end" font-family="'IBM Plex Sans Arabic','Segoe UI',sans-serif" font-size="38" font-weight="500" fill="#9ed0c1">شقة · أوضة · سرير  -  للإيجار والبيع</text>
 
   <!-- trust chips -->
   <g font-family="'IBM Plex Sans Arabic','Segoe UI',sans-serif" font-size="30" font-weight="600">

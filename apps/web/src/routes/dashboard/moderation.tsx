@@ -23,12 +23,12 @@ export const Route = createFileRoute("/dashboard/moderation")({
   component: ModerationQueue,
 });
 
-// Common rejection reasons — one tap instead of typing.
+// Common rejection reasons  -  one tap instead of typing.
 const QUICK_REASONS = [
   "الصور مش واضحة أو مش حقيقية",
   "السعر مش منطقي أو ناقص",
   "بيانات ناقصة عن المكان",
-  "مكرر — نفس الإعلان متحط قبل كده",
+  "مكرر  -  نفس الإعلان متحط قبل كده",
   "مخالف لشروط النشر",
 ];
 
@@ -57,7 +57,7 @@ function ModerationQueue() {
 
   const onApprove = async (p: Property) => {
     await approveListing(p.id);
-    toast.success(`وافقنا على «${p.title}» — بقت شغّالة`);
+    toast.success(`وافقنا على «${p.title}»  -  بقت شغّالة`);
     refreshQueue();
   };
 

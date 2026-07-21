@@ -1,6 +1,6 @@
-# Running Beitoon Locally — the complete runbook
+# Running Beitoon Locally  -  the complete runbook
 
-> Battle-tested recipe + every gotcha we've hit. If something breaks, jump to **Troubleshooting** at the bottom — 9/10 issues are one of those five.
+> Battle-tested recipe + every gotcha we've hit. If something breaks, jump to **Troubleshooting** at the bottom  -  9/10 issues are one of those five.
 
 ---
 
@@ -28,7 +28,7 @@ apps/web/.env
 ```
 > Without this file the web app runs on a **localStorage mock** (no backend). With it, the UI reads/writes the live API.
 
-**Optional — Google Maps (interactive pin on the listing wizard):**
+**Optional  -  Google Maps (interactive pin on the listing wizard):**
 ```
 apps/web/.env
   VITE_GOOGLE_MAPS_API_KEY=your_maps_js_api_key
@@ -93,10 +93,10 @@ docker compose down -v && docker compose up -d && pnpm db:migrate && pnpm db:see
 
 ## ⚠️ Troubleshooting (the five usual suspects)
 
-1. **`EADDRINUSE :3001`** — an API is already running. `lsof -ti:3001 | xargs kill -9` then `pnpm api`.
-2. **"CORS error" in the browser** — usually the **API is down**, not real CORS. Check `curl -s :3001/api/v1/health/ready`; start `pnpm api`. (Dev CORS already allows any localhost port.)
-3. **"role beitco does not exist"** — you hit the **native Postgres on 5432**. The seeded DB is the **Docker one on 5433**. `apps/api/.env` already points at 5433; don't override `DATABASE_URL`.
-4. **Web opened on 8081, not 8080** — port 8080 was taken by another app/container. Fine to use 8081, or free 8080 (`docker stop <that-container>`).
-5. **"None of the selected packages has a … script"** — root scripts: `api`→`dev`, `db:*` use `exec`. Or run direct: `cd apps/api && pnpm dev`.
+1. **`EADDRINUSE :3001`**  -  an API is already running. `lsof -ti:3001 | xargs kill -9` then `pnpm api`.
+2. **"CORS error" in the browser**  -  usually the **API is down**, not real CORS. Check `curl -s :3001/api/v1/health/ready`; start `pnpm api`. (Dev CORS already allows any localhost port.)
+3. **"role beitco does not exist"**  -  you hit the **native Postgres on 5432**. The seeded DB is the **Docker one on 5433**. `apps/api/.env` already points at 5433; don't override `DATABASE_URL`.
+4. **Web opened on 8081, not 8080**  -  port 8080 was taken by another app/container. Fine to use 8081, or free 8080 (`docker stop <that-container>`).
+5. **"None of the selected packages has a … script"**  -  root scripts: `api`→`dev`, `db:*` use `exec`. Or run direct: `cd apps/api && pnpm dev`.
 
 Harmless: `Meilisearch unavailable; using the DB fallback` (search still works) · `package.json#prisma deprecated` (Prisma 7 nudge).

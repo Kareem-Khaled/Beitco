@@ -286,7 +286,7 @@ function UserDetailSheet({
                 {/* Actions */}
                 {isSelf ? (
                   <p className="rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
-                    ده حسابك إنت — مش هتقدر توقفه أو تغيّر صلاحياته من هنا.
+                    ده حسابك إنت  -  مش هتقدر توقفه أو تغيّر صلاحياته من هنا.
                   </p>
                 ) : (
                   <div className="space-y-2">

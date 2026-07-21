@@ -25,7 +25,7 @@ function MatchesPage() {
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight">اللي يناسبك</h1>
           <p className="text-sm text-muted-foreground">
-            أماكن رتّبناها حسب تفضيلاتك — الأعلى تطابق الأول.
+            أماكن رتّبناها حسب تفضيلاتك  -  الأعلى تطابق الأول.
           </p>
         </div>
         <Button variant="outline" asChild>

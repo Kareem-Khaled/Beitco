@@ -229,7 +229,7 @@ export class ListingsWriteService {
       throw new ForbiddenException({ code: 'NOT_OWNER', message: 'مش من حقك تعدّل الإعلان ده.' });
     }
 
-    // Pause / unpause — only meaningful on a live listing (never override a
+    // Pause / unpause  -  only meaningful on a live listing (never override a
     // pending/rejected one through this path).
     if (dto.listingStatus) {
       if (existing.status === 'published' || existing.status === 'paused') {

@@ -57,7 +57,7 @@ export function PropertyGallery({ images, alt = "" }: { images: string[]; alt?: 
   return (
     <>
       {/* Fixed-height grid with explicit rows so every tile aligns perfectly and
-          gaps stay uniform — no aspect-ratio mismatch between main & thumbs. */}
+          gaps stay uniform  -  no aspect-ratio mismatch between main & thumbs. */}
       <div className="mt-5 grid h-64 grid-cols-2 grid-rows-2 gap-2 overflow-hidden rounded-3xl sm:h-[26rem] sm:grid-cols-4">
         <button
           type="button"
@@ -187,7 +187,7 @@ function Lightbox({
 
       {/* Stage */}
       <div className="relative flex flex-1 items-center justify-center px-4 pb-4">
-        {/* Prev — on the right in RTL */}
+        {/* Prev  -  on the right in RTL */}
         {images.length > 1 && (
           <button
             type="button"
@@ -212,7 +212,7 @@ function Lightbox({
           />
         </span>
 
-        {/* Next — on the left in RTL */}
+        {/* Next  -  on the left in RTL */}
         {images.length > 1 && (
           <button
             type="button"

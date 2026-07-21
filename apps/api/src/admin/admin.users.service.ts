@@ -186,7 +186,7 @@ export class AdminUsersService {
         userId: id,
         type: 'verification',
         title: 'حسابك اتوقف',
-        body: `حصل إيقاف لحسابك: ${reason} — لو ده غلط كلّمنا.`,
+        body: `حصل إيقاف لحسابك: ${reason}  -  لو ده غلط كلّمنا.`,
       },
     });
     await this.audit.log(admin, 'user.ban', 'user', id, { reason });

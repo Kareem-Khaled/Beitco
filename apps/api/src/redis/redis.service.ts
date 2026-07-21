@@ -27,7 +27,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       this.logger.log('Redis connected');
     } catch {
       this.logger.warn(
-        'Redis unavailable — OTP + notification read-state degrade. Start it with: docker compose up -d redis',
+        'Redis unavailable  -  OTP + notification read-state degrade. Start it with: docker compose up -d redis',
       );
     }
   }
@@ -36,7 +36,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     await this.client.quit().catch(() => undefined);
   }
 
-  // Live readiness — reflects reconnects/disconnects, not just the boot attempt.
+  // Live readiness  -  reflects reconnects/disconnects, not just the boot attempt.
   // (Stricter than the old per-service boot flag: an outage after boot now
   // correctly reads as not-ready, so callers degrade with a friendly message.)
   get ready(): boolean {

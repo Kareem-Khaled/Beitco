@@ -87,11 +87,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "بيتون أول منصة في مصر تأجّرك بالسرير — سرير، أوضة، أو شقة كاملة للإيجار أو للبيع. سكن متأكدين منه بأسعار واضحة وآراء حقيقية ودرجة ثقة لكل مكان.",
+          "بيتون أول منصة في مصر تأجّرك بالسرير  -  سرير، أوضة، أو شقة كاملة للإيجار أو للبيع. سكن متأكدين منه بأسعار واضحة وآراء حقيقية ودرجة ثقة لكل مكان.",
       },
       { name: "theme-color", content: "#14534c" },
       { property: "og:site_name", content: "بيتون" },
-      { property: "og:title", content: "بيتون — أجّر سرير، أوضة، أو شقة في مصر" },
+      { property: "og:title", content: "بيتون  -  أجّر سرير، أوضة، أو شقة في مصر" },
       { property: "og:description", content: "منصة السكن الموثوقة في مصر." },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "ar_EG" },
@@ -99,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "بيتون — أجّر سرير، أوضة، أو شقة في مصر" },
+      { name: "twitter:title", content: "بيتون  -  أجّر سرير، أوضة، أو شقة في مصر" },
       { name: "twitter:description", content: "منصة السكن الموثوقة في مصر." },
       { name: "twitter:image", content: "/og.svg" },
     ],

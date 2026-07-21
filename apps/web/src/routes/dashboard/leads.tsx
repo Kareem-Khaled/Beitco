@@ -127,7 +127,7 @@ function DashboardLeads() {
                         </span>
                       ) : null}
                     </div>
-                    {/* The specific unit(s) they want — the heart of bed-level booking */}
+                    {/* The specific unit(s) they want  -  the heart of bed-level booking */}
                     {l.units && l.units.length > 0 ? (
                       <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                         {l.units.map((u, i) => (
@@ -167,7 +167,7 @@ function DashboardLeads() {
                           {p.title}
                         </Link>
                       ) : (
-                        "—"
+                        " - "
                       )}
                     </p>
                     {l.preferredDate ? (

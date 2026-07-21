@@ -1,4 +1,4 @@
-// Beitoon seed — ports apps/web/src/lib/beitco/seed-data.ts into Postgres so the
+// Beitoon seed  -  ports apps/web/src/lib/beitco/seed-data.ts into Postgres so the
 // API serves the same demo users + listings the frontend prototype shows today
 // (B-0.1 seed parity). Run with: pnpm --filter @beitoon/api db:seed
 //

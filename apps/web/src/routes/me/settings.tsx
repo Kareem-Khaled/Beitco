@@ -145,7 +145,7 @@ function SettingsPage() {
               {user.phone}
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              رقم التليفون مش بيتغيّر — هو هويتك على بيتون.
+              رقم التليفون مش بيتغيّر  -  هو هويتك على بيتون.
             </p>
           </div>
         </div>

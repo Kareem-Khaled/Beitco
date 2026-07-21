@@ -7,7 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 // typo-tolerant, Arabic-friendly index and answers the `q` free-text query.
 // Config-gated: when MEILISEARCH_URL is unset (or the host is unreachable), the
 // service reports `enabled=false` and the listings service falls back to the DB
-// `contains` filter — so dev/CI/mock need zero setup.
+// `contains` filter  -  so dev/CI/mock need zero setup.
 
 const INDEX = 'properties';
 

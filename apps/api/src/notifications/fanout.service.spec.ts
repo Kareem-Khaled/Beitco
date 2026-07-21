@@ -3,7 +3,7 @@ import { NotificationsService } from './notifications.service';
 import { FanoutService } from './fanout.service';
 
 // SCALE-1: FanoutService. The queue/worker path needs a real Redis, so the unit
-// test covers the INLINE fallback — the guarantee that dev/CI/e2e/mock still
+// test covers the INLINE fallback  -  the guarantee that dev/CI/e2e/mock still
 // deliver saved-search alerts with zero setup, and that the publish path never
 // hard-depends on Redis.
 

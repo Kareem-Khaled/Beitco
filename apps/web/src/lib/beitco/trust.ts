@@ -1,5 +1,5 @@
 // Trust engine (T-1 / T-2). Pure, deterministic functions that turn real
-// activity — verification, resident reviews, tenure, responsiveness, recency —
+// activity  -  verification, resident reviews, tenure, responsiveness, recency  - 
 // into an explainable 0–10 trust score. No localStorage here: `store.ts` calls
 // these and persists the result. Spec: `.ai/TRUST_SPEC.md`.
 //
@@ -21,8 +21,8 @@ export const TRUST_WEIGHTS = {
 
 // ── Tuning constants ──────────────────────────────────────────────────────────
 export const TRUST_TUNING = {
-  globalMeanRating: 7.5, // m — prior mean every listing is pulled toward
-  confidence: 5, // C — "virtual" reviews; higher = slower to trust low volume
+  globalMeanRating: 7.5, // m  -  prior mean every listing is pulled toward
+  confidence: 5, // C  -  "virtual" reviews; higher = slower to trust low volume
   tenureCapMonths: 24, // months-lived that counts as a full tenure signal
   verificationCap: 7.0, // unverified listings/owners can't exceed this
   recencyHalfLifeDays: 180, // a review's recency weight halves every ~6 months
@@ -39,7 +39,7 @@ const round2 = (n: number): number => Math.round(n * 100) / 100;
 
 /**
  * Bayesian-smoothed mean of 0–10 ratings. Pulls low-volume listings toward the
- * global mean until they earn enough reviews — this is what kills the
+ * global mean until they earn enough reviews  -  this is what kills the
  * "1 fake 10-star review looks perfect" exploit.
  *
  *   smoothed = (C·m + Σ ratings) / (C + n)
@@ -98,7 +98,7 @@ export type ListingTrustInput = {
 /**
  * (T-1) Compute a listing's 0–10 trust score with a transparent breakdown.
  * Unverified listings are hard-capped at `verificationCap`, so verification is
- * a real gate — not just a badge.
+ * a real gate  -  not just a badge.
  */
 export function computeListingTrust(input: ListingTrustInput): TrustBreakdown {
   const { verified, reviews, responseRate } = input;

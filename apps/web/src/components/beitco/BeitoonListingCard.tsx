@@ -261,7 +261,7 @@ function AvailabilityBlock({
   );
 }
 
-// On the public card we only care about free vs taken — a renter doesn't need
+// On the public card we only care about free vs taken  -  a renter doesn't need
 // the owner-only distinction between "reserved" and "occupied". Both = taken.
 function BedChip({ status }: { status: BedStatus }) {
   const available = status === "available";

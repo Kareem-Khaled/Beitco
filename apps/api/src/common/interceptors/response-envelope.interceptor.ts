@@ -46,7 +46,7 @@ export class ResponseEnvelopeInterceptor implements NestInterceptor {
   intercept(_context: ExecutionContext, next: CallHandler): Observable<unknown> {
     return next.handle().pipe(
       map((payload: unknown) => {
-        // Already enveloped (handler opted out) — pass through.
+        // Already enveloped (handler opted out)  -  pass through.
         if (
           typeof payload === 'object' &&
           payload !== null &&

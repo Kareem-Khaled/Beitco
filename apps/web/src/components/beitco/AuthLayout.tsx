@@ -17,7 +17,7 @@ export function AuthLayout({
 }) {
   return (
     <div dir="rtl" className="flex min-h-screen flex-col bg-background text-foreground">
-      {/* Header — matches SiteHeader */}
+      {/* Header  -  matches SiteHeader */}
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-2">

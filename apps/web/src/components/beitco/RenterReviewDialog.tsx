@@ -77,7 +77,7 @@ export function RenterReviewDialog({
           <DialogTitle className="font-display">قيّم الساكن</DialogTitle>
           <DialogDescription>
             تقييمك بيساعد ملّاك تانيين ياخدوا قرار صح.{" "}
-            <span className="font-medium text-foreground">{renterName}</span> مش هيشوف مين قيّمه —
+            <span className="font-medium text-foreground">{renterName}</span> مش هيشوف مين قيّمه  - 
             بس درجته العامة.
           </DialogDescription>
         </DialogHeader>
@@ -141,7 +141,7 @@ export function RenterReviewDialog({
             <Textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
-              placeholder="اكتب تجربتك مع الساكن — التزامه، تعامله، حافظ على المكان ولا لأ…"
+              placeholder="اكتب تجربتك مع الساكن  -  التزامه، تعامله، حافظ على المكان ولا لأ…"
               rows={4}
               className="resize-none"
             />

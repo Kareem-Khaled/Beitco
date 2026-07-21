@@ -1,7 +1,7 @@
 import { PrismaService } from '../prisma/prisma.service';
 import { MatchingService } from './matching.service';
 
-// TEST-1: MatchingService.getMatches — the orchestration over the pure
+// TEST-1: MatchingService.getMatches  -  the orchestration over the pure
 // scoreMatch engine (covered by matching.engine.spec). Mocked Prisma verifies
 // the no-prefs short-circuit and the rent-vs-sale candidate filter.
 

@@ -51,7 +51,7 @@ export class ChatService {
       include: {
         property: threadProperty,
         // SCALE-2: bound the history to the most recent 500, then restore
-        // chronological order — a runaway thread can't pull unbounded rows.
+        // chronological order  -  a runaway thread can't pull unbounded rows.
         messages: { orderBy: { createdAt: 'desc' }, take: 500 },
       },
     });
@@ -77,7 +77,7 @@ export class ChatService {
     });
     if (!property) throw new NotFoundException({ code: 'PROPERTY_NOT_FOUND', message: 'المكان ده مش موجود.' });
     if (property.ownerId === renterId) {
-      throw new ForbiddenException({ code: 'OWN_LISTING', message: 'دي شقتك — مش هتكلّم نفسك.' });
+      throw new ForbiddenException({ code: 'OWN_LISTING', message: 'دي شقتك  -  مش هتكلّم نفسك.' });
     }
 
     const existing = await this.prisma.thread.findUnique({

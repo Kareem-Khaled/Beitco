@@ -1,4 +1,4 @@
-# Beitoon — Database Schema
+# Beitoon  -  Database Schema
 
 > **Last updated:** June 25, 2026 · **Source of truth: `apps/api/prisma/schema.prisma`** (always defer to it). This is a navigable map, not a copy.
 > PostgreSQL 16 + PostGIS via Prisma 6. **24 models, 23 enums.** Migrations in `apps/api/prisma/migrations/`.
@@ -12,46 +12,46 @@
 - **Soft deletes** via `deleted_at` (`deletedAt DateTime?`) on user-facing entities (`User`, `Property`).
 - **Timestamps:** `createdAt @default(now())`, `updatedAt @updatedAt` where mutated.
 - **JSON columns** for flexible/embedded data: `Property.costs`, `Property.quality`, `Property.trustBreakdown`, `User.notificationPrefs`, `SavedSearch.params`, `Review.scores`, `Review.ownerReply`.
-- **30 indexes/uniques** — every foreign key + hot filter column (`status`, `ownerId`, `type`, `listingType`, `area`, `userId`) is indexed; natural keys are `@@unique` (e.g. `Thread @@unique([propertyId, renterId])`, `ReviewHelpfulVote @@unique([reviewId, userId])`, `SavedListing @@unique([userId, propertyId])`).
+- **30 indexes/uniques**  -  every foreign key + hot filter column (`status`, `ownerId`, `type`, `listingType`, `area`, `userId`) is indexed; natural keys are `@@unique` (e.g. `Thread @@unique([propertyId, renterId])`, `ReviewHelpfulVote @@unique([reviewId, userId])`, `SavedListing @@unique([userId, propertyId])`).
 
 ---
 
 ## Models by domain
 
 ### Identity & preferences
-- **User** — phone-identity (no passwords). `isAdmin`, `verified`, `verificationStatus`, `trust`, `trustBreakdown`, `responseRate`, `renterReputation`, `renterReviewsCount`, `notificationPrefs`, `gender`, `role`, **`bannedAt`/`banReason`** (ADMIN-2 suspension). Soft-deletable. Hub of most relations.
-- **RenterProfile** — 1:1 with User; the matching inputs (`budgetMin/Max`, `areas[]`, `lookingFor[]`, `nearMetro`, `metroLines[]`, `maxWalkMinutes`, `mustHaveAmenities[]`, `furnishedPref`, `housematesGender`, `occupation`, `intent`, …).
-- **VerificationRequest** — KYC docs (`idDocUrl`, `selfieUrl`, optional `ownershipDocUrl`) + review state. Submit → pending → admin approve/reject (PROD-5, ✅).
+- **User**  -  phone-identity (no passwords). `isAdmin`, `verified`, `verificationStatus`, `trust`, `trustBreakdown`, `responseRate`, `renterReputation`, `renterReviewsCount`, `notificationPrefs`, `gender`, `role`, **`bannedAt`/`banReason`** (ADMIN-2 suspension). Soft-deletable. Hub of most relations.
+- **RenterProfile**  -  1:1 with User; the matching inputs (`budgetMin/Max`, `areas[]`, `lookingFor[]`, `nearMetro`, `metroLines[]`, `maxWalkMinutes`, `mustHaveAmenities[]`, `furnishedPref`, `housematesGender`, `occupation`, `intent`, …).
+- **VerificationRequest**  -  KYC docs (`idDocUrl`, `selfieUrl`, optional `ownershipDocUrl`) + review state. Submit → pending → admin approve/reject (PROD-5, ✅).
 
 ### Listings (bed-level model)
-- **Property** — the listing. Card-facing derived fields (`type`, `priceFrom`, `trust`, `verified`, `reviewsCount`) + structured fields (`rentalMode`, `unitType`, `bedrooms`, prices, `wholeStatus`, `saleStatus`, `rentToGender`, `images[]`, `amenities[]`, `costs` JSON, `quality` JSON, `lat`/`lng`, `status`, `rejectionReason`). Soft-deletable.
-- **Room** — a room in a property (`by_room`/`by_bed` modes); optional price/status + an optional `Occupant`.
-- **Bed** — a bed in a room (`by_bed`); price/status/features + an optional `Occupant`.
-- **Occupant** — owner-only renter details attached to a bed/room/whole-unit (1:1 unique on each link). **Never serialized publicly.**
-- **NearbyPlace** / **CustomSpec** — listing extras (transit/landmarks; free-form specs).
+- **Property**  -  the listing. Card-facing derived fields (`type`, `priceFrom`, `trust`, `verified`, `reviewsCount`) + structured fields (`rentalMode`, `unitType`, `bedrooms`, prices, `wholeStatus`, `saleStatus`, `rentToGender`, `images[]`, `amenities[]`, `costs` JSON, `quality` JSON, `lat`/`lng`, `status`, `rejectionReason`). Soft-deletable.
+- **Room**  -  a room in a property (`by_room`/`by_bed` modes); optional price/status + an optional `Occupant`.
+- **Bed**  -  a bed in a room (`by_bed`); price/status/features + an optional `Occupant`.
+- **Occupant**  -  owner-only renter details attached to a bed/room/whole-unit (1:1 unique on each link). **Never serialized publicly.**
+- **NearbyPlace** / **CustomSpec**  -  listing extras (transit/landmarks; free-form specs).
 
 ### Trust & reviews (the wedge)
-- **Review** — resident → property. `rating`, `body`, `scores` JSON, `helpful`, `ownerReply` JSON. Gated by a 30-day tenancy; moves listing trust.
-- **ReviewHelpfulVote** — one helpful vote per (review, user).
-- **RenterReview** — owner → renter (T-4). Gated by a confirmed tenancy; moves renter reputation.
-- **ResponseEvent** — 1:1 per thread; opened on the renter's first message, closed on the owner's first reply. Powers the **real response rate** (T-3) that feeds owner trust.
+- **Review**  -  resident → property. `rating`, `body`, `scores` JSON, `helpful`, `ownerReply` JSON. Gated by a 30-day tenancy; moves listing trust.
+- **ReviewHelpfulVote**  -  one helpful vote per (review, user).
+- **RenterReview**  -  owner → renter (T-4). Gated by a confirmed tenancy; moves renter reputation.
+- **ResponseEvent**  -  1:1 per thread; opened on the renter's first message, closed on the owner's first reply. Powers the **real response rate** (T-3) that feeds owner trust.
 
 ### Engagement
-- **Lead** — viewing/booking request (`pending → approved/declined → completed`). Completing creates a `Tenancy`.
-- **LeadUnit** — the specific bed(s)/room(s) a booking lead targets.
-- **Tenancy** — confirmed residency; the gate for reviews + reputation.
-- **Question** — public Q&A on a listing (`asker`, `body`, optional `answer`/`answerer`).
-- **SavedListing** / **SavedSearch** — renter saves (search stores `params` JSON, matched by NOTIF-2).
+- **Lead**  -  viewing/booking request (`pending → approved/declined → completed`). Completing creates a `Tenancy`.
+- **LeadUnit**  -  the specific bed(s)/room(s) a booking lead targets.
+- **Tenancy**  -  confirmed residency; the gate for reviews + reputation.
+- **Question**  -  public Q&A on a listing (`asker`, `body`, optional `answer`/`answerer`).
+- **SavedListing** / **SavedSearch**  -  renter saves (search stores `params` JSON, matched by NOTIF-2).
 
 ### Messaging & notifications
-- **Thread** — per (property, renter); `lastMessageAt`, `unreadForId`; one `ResponseEvent`.
-- **Message** — `body`, `type` (`text` | `viewing_request`), sender.
-- **Notification** — persisted rows (currently the **saved-search alerts**); merged with the derived feed (leads/messages/reviews/verification) at read time.
+- **Thread**  -  per (property, renter); `lastMessageAt`, `unreadForId`; one `ResponseEvent`.
+- **Message**  -  `body`, `type` (`text` | `viewing_request`), sender.
+- **Notification**  -  persisted rows (currently the **saved-search alerts**); merged with the derived feed (leads/messages/reviews/verification) at read time.
 
 ### Admin / operator (ADMIN epics)
-- **AdminAuditLog** — append-only record of every operator action: `adminId`/`adminName`, `action` (e.g. `user.ban`, `listing.takedown`, `review.remove`), `targetType`/`targetId`, `meta` JSON. Read at `GET /admin/audit` (ADMIN-12).
-- **Report** — a user-filed abuse report: `reporterId`, `targetType` (`listing`|`review`|`user`|`question`), `targetId`, `reason`, `details?`, `status` (`open`→`reviewing`→`resolved`/`dismissed`), `resolution`/`resolvedById`. Triage at `/admin/reports` (ADMIN-5).
-- **Content moderation (ADMIN-4):** `Review` + `Question` carry `removedAt`/`removedReason`/`removedById` — soft, restorable. **A `removedAt: null` filter is applied to every review read** (trust recompute, public/owner/admin includes, matching) so a removed review is hidden everywhere AND excluded from the trust score.
+- **AdminAuditLog**  -  append-only record of every operator action: `adminId`/`adminName`, `action` (e.g. `user.ban`, `listing.takedown`, `review.remove`), `targetType`/`targetId`, `meta` JSON. Read at `GET /admin/audit` (ADMIN-12).
+- **Report**  -  a user-filed abuse report: `reporterId`, `targetType` (`listing`|`review`|`user`|`question`), `targetId`, `reason`, `details?`, `status` (`open`→`reviewing`→`resolved`/`dismissed`), `resolution`/`resolvedById`. Triage at `/admin/reports` (ADMIN-5).
+- **Content moderation (ADMIN-4):** `Review` + `Question` carry `removedAt`/`removedReason`/`removedById`  -  soft, restorable. **A `removedAt: null` filter is applied to every review read** (trust recompute, public/owner/admin includes, matching) so a removed review is hidden everywhere AND excluded from the trust score.
 
 ---
 
@@ -74,11 +74,11 @@
 | `20260625114530_add_reports` | `Report` model + `ReportStatus`/`ReportTargetType` enums (ADMIN-5). |
 | `20260625123416_add_content_moderation` | `removedAt`/`removedReason`/`removedById` on `Review` + `Question` (ADMIN-4). |
 
-Seed: `apps/api/prisma/seed.ts` — idempotent (children-first reset), 12 users + 7 properties (whole/by-room/by-bed/sale/nightly). Run `pnpm --filter ... db:seed` (or `npm run db:seed` in `apps/api`).
+Seed: `apps/api/prisma/seed.ts`  -  idempotent (children-first reset), 12 users + 7 properties (whole/by-room/by-bed/sale/nightly). Run `pnpm --filter ... db:seed` (or `npm run db:seed` in `apps/api`).
 
 ---
 
 ## Notes / planned
 
-- **`lat`/`lng` are plain `Float`s**, but a **`geog geography(Point,4326)`** column (mapped in Prisma as `Unsupported(...)`) is derived from them by a DB trigger and **GiST-indexed** — `GET /properties?lat&lng&radiusKm` does PostGIS `ST_DWithin` radius search (PROD-4, ✅).
+- **`lat`/`lng` are plain `Float`s**, but a **`geog geography(Point,4326)`** column (mapped in Prisma as `Unsupported(...)`) is derived from them by a DB trigger and **GiST-indexed**  -  `GET /properties?lat&lng&radiusKm` does PostGIS `ST_DWithin` radius search (PROD-4, ✅).
 - **`images String[]`** holds object-storage URLs from the presigned upload pipeline (PROD-1, ✅), with a base64 fallback when uploads aren't configured.

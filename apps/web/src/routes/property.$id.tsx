@@ -94,7 +94,7 @@ export const Route = createFileRoute("/property/$id")({
     if (!p) {
       return {
         meta: [
-          { title: "بيت — بيتون" },
+          { title: "بيت  -  بيتون" },
           {
             name: "description",
             content: "سكن متأكدين منه، بآراء حقيقية ومعلومات عن المنطقة على بيتون.",
@@ -103,11 +103,11 @@ export const Route = createFileRoute("/property/$id")({
       };
     }
     const kind = p.listingType === "sale" ? "للبيع" : "للإيجار";
-    const title = `${p.title} — ${p.area} | بيتون`;
+    const title = `${p.title}  -  ${p.area} | بيتون`;
     const priceNum = p.listingType === "sale" ? (p.salePrice ?? p.price) : (p.priceFrom ?? p.price);
     const price = priceNum.toLocaleString("ar-EG-u-nu-latn");
     const unit = p.listingType === "sale" ? "ج.م" : "ج.م/شهر";
-    const description = `${p.type} ${kind} في ${p.area} — ${price} ${unit}. درجة الثقة ${p.trust.toFixed(1)}، ${p.reviewsCount.toLocaleString("ar-EG-u-nu-latn")} رأي من ساكنين حقيقيين على بيتون.`;
+    const description = `${p.type} ${kind} في ${p.area}  -  ${price} ${unit}. درجة الثقة ${p.trust.toFixed(1)}، ${p.reviewsCount.toLocaleString("ar-EG-u-nu-latn")} رأي من ساكنين حقيقيين على بيتون.`;
     const image = p.image || "/og.svg";
     return {
       meta: [
@@ -157,7 +157,7 @@ function PropertyPage() {
 
   // Avoid flashing the gate before auth hydrates.
   if (isLoading) return <PageSkeleton variant="detail" />;
-  // Un-authenticated users see a teaser only — full details are gated behind sign-in.
+  // Un-authenticated users see a teaser only  -  full details are gated behind sign-in.
   if (!user) return <PropertyGate p={p} />;
   return <PropertyDetail />;
 }
@@ -319,7 +319,7 @@ function PropertyDetail() {
       if (beds.length) {
         const byRoom = new Map<string, { roomName: string; beds: string[] }>();
         for (const b of beds) {
-          const key = b.roomId ?? b.roomName ?? "—";
+          const key = b.roomId ?? b.roomName ?? " - ";
           if (!byRoom.has(key)) byRoom.set(key, { roomName: b.roomName ?? "أوضة", beds: [] });
           byRoom.get(key)!.beds.push(b.label);
         }
@@ -368,11 +368,11 @@ function PropertyDetail() {
       }
       throw new Error("no-share");
     } catch (err) {
-      // User cancelled the native share sheet — stay silent.
+      // User cancelled the native share sheet  -  stay silent.
       if (err instanceof DOMException && err.name === "AbortError") return;
       try {
         await navigator.clipboard.writeText(url);
-        toast.success("اتنسخ اللينك — ابعته لأي حد");
+        toast.success("اتنسخ اللينك  -  ابعته لأي حد");
       } catch {
         toast.error("مقدرناش ننسخ اللينك");
       }
@@ -394,7 +394,7 @@ function PropertyDetail() {
   };
 
   const isOwner = user?.id === p.ownerId;
-  // Review context (eligibility + helpful-votes) — flag-aware, zero-flash mock.
+  // Review context (eligibility + helpful-votes)  -  flag-aware, zero-flash mock.
   const { data: reviewMeta } = useReviewMeta(p.id, user?.id);
   const eligibleToReview = reviewMeta?.canReview ?? false;
   const votedReviewIds = reviewMeta?.votedReviewIds ?? [];
@@ -431,7 +431,7 @@ function PropertyDetail() {
       body: data.body,
       scores: data.scores,
     });
-    toast.success("اتنشر رأيك — شكراً! 🙏");
+    toast.success("اتنشر رأيك  -  شكراً! 🙏");
     await onReviewChange();
   };
 
@@ -623,7 +623,7 @@ function PropertyDetail() {
             {/* Location: map (always) + nearby places (when present) */}
             <LocationSection p={p} />
 
-            {/* Rooms & pricing — not shown for sale listings (whole unit) */}
+            {/* Rooms & pricing  -  not shown for sale listings (whole unit) */}
             {isSale ? null : p.rentalMode ? (
               <RoomsSection p={p} onBook={requestBooking} canBook={!isOwner} />
             ) : (
@@ -808,10 +808,10 @@ function PropertyDetail() {
                         ? "السعر قابل للتفاوض"
                         : "السعر الإجمالي للشقة"
                       : p.rentalMode === "by_bed"
-                        ? "سعر أرخص سرير فاضي — تحت تفاصيل كل سرير"
+                        ? "سعر أرخص سرير فاضي  -  تحت تفاصيل كل سرير"
                         : p.rentalMode === "by_room"
-                          ? "سعر أرخص أوضة فاضية — تحت تفاصيل كل أوضة"
-                          : "الإيجار الأساسي — تحت هتلاقي التفاصيل كاملة"}
+                          ? "سعر أرخص أوضة فاضية  -  تحت تفاصيل كل أوضة"
+                          : "الإيجار الأساسي  -  تحت هتلاقي التفاصيل كاملة"}
                   </div>
                   {!isSale && p.nightlyPrice ? (
                     <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-trust-soft px-2 py-0.5 text-xs font-medium text-trust">
@@ -855,7 +855,7 @@ function PropertyDetail() {
                 />
               </div>
 
-              {/* Cost breakdown — monthly bills only apply to rentals */}
+              {/* Cost breakdown  -  monthly bills only apply to rentals */}
               {!isSale && (
                 <div className="mt-6 border-t border-border pt-5">
                   <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -1087,7 +1087,7 @@ const NEARBY_ICONS: Record<NearbyType, React.ComponentType<{ className?: string 
 function LocationSection({ p }: { p: Property }) {
   const items = p.nearby ?? [];
   // Google Maps everywhere (keyless embed). Prefer the exact pin the owner set;
-  // otherwise geocode the free-text address — clearly labeled approximate.
+  // otherwise geocode the free-text address  -  clearly labeled approximate.
   const hasPin = typeof p.lat === "number" && typeof p.lng === "number";
 
   let embedSrc: string;
@@ -1138,7 +1138,7 @@ function LocationSection({ p }: { p: Property }) {
       <p className="mt-2 text-[11px] text-muted-foreground">
         {hasPin
           ? "ده المكان اللي حدده صاحب البيت. العنوان بالظبط هتاخده بعد ما تتفقوا."
-          : "الموقع تقريبي على مستوى المنطقة — هتاخد العنوان بالظبط بعد ما تتفق مع صاحب البيت."}
+          : "الموقع تقريبي على مستوى المنطقة  -  هتاخد العنوان بالظبط بعد ما تتفق مع صاحب البيت."}
       </p>
 
       {items.length > 0 && (
@@ -1270,7 +1270,7 @@ function RoomsSection({
 
       {canBook && available > 0 && (
         <p className="mt-2 text-xs text-muted-foreground">
-          اختار {isBed ? "السرير أو السراير" : "الأوضة أو الأوض"} اللي عايزها — تقدر تختار أكتر من
+          اختار {isBed ? "السرير أو السراير" : "الأوضة أو الأوض"} اللي عايزها  -  تقدر تختار أكتر من
           واحد.
         </p>
       )}

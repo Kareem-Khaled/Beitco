@@ -1,4 +1,4 @@
-# Beitco — Cursor Rules
+# Beitco  -  Cursor Rules
 # This file configures Cursor AI for this project.
 
 You are working on **Beitco**, an Egyptian real estate social network.
@@ -20,11 +20,11 @@ You are working on **Beitco**, an Egyptian real estate social network.
 - Monorepo: Turborepo + pnpm
 
 ## Coding Rules
-1. TypeScript strict mode — no `any`, no `as` casts, no `@ts-ignore`
+1. TypeScript strict mode  -  no `any`, no `as` casts, no `@ts-ignore`
 2. All API responses use `ApiResponse<T>` wrapper: `{ success, data, meta?, error? }`
 3. UUID primary keys, `snake_case` DB columns, `camelCase` TypeScript
 4. Soft deletes with `deleted_at` column
-5. Arabic is the primary language — RTL is the default direction
+5. Arabic is the primary language  -  RTL is the default direction
 6. All user-facing strings must be in both Arabic and English
 7. Permission checks use `@RequireTier(X)` decorator
 8. Cursor-based pagination everywhere (no offset)
@@ -62,7 +62,7 @@ apps/web/
 ## Capacitor Rules
 - ALWAYS provide web fallbacks for native features
 - Use `Capacitor.isNativePlatform()` for platform detection
-- Dynamic import Capacitor plugins — never at module top level
+- Dynamic import Capacitor plugins  -  never at module top level
 - Test on web, iOS Simulator, and Android Emulator
 
 ## Key Patterns

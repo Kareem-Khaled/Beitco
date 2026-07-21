@@ -243,7 +243,7 @@ function DashboardListings() {
                   </div>
                 </div>
 
-                {/* Moderation feedback to the owner (MOD-1) — full-width banner */}
+                {/* Moderation feedback to the owner (MOD-1)  -  full-width banner */}
                 {p.status === "pending_approval" ? (
                   <div className="mt-3 flex items-start gap-2.5 rounded-xl border border-blue-500/25 bg-blue-500/5 p-3">
                     <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-500/15 text-blue-600 dark:text-blue-400">
@@ -254,7 +254,7 @@ function DashboardListings() {
                         بنراجع الإعلان دلوقتي
                       </p>
                       <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
-                        هيظهر للناس بعد ما نوافق عليه — عادةً في خلال يوم.
+                        هيظهر للناس بعد ما نوافق عليه  -  عادةً في خلال يوم.
                       </p>
                     </div>
                   </div>
@@ -276,7 +276,7 @@ function DashboardListings() {
                         </p>
                       ) : null}
                       <p className="mt-2 text-xs text-muted-foreground">
-                        عدّل الإعلان وابعته تاني — هنراجعه تاني بعد التعديل.
+                        عدّل الإعلان وابعته تاني  -  هنراجعه تاني بعد التعديل.
                       </p>
                     </div>
                   </div>
@@ -466,7 +466,7 @@ function UnitOccupancy({
         type="button"
         onClick={() => setOpen(true)}
         title="اضغط لتغيير الحالة"
-        aria-label={`غيّر حالة ${unitLabel} — الحالة الحالية ${m.label}`}
+        aria-label={`غيّر حالة ${unitLabel}  -  الحالة الحالية ${m.label}`}
         className={`group inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium shadow-sm transition-colors ${m.ring} focus:outline-none focus-visible:ring-2 focus-visible:ring-ring`}
       >
         <span className={`h-2 w-2 rounded-full ${m.dot}`} />

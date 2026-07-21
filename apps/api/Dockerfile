@@ -32,7 +32,7 @@ RUN pnpm --filter @beitoon/shared run build
 RUN pnpm --filter @beitoon/api exec prisma generate
 RUN pnpm --filter @beitoon/api run build
 # Produce a self-contained, production-only bundle in /app/out (real node_modules,
-# not a symlink farm — pnpm 9 `deploy` flattens it), then generate the Prisma
+# not a symlink farm  -  pnpm 9 `deploy` flattens it), then generate the Prisma
 # client INSIDE that bundle (prisma CLI is a prod dep, so it's present in /app/out).
 RUN pnpm --filter @beitoon/api deploy --prod /app/out
 RUN cd /app/out && pnpm exec prisma generate

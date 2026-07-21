@@ -7,7 +7,7 @@ import {
   type MatchProfile,
 } from './matching.engine';
 
-// Minimal MatchProperty factory — sensible defaults, override per test.
+// Minimal MatchProperty factory  -  sensible defaults, override per test.
 function makeProperty(overrides: Partial<MatchProperty> = {}): MatchProperty {
   return {
     area: 'القاهرة الجديدة · التجمع الخامس',

@@ -17,12 +17,12 @@ import type {
 } from "./types";
 
 export type ListingDraft = {
-  // Step 1 — location
+  // Step 1  -  location
   area?: string;
   address?: string;
   lat?: number; // exact map pin the owner sets (Google Maps)
   lng?: number;
-  // Step 2 — apartment specs
+  // Step 2  -  apartment specs
   unitType?: UnitType;
   bedrooms?: number;
   bathrooms?: number;
@@ -31,11 +31,11 @@ export type ListingDraft = {
   furnished?: boolean;
   nearby?: NearbyPlace[]; // قريب من المترو / الجامعة...
   customSpecs?: CustomSpec[]; // مواصفات إضافية من عند المالك
-  // Step 3 — offer type (rent vs sell) + rental mode
+  // Step 3  -  offer type (rent vs sell) + rental mode
   listingType?: ListingType; // "rent" (default) | "sale"
   rentalMode?: RentalMode;
   rentToGender?: RentalGenderPolicy;
-  // Step 4 — pricing
+  // Step 4  -  pricing
   wholePrice?: number;
   wholeStatus?: BedStatus;
   nightlyPrice?: number; // optional short-stay rate
@@ -44,11 +44,11 @@ export type ListingDraft = {
   salePrice?: number; // when listingType === "sale"
   saleStatus?: SaleStatus;
   negotiable?: boolean;
-  // Step 5 — amenities
+  // Step 5  -  amenities
   amenities?: string[];
-  // Step 6 — photos
+  // Step 6  -  photos
   images?: string[]; // data URLs from local upload
-  // Step 7 — title + description
+  // Step 7  -  title + description
   title?: string;
   description?: string;
 };

@@ -18,7 +18,7 @@ const summaryInclude = {
 };
 
 // SCALE-2: a defensive cap on per-user collection reads. A real user has dozens
-// of saved items/leads, not thousands — this bounds memory + serialization and
+// of saved items/leads, not thousands  -  this bounds memory + serialization and
 // stops a runaway/abusive account from pulling its whole history in one request.
 const MAX_USER_ROWS = 200;
 

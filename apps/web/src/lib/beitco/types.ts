@@ -25,13 +25,13 @@ export type UnitType = "شقة" | "استوديو" | "دوبلكس" | "روف" |
 // ── Renter preferences (powers matching) ──
 export type Occupation = "طالب" | "موظف" | "شغل ريموت" | "حر" | "غير ده";
 export type GenderPref = "ذكر" | "أنثى" | "مايفرقش";
-export type Gender = "ذكر" | "أنثى"; // a person's own gender — captured at registration
+export type Gender = "ذكر" | "أنثى"; // a person's own gender  -  captured at registration
 export type FurnishedPref = "furnished" | "unfurnished" | "any";
-// Shared rentals (by_room / by_bed) are always restricted to one gender —
+// Shared rentals (by_room / by_bed) are always restricted to one gender  - 
 // there's no "anyone" option. Whole-apartment rentals leave this undefined.
 export type RentalGenderPolicy = "male_only" | "female_only";
 
-// What the renter is looking for + about them. All optional — the more
+// What the renter is looking for + about them. All optional  -  the more
 // they fill, the better Beitoon can match them to the right place.
 export type RenterProfile = {
   intent?: "rent" | "buy"; // looking to rent (default) or to buy a place
@@ -39,7 +39,7 @@ export type RenterProfile = {
   budgetMax?: number;
   areas?: string[]; // preferred areas
   lookingFor?: PropertyType[]; // شقة / أوضة / سرير
-  moveInBy?: string; // ISO date — when they want to move
+  moveInBy?: string; // ISO date  -  when they want to move
   mustHaveAmenities?: string[]; // deal-breaker amenities
   nearMetro?: boolean; // wants to be close to a metro
   metroLines?: string[]; // preferred metro lines
@@ -47,7 +47,7 @@ export type RenterProfile = {
   nearTransit?: boolean; // wants public transit nearby (even without metro)
   furnishedPref?: FurnishedPref;
   gender?: GenderPref; // preferred housemates' gender (shared housing)
-  selfGender?: Gender; // the renter's own gender — matched against a listing's rentToGender policy
+  selfGender?: Gender; // the renter's own gender  -  matched against a listing's rentToGender policy
   occupation?: Occupation;
   smoker?: boolean;
   bio?: string; // a few words about themselves for owners
@@ -55,9 +55,9 @@ export type RenterProfile = {
 };
 
 // Optional details an owner records about who reserved/rented a unit.
-// Private — shown only to the owner in their dashboard, never publicly.
+// Private  -  shown only to the owner in their dashboard, never publicly.
 export type Occupant = {
-  userId?: string; // linked Beitoon account — set only after the renter consents
+  userId?: string; // linked Beitoon account  -  set only after the renter consents
   linkStatus?: "pending" | "confirmed"; // consent state of the account link
   name?: string;
   phone?: string;
@@ -89,7 +89,7 @@ export type User = {
   trustBreakdown?: TrustBreakdown; // computed owner trust explainability (T-1)
   renterReputation?: number; // 0–10, computed from owner reviews (T-4), when role includes renter
   renterReviewsCount?: number; // how many owner reviews back the reputation
-  isAdmin?: boolean; // platform moderator — can review the approval queue (MOD-1)
+  isAdmin?: boolean; // platform moderator  -  can review the approval queue (MOD-1)
   notifications?: NotificationPrefs;
   createdAt: string;
   profile?: RenterProfile; // renter preferences, when role includes renter
@@ -111,11 +111,11 @@ export type Room = {
   name: string; // "الأوضة الكبيرة" / "أوضة على البحري"
   features: string[]; // ["تكييف", "حمام خاص", "بلكونة"]
   sizeM2?: number;
-  // by_room mode — rent the whole room privately:
+  // by_room mode  -  rent the whole room privately:
   price?: number;
   status?: BedStatus;
   occupant?: Occupant; // owner-only renter details when reserved/occupied
-  // by_bed mode — beds inside this room (each its own price):
+  // by_bed mode  -  beds inside this room (each its own price):
   beds: Bed[];
 };
 
@@ -129,7 +129,7 @@ export type ApartmentSpec = {
   furnished: boolean;
 };
 
-// Nearby landmarks / transit — "قريب من المترو، الجامعة...".
+// Nearby landmarks / transit  -  "قريب من المترو، الجامعة...".
 export type NearbyType =
   | "مترو"
   | "جامعة"
@@ -270,7 +270,7 @@ export type Property = {
   createdAt: string;
   // ── Moderation (MOD-1) ──
   rejectionReason?: string; // why a listing was rejected (shown to the owner)
-  moderatedAt?: string; // ISO — when an admin last approved/rejected it
+  moderatedAt?: string; // ISO  -  when an admin last approved/rejected it
 };
 
 // Compact summary used in cards / search results
@@ -323,7 +323,7 @@ export type Thread = {
   lastMessageAt: string;
   unreadFor?: string; // user id who has unread messages
   messages: Message[];
-  // Embedded property summary — present on API responses so the messages pages
+  // Embedded property summary  -  present on API responses so the messages pages
   // need no extra property fetch. In mock mode it's derived via getProperty.
   property?: {
     id: string;
@@ -342,11 +342,11 @@ export type ResponseEvent = {
   ownerId: string;
   threadId: string;
   firstRenterMessageAt: string; // ISO
-  firstOwnerReplyAt?: string; // ISO — undefined = not yet answered
+  firstOwnerReplyAt?: string; // ISO  -  undefined = not yet answered
 };
 
 // The specific unit a renter is asking about (a bed / room), so the owner
-// knows exactly which one — the heart of bed-level booking.
+// knows exactly which one  -  the heart of bed-level booking.
 export type LeadUnit = {
   label: string; // e.g. "السرير الأول جنب الشباك" / "الأوضة الكبيرة"
   kind: "bed" | "room" | "whole";
@@ -385,7 +385,7 @@ export type Tenancy = {
 
 // Owner → renter review (two-sided trust, T-4). Gated by a confirmed tenancy.
 // Privacy: the score is shown to owners on leads, but never the individual text
-// from other owners (prevents blacklisting/retaliation chains) — see TRUST_SPEC §6.
+// from other owners (prevents blacklisting/retaliation chains)  -  see TRUST_SPEC §6.
 export type RenterReview = {
   id: string;
   tenancyId: string;
@@ -410,7 +410,7 @@ export type SavedListing = {
   savedAt: string;
 };
 
-// A renter's saved search — the filter set they want to revisit / be alerted on.
+// A renter's saved search  -  the filter set they want to revisit / be alerted on.
 export type SavedSearchParams = {
   q?: string;
   type?: PropertyType;

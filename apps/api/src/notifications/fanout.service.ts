@@ -11,7 +11,7 @@ interface AlertJob {
 
 // SCALE-1: the saved-search fan-out runs OFF the request path. On publish a
 // caller enqueues {propertyId}; a background worker does the (potentially large)
-// matching + insert. Config-gated on REDIS_URL — when Redis isn't configured (or
+// matching + insert. Config-gated on REDIS_URL  -  when Redis isn't configured (or
 // a job fails to enqueue) we run the matcher INLINE so dev/CI/e2e still deliver
 // alerts with zero setup. The publish request never blocks on the fan-out.
 @Injectable()
@@ -28,7 +28,7 @@ export class FanoutService implements OnModuleInit, OnModuleDestroy {
   onModuleInit(): void {
     const url = this.config.get<string>('REDIS_URL');
     if (!url) {
-      this.logger.log('REDIS_URL unset — saved-search fan-out runs inline (no queue).');
+      this.logger.log('REDIS_URL unset  -  saved-search fan-out runs inline (no queue).');
       return;
     }
     // BullMQ requires maxRetriesPerRequest: null on its connection.

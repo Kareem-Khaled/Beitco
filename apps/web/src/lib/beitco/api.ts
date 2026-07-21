@@ -15,7 +15,7 @@ const API_BASE =
   (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_API_URL ??
   "http://localhost:3001/api/v1";
 
-// The API origin (no /api/v1 path) — used by the chat WebSocket (CHAT-3).
+// The API origin (no /api/v1 path)  -  used by the chat WebSocket (CHAT-3).
 export const API_ORIGIN = API_BASE.replace(/\/api\/v1\/?$/, "");
 
 type Envelope<T> = {
@@ -27,7 +27,7 @@ type Envelope<T> = {
 
 // SSR auth forwarding: a route loader runs on the SERVER during a hard
 // navigation, where fetch's `credentials: "include"` can't see the browser's
-// cookie jar — so authenticated reads (e.g. an owner/admin previewing a
+// cookie jar  -  so authenticated reads (e.g. an owner/admin previewing a
 // not-yet-published listing) would hit the API anonymously and 404. On the
 // server we read the incoming request's Cookie header and forward it; on the
 // client it's a no-op (the browser already attaches cookies). createIsomorphicFn
@@ -173,7 +173,7 @@ export async function apiLogout(): Promise<void> {
   try {
     await postJSON("/auth/logout");
   } catch {
-    // ignore — clearing local state is enough
+    // ignore  -  clearing local state is enough
   }
 }
 
@@ -212,7 +212,7 @@ export async function apiUpdateMe(
   if (patch.role !== undefined) payload.role = patch.role;
   if (patch.avatar !== undefined) payload.avatar = patch.avatar;
   if (patch.notifications !== undefined) payload.notifications = patch.notifications;
-  // Renter preferences — the API upserts the profile + saves selfGender on the user.
+  // Renter preferences  -  the API upserts the profile + saves selfGender on the user.
   if (patch.profile !== undefined) payload.profile = patch.profile;
   const body = await patchJSON<import("./types").User>("/users/me", payload);
   return body.data;
@@ -441,7 +441,7 @@ export async function apiDeleteProperty(id: string): Promise<void> {
   await delJSON(`/properties/${encodeURIComponent(id)}`);
 }
 
-// Owner's own listings (all statuses) — FULL Property objects with owner-only
+// Owner's own listings (all statuses)  -  FULL Property objects with owner-only
 // occupant data (the dashboard management grid edits availability + tenants).
 export async function apiListMine(): Promise<Property[]> {
   const body = await getJSON<Property[]>("/properties/mine");

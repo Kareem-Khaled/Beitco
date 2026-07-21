@@ -3,8 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SearchService } from './search.service';
 
 // TEST-1: SearchService disabled-path. With no MEILISEARCH_URL the service must
-// stay disabled and degrade gracefully — `enabled=false`, `searchIds` returns
-// [], and index/remove are no-ops — so dev/CI/mock need zero Meili setup.
+// stay disabled and degrade gracefully  -  `enabled=false`, `searchIds` returns
+// [], and index/remove are no-ops  -  so dev/CI/mock need zero Meili setup.
 // (The live indexing path is covered by the running API + PROD-3's manual smoke.)
 
 function makeService(): SearchService {

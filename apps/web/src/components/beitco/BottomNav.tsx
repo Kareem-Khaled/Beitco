@@ -3,7 +3,7 @@ import { Home, Search, Plus, MessageCircle, User as UserIcon, LogIn } from "luci
 import { useAuth } from "@/lib/beitco/auth";
 import { useThreads } from "@/lib/beitco/queries";
 
-// Mobile-only bottom tab bar — the expected navigation pattern for a phone-first
+// Mobile-only bottom tab bar  -  the expected navigation pattern for a phone-first
 // Egyptian marketplace (and for the Capacitor shell later). Hidden on md+, where
 // the SiteHeader carries navigation. The center "اعرض مكانك" is the brand's
 // signature CTA, raised as a FAB.
@@ -27,7 +27,7 @@ export function BottomNav() {
         <Tab to="/" label="الرئيسية" icon={Home} active={isActive("/")} />
         <Tab to="/search" label="دوّر" icon={Search} active={isActive("/search")} />
 
-        {/* Center CTA — raised. "اعرض مكانك" only when logged in; otherwise a
+        {/* Center CTA  -  raised. "اعرض مكانك" only when logged in; otherwise a
             login prompt (keeps the 5-column grid balanced). */}
         {user ? (
           <Link

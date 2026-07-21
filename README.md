@@ -1,16 +1,16 @@
 # بيتون · Beitoon
 
-> **The trust-first housing marketplace for Egypt.** Rent a bed, a private room, or a whole apartment — with verification, real reviews, and quality scores you can actually trust.
+> **The trust-first housing marketplace for Egypt.** Rent a bed, a private room, or a whole apartment  -  with verification, real reviews, and quality scores you can actually trust.
 
 ---
 
 ## What This Is
 
-Most Egyptian housing today is rented through Facebook groups, ghost brokers, and 30%-fake OLX listings. Shared housing (the reality for most students and young professionals) is invisible — there's no platform built for it.
+Most Egyptian housing today is rented through Facebook groups, ghost brokers, and 30%-fake OLX listings. Shared housing (the reality for most students and young professionals) is invisible  -  there's no platform built for it.
 
 Beitoon changes that:
 
-- **Bed-level inventory.** Owners list how many beds are available *right now*. Renters book a bed, a room, or a whole apartment — whatever fits.
+- **Bed-level inventory.** Owners list how many beds are available *right now*. Renters book a bed, a room, or a whole apartment  -  whatever fits.
 - **Trust as the product.** Every listing carries a verification badge, a 0–10 trust score, real reviews from past residents (gated by 30+ day tenancy), per-listing quality scores (internet / safety / noise / maintenance / cleanliness), landlord response rate, and a public Q&A.
 - **Egyptian-first.** Arabic by default, Egyptian colloquial dialect throughout. Prices in ج.م. Areas Egyptians actually search.
 
@@ -94,25 +94,25 @@ Beitoon/
 
 The `.ai/` folder is the source of truth for product, business, and engineering context:
 
-- **[.ai/RUN_LOCALLY.md](./.ai/RUN_LOCALLY.md)** — **run the app + DB locally (recipe + every gotcha)**
-- **[.ai/ENTRY_PROMPT.md](./.ai/ENTRY_PROMPT.md)** — start here, canonical context
-- **[.ai/PROJECT_OVERVIEW.md](./.ai/PROJECT_OVERVIEW.md)** — product vision, personas, MVP scope
-- **[.ai/CURRENT_STATE.md](./.ai/CURRENT_STATE.md)** — what's actually built today
-- **[.ai/PROD_READINESS.md](./.ai/PROD_READINESS.md)** — **go-live checklist + deploy runbook**
-- **[.ai/SCALE_READINESS.md](./.ai/SCALE_READINESS.md)** — scale review (will it survive thousands of users?)
-- **[.ai/ADMIN_PLAN.md](./.ai/ADMIN_PLAN.md)** — operator-portal feature spec (ADMIN-1…13)
-- **[.ai/NEXT_STEPS.md](./.ai/NEXT_STEPS.md)** — the prioritized backlog
-- **[.ai/BUSINESS_MODEL.md](./.ai/BUSINESS_MODEL.md)** — how Beitoon makes money
-- **[.ai/ROADMAP.md](./.ai/ROADMAP.md)** — phased plan
-- **[.ai/AI_RULES.md](./.ai/AI_RULES.md)** — coding standards
+- **[.ai/RUN_LOCALLY.md](./.ai/RUN_LOCALLY.md)**  -  **run the app + DB locally (recipe + every gotcha)**
+- **[.ai/ENTRY_PROMPT.md](./.ai/ENTRY_PROMPT.md)**  -  start here, canonical context
+- **[.ai/PROJECT_OVERVIEW.md](./.ai/PROJECT_OVERVIEW.md)**  -  product vision, personas, MVP scope
+- **[.ai/CURRENT_STATE.md](./.ai/CURRENT_STATE.md)**  -  what's actually built today
+- **[.ai/PROD_READINESS.md](./.ai/PROD_READINESS.md)**  -  **go-live checklist + deploy runbook**
+- **[.ai/SCALE_READINESS.md](./.ai/SCALE_READINESS.md)**  -  scale review (will it survive thousands of users?)
+- **[.ai/ADMIN_PLAN.md](./.ai/ADMIN_PLAN.md)**  -  operator-portal feature spec (ADMIN-1…13)
+- **[.ai/NEXT_STEPS.md](./.ai/NEXT_STEPS.md)**  -  the prioritized backlog
+- **[.ai/BUSINESS_MODEL.md](./.ai/BUSINESS_MODEL.md)**  -  how Beitoon makes money
+- **[.ai/ROADMAP.md](./.ai/ROADMAP.md)**  -  phased plan
+- **[.ai/AI_RULES.md](./.ai/AI_RULES.md)**  -  coding standards
 
 ---
 
 ## Status
 
-**Full-stack and hardened.** The trust-first bed-level marketplace works end-to-end against a real NestJS + Postgres API — browse, phone-OTP auth, the `حط شقتك` listing wizard + moderation, leads → tenancy, gated reviews that move a computed trust score, matching, owner dashboard, live chat, notifications + saved-search alerts, image uploads, real OTP/SMS, Meilisearch + PostGIS geo search, and KYC verification.
+**Full-stack and hardened.** The trust-first bed-level marketplace works end-to-end against a real NestJS + Postgres API  -  browse, phone-OTP auth, the `حط شقتك` listing wizard + moderation, leads → tenancy, gated reviews that move a computed trust score, matching, owner dashboard, live chat, notifications + saved-search alerts, image uploads, real OTP/SMS, Meilisearch + PostGIS geo search, and KYC verification.
 
-The production-hardening backlog (security, CI/CD, Docker, e2e, structured logging, Sentry, readiness probes) is **complete**. What remains before launch is **test depth + a real deploy host** — see **[.ai/PROD_READINESS.md](./.ai/PROD_READINESS.md)**.
+The production-hardening backlog (security, CI/CD, Docker, e2e, structured logging, Sentry, readiness probes) is **complete**. What remains before launch is **test depth + a real deploy host**  -  see **[.ai/PROD_READINESS.md](./.ai/PROD_READINESS.md)**.
 
 See [`.ai/CURRENT_STATE.md`](./.ai/CURRENT_STATE.md) for the honest breakdown.
 

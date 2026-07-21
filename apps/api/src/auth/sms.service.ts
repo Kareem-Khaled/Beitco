@@ -26,7 +26,7 @@ export class SmsService {
   }
 
   // True when a real gateway is wired (so the OTP code is never returned to the
-  // client — it goes out by SMS instead).
+  // client  -  it goes out by SMS instead).
   get isLiveProvider(): boolean {
     return this.provider === 'http';
   }

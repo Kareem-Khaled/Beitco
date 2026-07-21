@@ -1,6 +1,6 @@
 // CHAT-3 client: a single shared Socket.io connection to the chat namespace.
 // The browser sends the httpOnly auth cookie automatically (withCredentials), so
-// no token handling here. The socket only signals "something changed" — the
+// no token handling here. The socket only signals "something changed"  -  the
 // useChatSocket hook turns `message:new` into TanStack Query invalidations, so
 // Query stays the single source of truth (no manual cache patching).
 import { io, type Socket } from "socket.io-client";

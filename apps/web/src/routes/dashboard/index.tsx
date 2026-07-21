@@ -85,7 +85,7 @@ function DashboardOverview() {
             <StatCard
               icon={<TrendingUp className="h-4 w-4" />}
               label="متوسط درجة الثقة"
-              value={avgTrust ? avgTrust.toFixed(1) : "—"}
+              value={avgTrust ? avgTrust.toFixed(1) : " - "}
             />
           </section>
 
@@ -159,7 +159,7 @@ function DashboardOverview() {
             </section>
           )}
 
-          {/* Responsiveness — real, tied to trust (T-3) */}
+          {/* Responsiveness  -  real, tied to trust (T-3) */}
           {responseRate != null && (
             <section className="rounded-2xl border border-border bg-card p-5">
               <div className="flex flex-wrap items-center justify-between gap-4">
@@ -180,7 +180,7 @@ function DashboardOverview() {
                     </div>
                     <p className="mt-0.5 max-w-md text-xs text-muted-foreground">
                       {responseRate >= 85
-                        ? "ممتاز — ردّك السريع بيرفع درجة ثقتك وبيخلّي الناس تكلّمك أكتر."
+                        ? "ممتاز  -  ردّك السريع بيرفع درجة ثقتك وبيخلّي الناس تكلّمك أكتر."
                         : "لو بتردّ على الرسايل في خلال يوم، درجة ثقتك بتزيد والناس بتطمّن أكتر."}
                     </p>
                   </div>
@@ -224,7 +224,7 @@ function DashboardOverview() {
                         <div className="min-w-0">
                           <p className="truncate text-sm font-medium">{l.renterName}</p>
                           <p className="truncate text-xs text-muted-foreground">
-                            {p?.title ?? "—"}
+                            {p?.title ?? " - "}
                           </p>
                         </div>
                         <LeadPill status={l.status} />

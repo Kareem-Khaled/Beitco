@@ -1,5 +1,5 @@
 // Beitoon brand mark: a house whose interior negative space forms a bed, with an
-// amber "sleeper" dot — the bed-level-renting wedge, in the trust-green. The bed
+// amber "sleeper" dot  -  the bed-level-renting wedge, in the trust-green. The bed
 // is a real cut-out (mask), so it shows whatever's behind (theme-safe on light or
 // dark headers). The house inherits `currentColor` via the caller's text color.
 export function Logo({ className }: { className?: string }) {

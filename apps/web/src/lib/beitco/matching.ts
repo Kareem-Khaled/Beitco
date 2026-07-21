@@ -1,9 +1,9 @@
-// Matching engine — pure, deterministic preference scoring. Mirrors the trust
+// Matching engine  -  pure, deterministic preference scoring. Mirrors the trust
 // engine's design: no localStorage/assets here, just `(property, profile) →
 // explainable score`. `store.ts` calls `scoreMatch` and handles the storage
 // side (`getMatchesForUser`). Keeping this pure makes it unit-testable.
 //
-// Principle: every match is *explainable* — we surface human-readable reasons
+// Principle: every match is *explainable*  -  we surface human-readable reasons
 // it fits and misses where it falls short (same transparency ethos as trust).
 
 import type { Property, RenterProfile } from "./types";
@@ -80,7 +80,7 @@ export function scoreMatch(p: Property, prof: RenterProfile): MatchResult {
     }
   }
 
-  // Near metro — considers preferred lines + max walking time.
+  // Near metro  -  considers preferred lines + max walking time.
   if (prof.nearMetro) {
     possible += 12;
     const metro = p.nearby?.find((n) => n.type === "مترو");
@@ -140,11 +140,11 @@ export function scoreMatch(p: Property, prof: RenterProfile): MatchResult {
     }
   }
 
-  // Shared-housing gender fit (compatible & restrictive) — a positive signal.
+  // Shared-housing gender fit (compatible & restrictive)  -  a positive signal.
   if (p.rentToGender && prof.selfGender) {
     possible += 10;
     earned += 10;
-    reasons.push(p.rentToGender === "male_only" ? "سكن شباب — مناسب ليك" : "سكن بنات — مناسب ليك");
+    reasons.push(p.rentToGender === "male_only" ? "سكن شباب  -  مناسب ليك" : "سكن بنات  -  مناسب ليك");
   }
 
   // No preferences set → fall back to trust as a soft signal.

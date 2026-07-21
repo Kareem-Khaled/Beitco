@@ -4,7 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AnalyticsTimeseriesDto } from './dto/admin-analytics.dto';
 
 // ADMIN-9: analytics & insights. Growth time-series, the conversion funnel, and
-// supply/demand by area — the operator's "understand the marketplace" view.
+// supply/demand by area  -  the operator's "understand the marketplace" view.
 
 const METRIC_TABLE: Record<string, { table: string; dateCol: string; where?: string }> = {
   signups: { table: 'users', dateCol: 'created_at', where: "deleted_at IS NULL" },

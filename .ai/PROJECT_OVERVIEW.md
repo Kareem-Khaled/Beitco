@@ -1,6 +1,6 @@
-# Project Overview — Beitoon
+# Project Overview  -  Beitoon
 
-> 📄 **Vision doc.** This captures the product vision, personas, and MVP scope. For the **current feature inventory, domain model, gaps, and roadmap**, see the working source of truth: `.ai/PRD.md`. Note: the "NOT building (now): Buy/sell" line below is now an **open decision** — a `للبيع` flow has been prototyped (see PRD §9).
+> 📄 **Vision doc.** This captures the product vision, personas, and MVP scope. For the **current feature inventory, domain model, gaps, and roadmap**, see the working source of truth: `.ai/PRD.md`. Note: the "NOT building (now): Buy/sell" line below is now an **open decision**  -  a `للبيع` flow has been prototyped (see PRD §9).
 
 ## One-Liner
 **Beitoon is the trust-first housing marketplace for Egypt where you rent a bed, a room, or a whole apartment with confidence.**
@@ -8,15 +8,15 @@
 ## The Problem
 Egyptian housing is a trust crisis:
 - Listings on OLX & Property Finder are 30–50% fake or stale.
-- Shared housing (the reality for most students & young professionals) is invisible — it lives in scattered Facebook groups.
+- Shared housing (the reality for most students & young professionals) is invisible  -  it lives in scattered Facebook groups.
 - Renters get burned by hidden fees, unsafe buildings, ghost landlords, lying brokers.
 - There's no public reputation for landlords or buildings.
 
 ## The Solution
 A platform where:
-1. **Owners list at the bed level** — "I have 4 beds in this apartment, 2 are free right now" — not just "rent this 3-bed apartment for X EGP".
-2. **Every listing carries a public trust footprint** — verification, score, real reviews, quality metrics, landlord response rate, Q&A.
-3. **Renters filter by what they actually need** — budget, area, type (شقة / أوضة / سرير), profile fit (students / professionals / families).
+1. **Owners list at the bed level**  -  "I have 4 beds in this apartment, 2 are free right now"  -  not just "rent this 3-bed apartment for X EGP".
+2. **Every listing carries a public trust footprint**  -  verification, score, real reviews, quality metrics, landlord response rate, Q&A.
+3. **Renters filter by what they actually need**  -  budget, area, type (شقة / أوضة / سرير), profile fit (students / professionals / families).
 4. **Reviews come only from past residents** with verified months-lived. No fake reviews. No paid placement.
 
 ## Inventory Types
@@ -68,7 +68,7 @@ Greater Cairo first, then Alexandria. Specifically:
 
 ### Explicitly NOT building (now)
 - Buy/sell real estate (rentals only)
-- Short-term / vacation rentals (long-term only — 1+ months)
+- Short-term / vacation rentals (long-term only  -  1+ months)
 - Brokerage commissions on transactions
 
 ## Key Differentiators vs Competition

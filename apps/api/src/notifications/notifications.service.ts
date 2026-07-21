@@ -18,7 +18,7 @@ const REVIEW_GATE_DAYS = 30;
 const SEEN_KEY = (userId: string) => `notif:seen:${userId}`;
 // SCALE-2: the derived feed merges several per-user reads; cap each so a heavy
 // account can't turn one feed request into a giant scan. The feed is a recent
-// activity surface, not an archive — a bound of 50 per source is plenty.
+// activity surface, not an archive  -  a bound of 50 per source is plenty.
 const FEED_SOURCE_LIMIT = 50;
 
 export interface AppNotification {
@@ -74,7 +74,7 @@ export class NotificationsService {
 
     // 0) Admin: listings sitting in the moderation queue. Derived like every
     // other source, so it auto-appears on a new pending listing and auto-clears
-    // the moment it's approved/rejected — no write needed at listing-create time.
+    // the moment it's approved/rejected  -  no write needed at listing-create time.
     // Uses updatedAt (not createdAt) as the date: it bumps whenever the listing
     // (re)enters the queue, so an owner editing a rejected listing and resubmitting
     // re-alerts the admin (a stale createdAt would stay "already seen").
@@ -122,7 +122,7 @@ export class NotificationsService {
       // 1b) Owner: moderation outcomes on their listings. Derived from the
       // listing's own state (moderatedAt is set ONLY by an admin approve/reject,
       // so auto-published listings never trigger this). A rejection is an action
-      // item — it self-clears when the owner edits & resubmits (status flips back
+      // item  -  it self-clears when the owner edits & resubmits (status flips back
       // to pending_approval). Approval confirms the listing went live.
       const moderated = await this.prisma.property.findMany({
         where: {
@@ -142,7 +142,7 @@ export class NotificationsService {
           type: 'listing_status',
           title: rejected ? 'إعلانك اترفض' : 'إعلانك اتنشر',
           body: rejected
-            ? `«${m.title}» محتاج تعديل: ${m.rejectionReason ?? 'مخالف لشروط النشر.'} — عدّله وابعته تاني.`
+            ? `«${m.title}» محتاج تعديل: ${m.rejectionReason ?? 'مخالف لشروط النشر.'}  -  عدّله وابعته تاني.`
             : `«${m.title}» بقى منشور ومتاح للناس دلوقتي. 🎉`,
           date: (m.moderatedAt ?? new Date()).toISOString(),
           propertyId: m.id,

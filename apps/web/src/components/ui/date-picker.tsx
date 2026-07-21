@@ -45,7 +45,7 @@ type DatePickerProps = {
 
 /**
  * A polished date picker (Popover + Calendar) that replaces the native
- * `<input type="date">` so it matches the rest of the design system — same
+ * `<input type="date">` so it matches the rest of the design system  -  same
  * look as the Select dropdowns, RTL-aware, Arabic month names + Latin digits.
  */
 export function DatePicker({

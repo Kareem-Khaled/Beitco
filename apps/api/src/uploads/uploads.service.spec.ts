@@ -4,7 +4,7 @@ import { UploadsService } from './uploads.service';
 
 // Build an UploadsService with a fake ConfigService. When `withS3` is true we
 // supply credentials so the service self-configures (it constructs a real
-// S3Client, but we never call AWS — presign only signs a URL locally).
+// S3Client, but we never call AWS  -  presign only signs a URL locally).
 function makeService(withS3: boolean): UploadsService {
   const env: Record<string, string> = withS3
     ? {

@@ -1,8 +1,8 @@
-> ⚠️ **STALE — pre-pivot doc.** Beitoon pivoted to a trust-first **bed-level housing marketplace** (June 2026). This doc was written before the pivot and references the old social-network/real-estate model. Trust `.ai/ENTRY_PROMPT.md`, `.ai/PROJECT_OVERVIEW.md`, `.ai/CURRENT_STATE.md`, `.ai/BUSINESS_MODEL.md`, `.ai/ROADMAP.md`, and `.ai/TASKS.md` instead. This file is kept for historical reference only and is on the cleanup list.
+> ⚠️ **STALE  -  pre-pivot doc.** Beitoon pivoted to a trust-first **bed-level housing marketplace** (June 2026). This doc was written before the pivot and references the old social-network/real-estate model. Trust `.ai/ENTRY_PROMPT.md`, `.ai/PROJECT_OVERVIEW.md`, `.ai/CURRENT_STATE.md`, `.ai/BUSINESS_MODEL.md`, `.ai/ROADMAP.md`, and `.ai/TASKS.md` instead. This file is kept for historical reference only and is on the cleanup list.
 
 ---
 
-# Beitoon — Strategic Roadmap
+# Beitoon  -  Strategic Roadmap
 
 > Based on: Strategic Repositioning (June 2026)  
 > Direction: Trust → Knowledge → Community → Listings
@@ -76,7 +76,7 @@ DeveloperProject { developerId, compoundId, promisedDelivery, actualDelivery, st
 
 ### 📍 Area Intelligence Pages (`/areas/[slug]`)
 
-**Purpose:** Living guide — "Should I live here?"
+**Purpose:** Living guide  -  "Should I live here?"
 
 **Sections:**
 1. Hero: Area name, city, lifestyle score
@@ -115,7 +115,7 @@ AreaGuide { areaId, schools, hospitals, transportation, costOfLiving (JSON), ...
 2. Categories: Price fair?, Area comparison, Developer review, General advice
 3. Thread View: Question + answers (upvote/downvote)
 4. Tags: compound names, areas, developers
-5. "Expert Answers" — from verified contributors
+5. "Expert Answers"  -  from verified contributors
 
 **Data Model:**
 ```
@@ -285,14 +285,14 @@ model DiscussionAnswer {
 
 ## Implementation Order
 
-1. **Compound Pages** (frontend + backend) — highest community value
-2. **Area Pages** (frontend + backend) — SEO + decision support
-3. **Discussions** (frontend + backend) — engagement + SEO moat
-4. **Developer Pages** (frontend + backend) — trust layer
+1. **Compound Pages** (frontend + backend)  -  highest community value
+2. **Area Pages** (frontend + backend)  -  SEO + decision support
+3. **Discussions** (frontend + backend)  -  engagement + SEO moat
+4. **Developer Pages** (frontend + backend)  -  trust layer
 5. **Trust Score System** (backend + profile enhancement)
-6. **Price Intelligence** (backend + frontend) — data moat
-7. **Resident Verification** (backend) — credibility
-8. **AI Advisor** (future) — differentiation
+6. **Price Intelligence** (backend + frontend)  -  data moat
+7. **Resident Verification** (backend)  -  credibility
+8. **AI Advisor** (future)  -  differentiation
 
 ---
 

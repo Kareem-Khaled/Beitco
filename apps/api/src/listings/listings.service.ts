@@ -168,7 +168,7 @@ export class ListingsService {
     const hasMore = rows.length > limit;
     const page = hasMore ? rows.slice(0, limit) : rows;
 
-    // freeOnly is computed from bed availability — apply on the page.
+    // freeOnly is computed from bed availability  -  apply on the page.
     let summaries = page.map(serializeSummary);
     if (truthy(query.freeOnly)) {
       summaries = summaries.filter(

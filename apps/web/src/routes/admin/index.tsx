@@ -22,7 +22,7 @@ export const Route = createFileRoute("/admin/")({
 });
 
 const ar = (n: number | null | undefined) =>
-  n == null ? "—" : n.toLocaleString("ar-EG-u-nu-latn");
+  n == null ? " - " : n.toLocaleString("ar-EG-u-nu-latn");
 
 function AdminOverview() {
   const { data: s, isLoading } = useAdminStats();
@@ -42,7 +42,7 @@ function AdminOverview() {
         <p className="text-sm text-muted-foreground">كل اللي بيحصل في بيتون في مكان واحد.</p>
       </header>
 
-      {/* Action queues — what needs the team's attention */}
+      {/* Action queues  -  what needs the team's attention */}
       {(s.queues.pendingListings > 0 || s.queues.pendingVerifications > 0) && (
         <div className="grid gap-3 sm:grid-cols-2">
           <QueueAlert
@@ -124,12 +124,12 @@ function AdminOverview() {
           <div className="my-2 border-t border-border" />
           <Row
             label="متوسط ثقة الإعلانات"
-            value={s.trust.avgListingTrust?.toLocaleString("ar-EG") ?? "—"}
+            value={s.trust.avgListingTrust?.toLocaleString("ar-EG") ?? " - "}
             accent="trust"
           />
           <Row
             label="متوسط ثقة الملّاك"
-            value={s.trust.avgOwnerTrust?.toLocaleString("ar-EG") ?? "—"}
+            value={s.trust.avgOwnerTrust?.toLocaleString("ar-EG") ?? " - "}
             accent="trust"
           />
         </Panel>

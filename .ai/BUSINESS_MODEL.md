@@ -1,4 +1,4 @@
-# Business Model — Beitoon
+# Business Model  -  Beitoon
 
 ## TL;DR
 Free for renters, free to list for owners. Revenue from **(1) verified-owner subscriptions** and **(2) success fees on confirmed move-ins**, with optional **promoted-listing boosts** later.
@@ -6,15 +6,15 @@ Free for renters, free to list for owners. Revenue from **(1) verified-owner sub
 ---
 
 ## Why This Model
-- We can't charge listing fees out of the gate — supply is fragile in a new market.
-- We can't charge renters — they have free alternatives (OLX, Facebook).
+- We can't charge listing fees out of the gate  -  supply is fragile in a new market.
+- We can't charge renters  -  they have free alternatives (OLX, Facebook).
 - The wedge that makes Beitoon valuable (trust) is exactly what justifies a success fee: when a renter moves in, both sides won because of *our* trust layer.
 
 ---
 
 ## Revenue Streams
 
-### 1. Verified Owner Subscription — *primary*
+### 1. Verified Owner Subscription  -  *primary*
 **299 EGP / month** or **2,499 EGP / year** per owner.
 
 What they get:
@@ -36,12 +36,12 @@ Average success fee: ~400–800 EGP per move-in.
 
 **Target by month 12:** 800 move-ins/month → ~480k EGP/month.
 
-### 3. Promoted Listings — *post-MVP*
+### 3. Promoted Listings  -  *post-MVP*
 Pay-per-day boost to top of search for a specific area/filter combo.
 - 50 EGP/day for "top of أوضة in المعادي"
 - Algorithm still respects trust score floor (we never promote unverified listings)
 
-### 4. Coliving Operator Plan — *post-MVP*
+### 4. Coliving Operator Plan  -  *post-MVP*
 Custom pricing for operators with 50+ beds. Bulk listing tools, branded landing page, analytics.
 
 ---
@@ -86,8 +86,8 @@ The data we accumulate (reviews, response rates, quality scores, building reputa
 ---
 
 ## Anti-Patterns (things we will not do)
-- Charging deposit/escrow fees in v1 — regulatory risk in Egypt
-- Selling renter contact info as leads — kills trust
-- Pay-to-rank above trust score — kills trust
+- Charging deposit/escrow fees in v1  -  regulatory risk in Egypt
+- Selling renter contact info as leads  -  kills trust
+- Pay-to-rank above trust score  -  kills trust
 - Brokering offline (we don't take a cut of the lease itself, only of the match)
 - Buying/selling real estate inventory ourselves

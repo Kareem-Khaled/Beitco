@@ -35,7 +35,7 @@ const COMPONENT_META: {
 ];
 
 // A TrustBadge with a "ليه الدرجة دي؟" popover that breaks the score into its
-// components — transparency is the whole point of the trust wedge.
+// components  -  transparency is the whole point of the trust wedge.
 export function TrustBadgeExplained({
   score,
   verified,
@@ -66,7 +66,7 @@ export function TrustBadgeExplained({
     {
       icon: MessageCircle,
       label: "سرعة الرد",
-      value: responseRate != null ? `${responseRate}%` : "—",
+      value: responseRate != null ? `${responseRate}%` : " - ",
       good: (responseRate ?? 0) >= 85,
     },
     {
@@ -77,7 +77,7 @@ export function TrustBadgeExplained({
     },
   ];
 
-  // Largest contributor — highlighted as "أكتر حاجة رفعت الدرجة".
+  // Largest contributor  -  highlighted as "أكتر حاجة رفعت الدرجة".
   const topKey = breakdown
     ? COMPONENT_META.reduce(
         (best, m) => (breakdown.components[m.key] > breakdown.components[best.key] ? m : best),
@@ -103,7 +103,7 @@ export function TrustBadgeExplained({
           <h4 className="text-sm font-semibold">ليه الدرجة دي؟</h4>
         </div>
         <p className="mt-1 text-xs text-muted-foreground">
-          درجة الثقة بنحسبها من كذا حاجة — مش رقم عشوائي.
+          درجة الثقة بنحسبها من كذا حاجة  -  مش رقم عشوائي.
         </p>
 
         <div className="mt-3 flex items-center justify-between rounded-lg bg-trust-soft px-3 py-2">

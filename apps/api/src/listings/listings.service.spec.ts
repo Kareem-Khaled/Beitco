@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SearchService } from '../search/search.service';
 import { ListingsService } from './listings.service';
 
-// TEST-1: ListingsService.list — the public browse query. Mocked Prisma +
+// TEST-1: ListingsService.list  -  the public browse query. Mocked Prisma +
 // a disabled SearchService (so `q` uses the DB `contains` fallback, no Meili).
 // Locks the filter mapping (Arabic→Latin type, purpose, price, verifiedOnly,
 // freeOnly), cursor pagination, sort selection, and findOne's published gate.
@@ -63,7 +63,7 @@ describe('ListingsService', () => {
     );
   });
 
-  describe('list — filters', () => {
+  describe('list  -  filters', () => {
     it('always scopes to published + not-deleted', async () => {
       await service.list({});
       expect(prisma.property.findMany.mock.calls[0][0].where).toMatchObject({
@@ -116,7 +116,7 @@ describe('ListingsService', () => {
     });
   });
 
-  describe('list — sort + pagination', () => {
+  describe('list  -  sort + pagination', () => {
     it('defaults to trust desc, then id', async () => {
       await service.list({});
       expect(prisma.property.findMany.mock.calls[0][0].orderBy).toEqual([
@@ -152,7 +152,7 @@ describe('ListingsService', () => {
     });
   });
 
-  describe('list — freeOnly', () => {
+  describe('list  -  freeOnly', () => {
     it('keeps only listings with an available bed', async () => {
       prisma.property.findMany.mockResolvedValue([
         propRow({ id: 'free', wholeStatus: 'available' }),

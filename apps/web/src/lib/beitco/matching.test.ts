@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { scoreMatch, isGenderEligible } from "./matching";
 import type { Property, RenterProfile } from "./types";
 
-// Minimal Property factory — sensible defaults, override what each test needs.
+// Minimal Property factory  -  sensible defaults, override what each test needs.
 function makeProperty(overrides: Partial<Property> = {}): Property {
   return {
     id: "p-test",
@@ -61,7 +61,7 @@ describe("isGenderEligible", () => {
   });
 });
 
-describe("scoreMatch — hard constraints", () => {
+describe("scoreMatch  -  hard constraints", () => {
   it("marks a gender-mismatched listing ineligible with a clear miss", () => {
     const p = makeProperty({ rentToGender: "female_only" });
     const m = scoreMatch(p, { selfGender: "ذكر", budgetMax: 10000 });
@@ -71,7 +71,7 @@ describe("scoreMatch — hard constraints", () => {
   });
 });
 
-describe("scoreMatch — preference weighting", () => {
+describe("scoreMatch  -  preference weighting", () => {
   it("rewards a listing inside preferred area + budget + type", () => {
     const p = makeProperty({ area: "المعادي · شارع 9", type: "أوضة", price: 5000 });
     const prof: RenterProfile = {
@@ -117,7 +117,7 @@ describe("scoreMatch — preference weighting", () => {
   });
 });
 
-describe("scoreMatch — fallbacks & bounds", () => {
+describe("scoreMatch  -  fallbacks & bounds", () => {
   it("falls back to trust×10 when the renter set no preferences", () => {
     const p = makeProperty({ trust: 9 });
     const m = scoreMatch(p, {});

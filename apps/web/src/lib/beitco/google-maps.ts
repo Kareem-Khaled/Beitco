@@ -1,8 +1,8 @@
-// Google Maps JavaScript API loader — SSR-safe, single-injection, promise-based.
+// Google Maps JavaScript API loader  -  SSR-safe, single-injection, promise-based.
 //
 // The interactive location picker (list wizard) uses the full JS API when a key
 // is configured (VITE_GOOGLE_MAPS_API_KEY); without a key it falls back to the
-// keyless Google embed iframe (read-only) — same philosophy as uploads/SMS:
+// keyless Google embed iframe (read-only)  -  same philosophy as uploads/SMS:
 // "configured -> full experience, otherwise a graceful fallback". Read-only map
 // VIEWS across the app already use the keyless embed and need no key.
 

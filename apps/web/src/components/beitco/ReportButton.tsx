@@ -74,7 +74,7 @@ export function ReportButton({
         reason,
         details: details.trim() || undefined,
       });
-      toast.success("وصلنا بلاغك — هنراجعه. شكرًا إنك بتحافظ على المكان نضيف.");
+      toast.success("وصلنا بلاغك  -  هنراجعه. شكرًا إنك بتحافظ على المكان نضيف.");
       setOpen(false);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "مش قادرين نبعت البلاغ دلوقتي");
@@ -102,7 +102,7 @@ export function ReportButton({
           <DialogHeader>
             <DialogTitle>{TITLE_BY_TYPE[targetType]}</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">اختر السبب — وفريقنا هيراجعه بسرعة.</p>
+          <p className="text-sm text-muted-foreground">اختر السبب  -  وفريقنا هيراجعه بسرعة.</p>
           <div className="flex flex-wrap gap-1.5">
             {REASONS_BY_TYPE[targetType].map((r) => (
               <button

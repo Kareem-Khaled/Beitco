@@ -66,7 +66,7 @@ function MeOverview() {
     };
   }, [user, savedList.length, renterLeads, ownerProps.length, matches]);
 
-  // Saved searches (FE-6) — local list so deletes re-render immediately.
+  // Saved searches (FE-6)  -  local list so deletes re-render immediately.
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
   useEffect(() => {
     setSavedSearches(user ? getSavedSearches(user.id) : []);
@@ -86,7 +86,7 @@ function MeOverview() {
       <header>
         <h1 className="font-display text-2xl font-semibold tracking-tight">حسابي</h1>
         <p className="text-sm text-muted-foreground">
-          أهلاً يا {user.name.split(" ")[0]} — ده ملخص نشاطك على بيتون.
+          أهلاً يا {user.name.split(" ")[0]}  -  ده ملخص نشاطك على بيتون.
         </p>
       </header>
 
@@ -112,14 +112,14 @@ function MeOverview() {
               </div>
               <p className="mt-0.5 text-xs text-muted-foreground">
                 من تقييم {data.reputation.count.toLocaleString("ar-EG-u-nu-latn")} من الملّاك اللي
-                سكنت عندهم — بتساعدك توصل لبيتك الجاي أسرع.
+                سكنت عندهم  -  بتساعدك توصل لبيتك الجاي أسرع.
               </p>
             </div>
           </div>
         </section>
       )}
 
-      {/* Owner card — go to your dashboard */}
+      {/* Owner card  -  go to your dashboard */}
       {isOwner && (
         <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5">
           <div className="flex items-center gap-4">
@@ -153,7 +153,7 @@ function MeOverview() {
         </section>
       )}
 
-      {/* Matching hero — renters only */}
+      {/* Matching hero  -  renters only */}
       {showRenterHero &&
         (data.completeness >= 30 ? (
           <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-trust/30 bg-trust-soft/50 p-5">
@@ -180,7 +180,7 @@ function MeOverview() {
             <div>
               <h3 className="font-display text-base font-semibold">كمّل ملفك عشان نلاقيلك بيتك</h3>
               <p className="mt-1 max-w-md text-xs text-muted-foreground">
-                قولنا ميزانيتك ومناطقك واللي بتدوّر عليه — وهنرتّبلك الأماكن اللي تناسبك بالظبط.
+                قولنا ميزانيتك ومناطقك واللي بتدوّر عليه  -  وهنرتّبلك الأماكن اللي تناسبك بالظبط.
               </p>
               <div className="mt-3 h-2 w-48 overflow-hidden rounded-full bg-muted">
                 <div
@@ -250,7 +250,7 @@ function MeOverview() {
             <div>
               <h2 className="font-display text-base font-semibold">عمليات البحث المحفوظة</h2>
               <p className="text-xs text-muted-foreground">
-                ارجع لأي بحث بضغطة — وقريّب هنبعتلك لما ينزل مكان جديد يطابقه.
+                ارجع لأي بحث بضغطة  -  وقريّب هنبعتلك لما ينزل مكان جديد يطابقه.
               </p>
             </div>
           </div>

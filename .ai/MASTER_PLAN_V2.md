@@ -1,12 +1,12 @@
-> ⚠️ **STALE — pre-pivot doc.** Beitoon pivoted to a trust-first **bed-level housing marketplace** (June 2026). This doc was written before the pivot and references the old social-network/real-estate model. Trust `.ai/ENTRY_PROMPT.md`, `.ai/PROJECT_OVERVIEW.md`, `.ai/CURRENT_STATE.md`, `.ai/BUSINESS_MODEL.md`, `.ai/ROADMAP.md`, and `.ai/TASKS.md` instead. This file is kept for historical reference only and is on the cleanup list.
+> ⚠️ **STALE  -  pre-pivot doc.** Beitoon pivoted to a trust-first **bed-level housing marketplace** (June 2026). This doc was written before the pivot and references the old social-network/real-estate model. Trust `.ai/ENTRY_PROMPT.md`, `.ai/PROJECT_OVERVIEW.md`, `.ai/CURRENT_STATE.md`, `.ai/BUSINESS_MODEL.md`, `.ai/ROADMAP.md`, and `.ai/TASKS.md` instead. This file is kept for historical reference only and is on the cleanup list.
 
 ---
 
-# Beitoon — Master Plan (V2)
+# Beitoon  -  Master Plan (V2)
 
 > **Based on: "Beitoon Business Vision & Product Strategy V2"**  
 > **Created: June 1, 2026**  
-> **Status: PLANNING — Nothing built until this is approved**
+> **Status: PLANNING  -  Nothing built until this is approved**
 
 ---
 
@@ -14,7 +14,7 @@
 
 ### What EXISTS (already built):
 
-**Backend (apps/api/) — 17 modules, 773 E2E tests:**
+**Backend (apps/api/)  -  17 modules, 773 E2E tests:**
 - Auth (OTP + JWT)
 - Users (profiles, follow, block)
 - Posts (CRUD, approval pipeline)
@@ -33,7 +33,7 @@
 - Analytics (basic)
 - Payments (scaffolded)
 
-**Frontend (apps/web/) — 40+ routes, mock data:**
+**Frontend (apps/web/)  -  40+ routes, mock data:**
 - Auth/Onboarding (5 screens)
 - Home Feed
 - Explore
@@ -56,11 +56,11 @@
 - Jobs: BullMQ
 
 ### What does NOT exist:
-- ❌ Shared Living (beds/rooms) — backend + frontend
-- ❌ Landlord Profiles & Trust — backend + frontend
-- ❌ Property/Landlord Reviews — backend + frontend
-- ❌ Bed Availability Management — backend + frontend
-- ❌ Housing Intelligence (internet, costs) — backend + frontend
+- ❌ Shared Living (beds/rooms)  -  backend + frontend
+- ❌ Landlord Profiles & Trust  -  backend + frontend
+- ❌ Property/Landlord Reviews  -  backend + frontend
+- ❌ Bed Availability Management  -  backend + frontend
+- ❌ Housing Intelligence (internet, costs)  -  backend + frontend
 - ❌ Frontend ↔ Backend integration (all pages use mock data)
 - ❌ Mobile app (Capacitor not initialized)
 - ❌ Real data / seed scripts
@@ -100,9 +100,9 @@
 ## 🗂️ Task Phases
 
 ### Phase 0: Planning & Schema (THIS PHASE)
-### Phase 1: Core Backend — New Modules
-### Phase 2: Frontend — New Pages
-### Phase 3: Integration — Wire Frontend ↔ Backend
+### Phase 1: Core Backend  -  New Modules
+### Phase 2: Frontend  -  New Pages
+### Phase 3: Integration  -  Wire Frontend ↔ Backend
 ### Phase 4: Polish & Launch Prep
 ### Phase 5: Mobile (Capacitor)
 
@@ -120,7 +120,7 @@
 
 ---
 
-## Phase 1: Core Backend — New Modules
+## Phase 1: Core Backend  -  New Modules
 
 ### Epic 1.1: Shared Living
 
@@ -128,7 +128,7 @@
 |----|------|----------|---------|------|--------|
 | T-201 | Create `SharedListing` model (beds, rooms, full apt) | P0 | P0-002 | 2h | 🔴 |
 | T-202 | Create `BedAvailability` model (occupancy tracking) | P0 | T-201 | 2h | 🔴 |
-| T-203 | SharedListings module — CRUD endpoints | P0 | T-201 | 4h | 🔴 |
+| T-203 | SharedListings module  -  CRUD endpoints | P0 | T-201 | 4h | 🔴 |
 | T-204 | Bed availability management endpoints | P0 | T-202 | 3h | 🔴 |
 | T-205 | Shared listing search & filters (university proximity, price, type) | P0 | T-203 | 3h | 🔴 |
 | T-206 | Roommate matching algorithm (preferences) | P1 | T-203 | 4h | 🔴 |
@@ -140,7 +140,7 @@
 |----|------|----------|---------|------|--------|
 | T-211 | Create `Review` model (polymorphic: property, landlord, compound, area) | P0 | P0-002 | 2h | 🔴 |
 | T-212 | Create `ReviewRating` model (category ratings) | P0 | T-211 | 1h | 🔴 |
-| T-213 | Reviews module — CRUD endpoints | P0 | T-211 | 4h | 🔴 |
+| T-213 | Reviews module  -  CRUD endpoints | P0 | T-211 | 4h | 🔴 |
 | T-214 | Rating aggregation service (avg per category, overall) | P0 | T-212 | 3h | 🔴 |
 | T-215 | Review verification (only actual tenants/residents can review) | P1 | T-213 | 3h | 🔴 |
 | T-216 | Review helpfulness voting (upvote/downvote) | P1 | T-213 | 2h | 🔴 |
@@ -163,9 +163,9 @@
 |----|------|----------|---------|------|--------|
 | T-231 | Create `Compound` model | P0 | P0-002 | 2h | 🔴 |
 | T-232 | Create `Developer` model with trust score | P0 | P0-002 | 2h | 🔴 |
-| T-233 | Compounds module — CRUD + reviews aggregation | P0 | T-231, T-213 | 4h | 🔴 |
-| T-234 | Developers module — CRUD + trust score | P0 | T-232 | 3h | 🔴 |
-| T-235 | Seed script — top 100 compounds + developers | P1 | T-231, T-232 | 3h | 🔴 |
+| T-233 | Compounds module  -  CRUD + reviews aggregation | P0 | T-231, T-213 | 4h | 🔴 |
+| T-234 | Developers module  -  CRUD + trust score | P0 | T-232 | 3h | 🔴 |
+| T-235 | Seed script  -  top 100 compounds + developers | P1 | T-231, T-232 | 3h | 🔴 |
 | T-236 | E2E tests for compounds & developers | P0 | T-233, T-234 | 3h | 🔴 |
 
 ### Epic 1.5: Areas & Intelligence
@@ -174,7 +174,7 @@
 |----|------|----------|---------|------|--------|
 | T-241 | Create `Area` model (with PostGIS polygon) | P0 | P0-002 | 2h | 🔴 |
 | T-242 | Create `AreaIntelligence` model (internet, costs, amenities) | P1 | T-241 | 2h | 🔴 |
-| T-243 | Areas module — CRUD + reviews aggregation | P0 | T-241, T-213 | 3h | 🔴 |
+| T-243 | Areas module  -  CRUD + reviews aggregation | P0 | T-241, T-213 | 3h | 🔴 |
 | T-244 | Internet quality reporting endpoint | P1 | T-241 | 2h | 🔴 |
 | T-245 | Monthly cost data endpoint | P1 | T-242 | 2h | 🔴 |
 | T-246 | Area seed script (top 30 areas in Greater Cairo) | P1 | T-241 | 2h | 🔴 |
@@ -184,15 +184,15 @@
 
 | ID | Task | Priority | Depends | Est. | Status |
 |----|------|----------|---------|------|--------|
-| T-251 | Add `discussion` post type with category + tags | P0 | — | 2h | 🔴 |
-| T-252 | Discussion answers (separate from comments — upvotable) | P0 | T-251 | 3h | 🔴 |
+| T-251 | Add `discussion` post type with category + tags | P0 |  -  | 2h | 🔴 |
+| T-252 | Discussion answers (separate from comments  -  upvotable) | P0 | T-251 | 3h | 🔴 |
 | T-253 | Expert answer badges | P1 | T-252 | 1h | 🔴 |
 | T-254 | Discussion search & filtering | P0 | T-251 | 2h | 🔴 |
 | T-255 | E2E tests for discussions | P0 | T-252 | 2h | 🔴 |
 
 ---
 
-## Phase 2: Frontend — New Pages
+## Phase 2: Frontend  -  New Pages
 
 ### Epic 2.1: Navigation Restructure
 
@@ -217,7 +217,7 @@
 
 | ID | Task | Priority | Depends | Est. | Status |
 |----|------|----------|---------|------|--------|
-| T-321 | Landlord profile page (public — trust score, properties, reviews) | P0 | — | 4h | 🔴 |
+| T-321 | Landlord profile page (public  -  trust score, properties, reviews) | P0 |  -  | 4h | 🔴 |
 | T-322 | Landlord dashboard page (manage properties, occupancy) | P1 | T-321 | 4h | 🔴 |
 | T-323 | Write landlord review page | P0 | T-321 | 2h | 🔴 |
 
@@ -225,18 +225,18 @@
 
 | ID | Task | Priority | Depends | Est. | Status |
 |----|------|----------|---------|------|--------|
-| T-331 | Review form component (reusable for property/landlord/compound/area) | P0 | — | 3h | 🔴 |
-| T-332 | Review display component (with category bars, avatar, verified badge) | P0 | — | 2h | 🔴 |
+| T-331 | Review form component (reusable for property/landlord/compound/area) | P0 |  -  | 3h | 🔴 |
+| T-332 | Review display component (with category bars, avatar, verified badge) | P0 |  -  | 2h | 🔴 |
 | T-333 | "Write a Review" flows from listing/compound/area detail pages | P0 | T-331 | 2h | 🔴 |
 
 ### Epic 2.5: Existing Pages Updates
 
 | ID | Task | Priority | Depends | Est. | Status |
 |----|------|----------|---------|------|--------|
-| T-341 | Update listing detail — show landlord trust, property reviews, costs | P0 | T-321, T-331 | 3h | 🔴 |
-| T-342 | Update compound detail — wire to review system | P0 | T-332 | 2h | 🔴 |
-| T-343 | Update area detail — add intelligence data (internet, costs) | P0 | T-332 | 2h | 🔴 |
-| T-344 | Update profile page — show trust score, reviews given/received | P0 | — | 2h | 🔴 |
+| T-341 | Update listing detail  -  show landlord trust, property reviews, costs | P0 | T-321, T-331 | 3h | 🔴 |
+| T-342 | Update compound detail  -  wire to review system | P0 | T-332 | 2h | 🔴 |
+| T-343 | Update area detail  -  add intelligence data (internet, costs) | P0 | T-332 | 2h | 🔴 |
+| T-344 | Update profile page  -  show trust score, reviews given/received | P0 |  -  | 2h | 🔴 |
 
 ---
 
@@ -244,7 +244,7 @@
 
 | ID | Task | Priority | Depends | Est. | Status |
 |----|------|----------|---------|------|--------|
-| T-401 | Wire auth flow (login/register/OTP) | P0 | — | 4h | 🔴 |
+| T-401 | Wire auth flow (login/register/OTP) | P0 |  -  | 4h | 🔴 |
 | T-402 | Wire feed (real posts from API) | P0 | T-401 | 3h | 🔴 |
 | T-403 | Wire listings (search, detail, create) | P0 | T-401 | 4h | 🔴 |
 | T-404 | Wire shared living (browse, detail, create, availability) | P0 | T-203, T-311 | 4h | 🔴 |
@@ -306,23 +306,23 @@ VerificationType: national_id | property_ownership | residency | professional
 ### New Models Needed:
 
 ```
-SharedListing       — Beds/rooms/apartments for sharing
-BedSlot             — Individual bed within a shared listing
-BedOccupancy        — Who's in which bed, move-in/out dates
-RoommatePreference  — Matching preferences
-Review              — Polymorphic (property, landlord, compound, area, developer)
-ReviewCategory      — Per-category rating (security: 8, internet: 6, etc.)
-Compound            — Residential compound
-Developer           — Real estate developer
-Area                — Geographic area (with PostGIS polygon)
-AreaIntelligence    — Internet, costs, amenities data
-InternetReport      — User-reported internet quality
-CostReport          — User-reported monthly costs
-Discussion          — Q&A thread (extends Post or separate)
-DiscussionAnswer    — Answer to a discussion (upvotable)
-Landlord            — Landlord profile (linked to User)
-LandlordVerification — Verification documents
-TrustScore          — Computed trust for any entity
+SharedListing        -  Beds/rooms/apartments for sharing
+BedSlot              -  Individual bed within a shared listing
+BedOccupancy         -  Who's in which bed, move-in/out dates
+RoommatePreference   -  Matching preferences
+Review               -  Polymorphic (property, landlord, compound, area, developer)
+ReviewCategory       -  Per-category rating (security: 8, internet: 6, etc.)
+Compound             -  Residential compound
+Developer            -  Real estate developer
+Area                 -  Geographic area (with PostGIS polygon)
+AreaIntelligence     -  Internet, costs, amenities data
+InternetReport       -  User-reported internet quality
+CostReport           -  User-reported monthly costs
+Discussion           -  Q&A thread (extends Post or separate)
+DiscussionAnswer     -  Answer to a discussion (upvotable)
+Landlord             -  Landlord profile (linked to User)
+LandlordVerification  -  Verification documents
+TrustScore           -  Computed trust for any entity
 ```
 
 ---
@@ -403,8 +403,8 @@ TrustScore          — Computed trust for any entity
 
 | Phase | Duration | Parallel? |
 |-------|----------|-----------|
-| Phase 0: Planning | 2-3 days | — |
-| Phase 1: Backend modules | 2-3 weeks | — |
+| Phase 0: Planning | 2-3 days |  -  |
+| Phase 1: Backend modules | 2-3 weeks |  -  |
 | Phase 2: Frontend pages | 2-3 weeks | ✅ with Phase 1 |
 | Phase 3: Integration | 1-2 weeks | After 1+2 |
 | Phase 4: Polish & Deploy | 1 week | After 3 |

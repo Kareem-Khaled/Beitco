@@ -25,7 +25,7 @@ export class ListingsController {
     return this.listings.list(query);
   }
 
-  // Owner's own listings (all statuses) — must be declared before :id.
+  // Owner's own listings (all statuses)  -  must be declared before :id.
   @Get('mine')
   @ApiOperation({ summary: "My listings (owner, all statuses)" })
   mine(@CurrentUser() me: AuthUser) {

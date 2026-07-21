@@ -37,7 +37,7 @@ function AdminReviews() {
       <header>
         <h1 className="font-display text-2xl font-semibold tracking-tight">التقييمات</h1>
         <p className="text-sm text-muted-foreground">
-          شيل التقييمات المزيّفة أو المسيئة — درجة الثقة بتتحسب من جديد على طول.
+          شيل التقييمات المزيّفة أو المسيئة  -  درجة الثقة بتتحسب من جديد على طول.
         </p>
       </header>
 

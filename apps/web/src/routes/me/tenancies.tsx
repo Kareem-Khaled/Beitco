@@ -51,7 +51,7 @@ function MeTenancies() {
         </p>
       </header>
 
-      {/* Pending link requests — owner asked to register you as a resident */}
+      {/* Pending link requests  -  owner asked to register you as a resident */}
       {pendingLinks.length > 0 && (
         <section className="space-y-2 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4">
           <div className="flex items-center gap-2 text-sm font-medium">
@@ -59,7 +59,7 @@ function MeTenancies() {
             طلبات تأكيد سكن
           </div>
           <p className="text-xs text-muted-foreground">
-            صاحب شقة سجّلك ساكن عنده. أكّد بس لو ده صح — التأكيد بيخليك تقدر تكتب رأيك بعد 30 يوم.
+            صاحب شقة سجّلك ساكن عنده. أكّد بس لو ده صح  -  التأكيد بيخليك تقدر تكتب رأيك بعد 30 يوم.
           </p>
           <ul className="space-y-2">
             {pendingLinks.map((link, i) => (
@@ -130,7 +130,7 @@ function MeTenancies() {
                           {p.title}
                         </Link>
                       ) : (
-                        <span className="font-display text-base font-semibold">—</span>
+                        <span className="font-display text-base font-semibold"> - </span>
                       )}
                       {current ? (
                         <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">

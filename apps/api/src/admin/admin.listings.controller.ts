@@ -10,7 +10,7 @@ import {
   AdminDeleteListingDto,
 } from './dto/admin-listings.dto';
 
-// ADMIN-3: listing management — search ALL listings + force-takedown. Admin-only.
+// ADMIN-3: listing management  -  search ALL listings + force-takedown. Admin-only.
 // Every mutation is audit-logged in the service (ADMIN-12).
 @Controller({ path: 'admin/listings', version: '1' })
 @ApiTags('Admin')

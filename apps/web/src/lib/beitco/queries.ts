@@ -2,7 +2,7 @@
 // data comes from the localStorage mock or the API (B-1). The VITE_USE_API flag
 // (in api.ts) decides the source:
 //   - flag OFF (default): `initialData` returns the mock synchronously, so there
-//     is zero loading flash — behaviour is byte-identical to the pre-API app.
+//     is zero loading flash  -  behaviour is byte-identical to the pre-API app.
 //   - flag ON: data is fetched from the NestJS API.
 
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
@@ -250,7 +250,7 @@ export function useSearchProperties(params: PropertyFilters): SearchResult & {
     hasMore: query.hasNextPage ?? false,
     fetchMore: () => query.fetchNextPage(),
     isFetchingMore: query.isFetchingNextPage,
-    // True only on the very first fetch (no pages yet) — the page shows skeleton
+    // True only on the very first fetch (no pages yet)  -  the page shows skeleton
     // cards instead of a false "no results" flash.
     isLoading: query.isLoading,
   } as SearchResult & {
@@ -960,7 +960,7 @@ export function useThread(threadId: string, userId: string | undefined) {
   });
 }
 
-// Start (or re-open) a thread about a listing — returns the thread (callers
+// Start (or re-open) a thread about a listing  -  returns the thread (callers
 // navigate to thread.id). Flag-aware: mock upserts locally, API is idempotent.
 export async function startThread(propertyId: string, renterId: string): Promise<Thread> {
   if (USE_API) return apiFindOrCreateThread(propertyId);

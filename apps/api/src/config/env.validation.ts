@@ -1,6 +1,6 @@
 // SEC-1: centralized env validation. Runs once at boot via
 // ConfigModule.forRoot({ validate }). The dev-only secret fallbacks live HERE
-// and nowhere else — in production a missing/weak secret throws immediately so
+// and nowhere else  -  in production a missing/weak secret throws immediately so
 // the app can never silently sign tokens with a publicly-known dev secret.
 
 const DEV_JWT_SECRET = 'dev-jwt-secret';
@@ -36,7 +36,7 @@ export function validateEnv(config: Record<string, unknown>): ValidatedEnv {
     }
     if (problems.length > 0) {
       throw new Error(
-        `[env] Production startup blocked — fix these secrets: ${problems.join(', ')}. ` +
+        `[env] Production startup blocked  -  fix these secrets: ${problems.join(', ')}. ` +
           'Set strong, distinct values (>= 32 chars) in the environment.',
       );
     }

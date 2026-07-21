@@ -84,7 +84,7 @@ export class ListPropertiesQueryDto {
   @Max(180)
   lng?: number;
 
-  @ApiPropertyOptional({ description: 'Radius in km (default 5, max 50) — requires lat & lng' })
+  @ApiPropertyOptional({ description: 'Radius in km (default 5, max 50)  -  requires lat & lng' })
   @IsOptional()
   @Transform(({ value }) => (value === '' || value == null ? undefined : Number(value)))
   @IsNumber()

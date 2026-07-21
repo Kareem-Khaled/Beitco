@@ -12,7 +12,7 @@ import {
   getAdminAreas,
 } from "./store";
 
-// TEST-3: the flag-aware data layer in MOCK mode (VITE_USE_API off — the test
+// TEST-3: the flag-aware data layer in MOCK mode (VITE_USE_API off  -  the test
 // default). These back the operator portal + browse pages without a network,
 // so they're the highest-value web units. localStorage (jsdom) is reset per test
 // so each starts from the seed.

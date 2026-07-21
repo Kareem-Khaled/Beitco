@@ -25,7 +25,7 @@ export class HealthController {
 
   @Get('ready')
   @Public()
-  @ApiOperation({ summary: 'Readiness check — pings Postgres + Redis (503 if down)' })
+  @ApiOperation({ summary: 'Readiness check  -  pings Postgres + Redis (503 if down)' })
   async ready(@Res({ passthrough: true }) res: Response) {
     const result = await this.health.checkReadiness();
     res.status(result.ready ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE);

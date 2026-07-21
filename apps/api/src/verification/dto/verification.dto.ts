@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, MaxLength } from 'class-validator';
 
 // PROD-5: submit identity (+ ownership) docs for KYC review. The doc URLs come
-// from the presigned-upload flow (PROD-1) — we store URLs, not blobs.
+// from the presigned-upload flow (PROD-1)  -  we store URLs, not blobs.
 export class SubmitVerificationDto {
   @ApiProperty({ description: 'URL of the national ID image' })
   @IsString()

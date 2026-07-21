@@ -76,7 +76,7 @@ describe('AdminService.platformStats', () => {
 
   beforeEach(() => {
     prisma = makePrisma();
-    // property.groupBy is called twice (by status, then by type) — return the
+    // property.groupBy is called twice (by status, then by type)  -  return the
     // status buckets first, the type buckets second.
     (prisma.property.groupBy as Mock)
       .mockResolvedValueOnce([

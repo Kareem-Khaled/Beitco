@@ -45,7 +45,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     } else if (typeof (exception as { status?: number }).status === 'number') {
       // Errors thrown by Express middleware (e.g. body-parser's
       // PayloadTooLargeError) carry an HTTP status but aren't Nest
-      // HttpExceptions — surface them cleanly instead of as a generic 500.
+      // HttpExceptions  -  surface them cleanly instead of as a generic 500.
       status = (exception as { status: number }).status;
       errorResponse =
         status === HttpStatus.PAYLOAD_TOO_LARGE

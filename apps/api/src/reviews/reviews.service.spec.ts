@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { TrustService } from '../trust/trust.service';
 import { ReviewsService } from './reviews.service';
 
-// TEST-1: ReviewsService — the trust wedge. Mocked Prisma + Trust lock the
+// TEST-1: ReviewsService  -  the trust wedge. Mocked Prisma + Trust lock the
 // residency gate (30-day tenancy), the helpful-vote toggle, owner-reply
 // ownership, and the two-sided renter-review guards. The e2e proves a real
 // review moves the score end-to-end; here we assert the recompute is triggered.

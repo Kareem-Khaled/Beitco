@@ -4,10 +4,10 @@
 // matching.service.ts reads from Prisma, maps rows to these loose input
 // shapes, and calls scoreMatch. Keeping it pure makes it unit-testable.
 //
-// Principle: every match is *explainable* — we surface human-readable reasons
+// Principle: every match is *explainable*  -  we surface human-readable reasons
 // it fits and where it falls short (same transparency ethos as the trust engine).
 
-// Loose input shapes (decoupled from Prisma / the frontend Property type) — the
+// Loose input shapes (decoupled from Prisma / the frontend Property type)  -  the
 // engine only reads these fields.
 export interface MatchNearby {
   type: string; // Arabic: متر و / مواصلات / ...
@@ -118,7 +118,7 @@ export function scoreMatch(p: MatchProperty, prof: MatchProfile): MatchResult {
     }
   }
 
-  // Near metro — considers preferred lines + max walking time.
+  // Near metro  -  considers preferred lines + max walking time.
   if (prof.nearMetro) {
     possible += 12;
     const metro = p.nearby?.find((n) => n.type === 'مترو');
@@ -180,11 +180,11 @@ export function scoreMatch(p: MatchProperty, prof: MatchProfile): MatchResult {
     }
   }
 
-  // Shared-housing gender fit (compatible & restrictive) — a positive signal.
+  // Shared-housing gender fit (compatible & restrictive)  -  a positive signal.
   if (p.rentToGender && prof.selfGender) {
     possible += 10;
     earned += 10;
-    reasons.push(p.rentToGender === 'male_only' ? 'سكن شباب — مناسب ليك' : 'سكن بنات — مناسب ليك');
+    reasons.push(p.rentToGender === 'male_only' ? 'سكن شباب  -  مناسب ليك' : 'سكن بنات  -  مناسب ليك');
   }
 
   // No preferences set -> fall back to trust as a soft signal.

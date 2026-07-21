@@ -14,7 +14,7 @@ import { ResponseEnvelopeInterceptor } from './common/interceptors/response-enve
 
 async function bootstrap() {
   // bufferLogs so early startup logs flush through pino once it's ready.
-  // bodyParser:false — we register our own (below) with a larger limit so
+  // bodyParser:false  -  we register our own (below) with a larger limit so
   // listing payloads carrying downscaled base64 images (the dev fallback when
   // S3/R2 isn't configured) aren't rejected by the default 100kb cap.
   const app = await NestFactory.create(AppModule, { bufferLogs: true, bodyParser: false });

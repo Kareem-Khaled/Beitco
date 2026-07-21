@@ -1,4 +1,4 @@
-# Current State — Beitoon
+# Current State  -  Beitoon
 
 > **Last updated:** June 24, 2026 · branch: `dev`
 > Honest snapshot of what's actually built and verified. For the prioritized "what's next" read **`.ai/NEXT_STEPS.md`**; for the **go-live checklist + deploy runbook** read **`.ai/PROD_READINESS.md`**; for the product vision read `.ai/PRD.md`; for the backend build log read `.ai/BACKEND_TASKS.md`.
@@ -7,7 +7,7 @@
 
 ## TL;DR
 
-- **Full-stack, end-to-end.** The trust-first bed-level marketplace is real on a server. The frontend talks to a NestJS + Postgres API across **every core surface** — browse, auth, listings CRUD + moderation, leads, Q&A, reviews, matching, the owner dashboard, live chat, and notifications.
+- **Full-stack, end-to-end.** The trust-first bed-level marketplace is real on a server. The frontend talks to a NestJS + Postgres API across **every core surface**  -  browse, auth, listings CRUD + moderation, leads, Q&A, reviews, matching, the owner dashboard, live chat, and notifications.
 - **Behind a feature flag.** `VITE_USE_API` toggles the data source: **OFF (default)** = the byte-identical localStorage mock; **ON** = the live API. Both paths are kept identical so the prototype still runs with no backend.
 - **The trust wedge is proven, not cosmetic.** Reviews move a listing's computed score (verified 8.3 → 5.2); an owner's first chat reply moves it up via real response-rate tracking (8.1 → 8.6). Nothing buys a higher score; every score is explainable.
 - **Production-hardening is done.** P0 security (secrets fail-fast, helmet, readiness, OTP throttle), P1 shippability (API lint, CI/CD, Docker, e2e, pino logs, Sentry), and P2 product readiness (image uploads, real OTP/SMS, Meilisearch, PostGIS geo, KYC) are all shipped + verified.
@@ -25,7 +25,7 @@
 
 ---
 
-## ✅ Frontend — `apps/web/` (`tanstack_start_ts`)
+## ✅ Frontend  -  `apps/web/` (`tanstack_start_ts`)
 
 **Stack:** TanStack Start (Vite + React 19), TypeScript strict, Tailwind v4, shadcn/ui, Arabic RTL (Egyptian dialect), Leaflet (maps), TanStack Query, socket.io-client, Vitest. Runs on `pnpm web` → http://localhost:8080. 40 routes, 70+ components.
 
@@ -38,14 +38,14 @@
 - **Chat:** `/messages` + thread view, "كلّم صاحب الشقة", live updates via Socket.io.
 - **Notifications:** bell badge + `/notifications` feed (leads, messages, review-eligibility, verification, saved-search alerts).
 - **Verification (KYC):** `dashboard/verify` (upload ID/selfie/ownership docs → pending) + admin `dashboard/verifications` queue (approve/reject).
-- **Admin:** moderation queue (`/dashboard/moderation`) + verifications queue, gated on `isPlatformAdmin`. **Operator portal** (`/admin`) — a 7-section control room for the Beitoon team: overview/KPIs, analytics (time-series/funnel/supply-demand), users (ban/verify/make-admin), listings (force-takedown), reviews (remove→recompute trust), reports triage; every action audit-logged.
+- **Admin:** moderation queue (`/dashboard/moderation`) + verifications queue, gated on `isPlatformAdmin`. **Operator portal** (`/admin`)  -  a 7-section control room for the Beitoon team: overview/KPIs, analytics (time-series/funnel/supply-demand), users (ban/verify/make-admin), listings (force-takedown), reviews (remove→recompute trust), reports triage; every action audit-logged.
 - **Platform:** dark mode, PWA manifest, mobile bottom-nav, accessibility pass (skip link, aria, focus management), maps (Leaflet pin-drop + Google embeds), public profiles.
 
-**Tests:** 62 Vitest — pure engines (trust + matching) + the **flag-aware mock data layer** (browse + admin users/listings/content/analytics) + **component tests** (Testing Library + jsdom: `TrustBadge`/`EmptyState` renders, `BeitoonListingCard` listing render, `ReportButton` full report-flow interaction). `tsc` clean.
+**Tests:** 62 Vitest  -  pure engines (trust + matching) + the **flag-aware mock data layer** (browse + admin users/listings/content/analytics) + **component tests** (Testing Library + jsdom: `TrustBadge`/`EmptyState` renders, `BeitoonListingCard` listing render, `ReportButton` full report-flow interaction). `tsc` clean.
 
 ---
 
-## ✅ Backend — `apps/api/` (NestJS 11)
+## ✅ Backend  -  `apps/api/` (NestJS 11)
 
 **Stack:** NestJS 11, Prisma 6, PostgreSQL 16 + PostGIS, Redis (OTP + read-state), Meilisearch (search), S3/R2 (uploads), JWT/Passport (httpOnly cookies), Socket.io, class-validator, pino logs, Sentry, Swagger. Runs on `pnpm api` → http://localhost:3001 (`/api/v1`, Swagger at `/api/docs`).
 
@@ -81,10 +81,10 @@
 
 Older docs describe a **5-tier permission system** (`@RequireTier`). **That was never implemented and is not the design.** The real, simpler model is:
 
-- **Admin** — `User.isAdmin`; passes `AdminGuard` for the moderation queue.
-- **Verified owner/renter** — `verified` / `verificationStatus`; verified owners auto-publish, unverified ones go to the moderation queue.
-- **Ownership** — every write checks the resource owner (403 otherwise): listings, leads, threads (participants), reviews-reply.
-- **Auth** — global `JwtAuthGuard`; `@Public()` opens browse + health.
+- **Admin**  -  `User.isAdmin`; passes `AdminGuard` for the moderation queue.
+- **Verified owner/renter**  -  `verified` / `verificationStatus`; verified owners auto-publish, unverified ones go to the moderation queue.
+- **Ownership**  -  every write checks the resource owner (403 otherwise): listings, leads, threads (participants), reviews-reply.
+- **Auth**  -  global `JwtAuthGuard`; `@Public()` opens browse + health.
 
 Treat this section as the source of truth over any `@RequireTier` references elsewhere.
 
@@ -93,8 +93,8 @@ Treat this section as the source of truth over any `@RequireTier` references els
 ## Infra (`docker-compose.yml`)
 
 - **Postgres 16 + PostGIS** (`beitco-postgres`). Dev runs on **host port 5433** via the gitignored `docker-compose.override.yml` (a native Postgres occupies 5432). A trigger-maintained, **GiST-indexed `geog` column** (derived from `lat`/`lng`) powers `ST_DWithin` radius search (PROD-4).
-- **Redis 7** (`beitco-redis`) — OTP store + notification last-seen marker + **BullMQ** queue backend (SCALE-1 saved-search fan-out worker).
-- **Meilisearch v1.11** (`beitco-meilisearch`) — **integrated** (PROD-3): typo-tolerant, Arabic-aware `?q=` with relevance ordering + a DB `contains` fallback when it's unreachable/unset.
+- **Redis 7** (`beitco-redis`)  -  OTP store + notification last-seen marker + **BullMQ** queue backend (SCALE-1 saved-search fan-out worker).
+- **Meilisearch v1.11** (`beitco-meilisearch`)  -  **integrated** (PROD-3): typo-tolerant, Arabic-aware `?q=` with relevance ordering + a DB `contains` fallback when it's unreachable/unset.
 
 ---
 
@@ -102,9 +102,9 @@ Treat this section as the source of truth over any `@RequireTier` references els
 
 > **The hardening backlog (P0 security → P1 shippable → P2 product) is complete.** What remains is optional polish + the business phases.
 
-- **Security / shippable / observability:** ✅ done — secrets fail-fast + `helmet` + readiness (DB+Redis) + OTP throttle; API ESLint + CI/CD + Dockerfiles; e2e suite (19); structured pino logs + Sentry.
+- **Security / shippable / observability:** ✅ done  -  secrets fail-fast + `helmet` + readiness (DB+Redis) + OTP throttle; API ESLint + CI/CD + Dockerfiles; e2e suite (19); structured pino logs + Sentry.
 - **Product:** ✅ image-upload pipeline (PROD-1), real OTP/SMS gateway (PROD-2), Meilisearch (PROD-3), PostGIS geo (PROD-4), verification/KYC (PROD-5).
-- **Still open (optional):** **Launch blocker** — a real deploy host (DEPLOY-1); see `.ai/PROD_READINESS.md`. _(TEST-1 service specs + a CI coverage floor and TEST-3 web component tests are done; the empty shared packages + `_unported/` are deleted.)_ **P3 polish** — decompose the monolith FE files, a BullMQ worker for saved-search alerts, the occupant-link consent flow, a11y automation, the admin tail (RBAC roles, trust controls, billing). **P4 business** — payments (Paymob/Stripe EGP) + Capacitor mobile wrap.
+- **Still open (optional):** **Launch blocker**  -  a real deploy host (DEPLOY-1); see `.ai/PROD_READINESS.md`. _(TEST-1 service specs + a CI coverage floor and TEST-3 web component tests are done; the empty shared packages + `_unported/` are deleted.)_ **P3 polish**  -  decompose the monolith FE files, a BullMQ worker for saved-search alerts, the occupant-link consent flow, a11y automation, the admin tail (RBAC roles, trust controls, billing). **P4 business**  -  payments (Paymob/Stripe EGP) + Capacitor mobile wrap.
 
 ---
 
@@ -112,9 +112,9 @@ Treat this section as the source of truth over any `@RequireTier` references els
 
 | Doc | Purpose |
 |---|---|
-| `NEXT_STEPS.md` | **The active backlog — what's next, prioritized.** |
+| `NEXT_STEPS.md` | **The active backlog  -  what's next, prioritized.** |
 | `PROD_READINESS.md` | **Go-live checklist + deploy runbook + go/no-go.** |
-| `SCALE_READINESS.md` | **Scale review — thousands-of-users readiness + the P0.5 backlog.** |
+| `SCALE_READINESS.md` | **Scale review  -  thousands-of-users readiness + the P0.5 backlog.** |
 | `ADMIN_PLAN.md` | **Operator-portal feature spec (ADMIN-1…13).** |
 | `ROADMAP.md` | Phased plan (what's done / what's next). |
 | `PRD.md` | Product vision, personas, scope. |

@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/help")({
   head: () => ({
     meta: [
-      { title: "مساعدة — بيتون" },
+      { title: "مساعدة  -  بيتون" },
       {
         name: "description",
-        content: "أسئلة شائعة عن استخدام بيتون — للساكنين ولأصحاب البيوت.",
+        content: "أسئلة شائعة عن استخدام بيتون  -  للساكنين ولأصحاب البيوت.",
       },
     ],
   }),

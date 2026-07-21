@@ -3,7 +3,7 @@
  * Run: node apps/api/test-auth-flow.mjs
  *
  * Tests:
- * 1. Health endpoint (public) — should work without auth
+ * 1. Health endpoint (public)  -  should work without auth
  * 2. Send OTP to a test phone
  * 3. Verify OTP and get tokens
  * 4. Access protected endpoint with JWT
@@ -35,7 +35,7 @@ function log(label, result) {
 
 async function main() {
   console.log('═══════════════════════════════════════');
-  console.log('  Beitoon Auth Flow — E2E Test');
+  console.log('  Beitoon Auth Flow  -  E2E Test');
   console.log('═══════════════════════════════════════');
 
   // 1. Health (public)
@@ -52,7 +52,7 @@ async function main() {
   log('3. Send OTP', sendOtp);
 
   if (sendOtp.status !== 200) {
-    console.log('\n⚠️  OTP send failed — cannot continue flow');
+    console.log('\n⚠️  OTP send failed  -  cannot continue flow');
     return;
   }
 
@@ -74,7 +74,7 @@ async function main() {
   log('5. Verify OTP → tokens', verify);
 
   if (verify.status !== 200) {
-    console.log('\n⚠️  OTP verify failed — cannot continue flow');
+    console.log('\n⚠️  OTP verify failed  -  cannot continue flow');
     await redis.quit();
     return;
   }
@@ -84,7 +84,7 @@ async function main() {
   console.log(`🎫 Access token: ${accessToken?.substring(0, 40)}...`);
   console.log(`🔄 Refresh token: ${refreshToken?.substring(0, 40)}...`);
 
-  // 6. Authenticated request — logout endpoint requires auth
+  // 6. Authenticated request  -  logout endpoint requires auth
   const authed = await request('DELETE', '/auth/logout', { refreshToken }, {
     Authorization: `Bearer ${accessToken}`,
   });
@@ -104,7 +104,7 @@ async function main() {
   });
   log('9. Fake JWT (expect 401)', fakeJwt);
 
-  // 10. OTP cooldown — sending again immediately should fail
+  // 10. OTP cooldown  -  sending again immediately should fail
   const cooldown = await request('POST', '/auth/otp/send', { phone });
   log('10. OTP cooldown (expect 400)', cooldown);
 

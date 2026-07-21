@@ -1,4 +1,4 @@
-// Listing derivation — pure functions that compute card/search-facing fields
+// Listing derivation  -  pure functions that compute card/search-facing fields
 // (type, entry price, unit counts) from the structured apartment→rooms→beds
 // model. No storage access; store.ts calls these. Mirrors trust.ts / matching.ts.
 
@@ -72,7 +72,7 @@ export function summarizeListing(p: Summarizable): {
     };
   }
 
-  // Legacy property without structured fields — keep existing values.
+  // Legacy property without structured fields  -  keep existing values.
   return { type: p.type, priceFrom: p.price ?? 0, beds: p.beds };
 }
 

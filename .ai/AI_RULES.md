@@ -1,4 +1,4 @@
-# Beitoon — AI Development Rules
+# Beitoon  -  AI Development Rules
 
 > **Every AI assistant MUST read this file before writing any code.**
 
@@ -20,7 +20,7 @@ MANDATORY PRE-FLIGHT CHECKLIST:
 
 ---
 
-## 2. Tech Stack — Non-Negotiable
+## 2. Tech Stack  -  Non-Negotiable
 
 | Layer | Technology | DO NOT use alternatives |
 |-------|-----------|------------------------|
@@ -58,8 +58,8 @@ MANDATORY PRE-FLIGHT CHECKLIST:
 // ❌ DO NOT
 - Never use `any`. Use `unknown` if type is truly unknown.
 - Never use `@ts-ignore` or `@ts-expect-error` without a TODO comment
-- Never duplicate types between frontend and backend — use shared package
-- Never use relative imports across package boundaries — use `@beitoon/types`
+- Never duplicate types between frontend and backend  -  use shared package
+- Never use relative imports across package boundaries  -  use `@beitoon/types`
 ```
 
 ### 3.2 Naming Conventions
@@ -156,11 +156,11 @@ Every feature module MUST have:
 └── {feature}.service.spec.ts    → Unit tests
 
 Rules:
-- Controllers NEVER contain business logic — delegate to services
-- Services NEVER import other controllers — only other services
-- Guards handle authorization — services handle business rules
+- Controllers NEVER contain business logic  -  delegate to services
+- Services NEVER import other controllers  -  only other services
+- Guards handle authorization  -  services handle business rules
 - Use @CurrentUser() decorator to get authenticated user, NEVER parse JWT in services
-- Authorize via `@Public()`/`AdminGuard` + explicit owner/participant checks in services (see §4.5) — there is no tier guard
+- Authorize via `@Public()`/`AdminGuard` + explicit owner/participant checks in services (see §4.5)  -  there is no tier guard
 - Pagination: always use cursor-based for feeds, offset for admin lists
 ```
 
@@ -182,10 +182,10 @@ Every page/feature MUST follow:
 
 Rules:
 - Server Components by default. Add "use client" ONLY when needed (state, effects, browser APIs)
-- All data fetching via TanStack Query hooks — NEVER fetch in useEffect
+- All data fetching via TanStack Query hooks  -  NEVER fetch in useEffect
 - Optimistic updates for likes, follows, saves (update UI immediately, rollback on error)
-- All text must use next-intl t() function — NEVER hardcode Arabic or English strings
-- All images use next/image with width/height — NEVER use <img>
+- All text must use next-intl t() function  -  NEVER hardcode Arabic or English strings
+- All images use next/image with width/height  -  NEVER use <img>
 - RTL support: use logical properties (ms-, me-, ps-, pe-) NOT left/right
 ```
 
@@ -193,7 +193,7 @@ Rules:
 
 ```
 Rules:
-- NEVER import Capacitor plugins at module level — use dynamic imports
+- NEVER import Capacitor plugins at module level  -  use dynamic imports
 - ALWAYS provide web fallbacks for every native feature
 - Use the platform detection helper from lib/capacitor.ts
 - Test on web, iOS Simulator, and Android Emulator
@@ -226,8 +226,8 @@ Files:
 - Denormalized counters (like_count, follower_count, etc.) updated via triggers or service logic
 - Use database transactions for multi-table writes
 - Use Prisma's $transaction for atomic operations
-- NEVER delete data physically — use soft delete (status = 'deleted') or move to archive
-- All foreign keys have ON DELETE CASCADE or ON DELETE SET NULL — explicitly defined
+- NEVER delete data physically  -  use soft delete (status = 'deleted') or move to archive
+- All foreign keys have ON DELETE CASCADE or ON DELETE SET NULL  -  explicitly defined
 - Indexes: every FK must be indexed. Every query filter must have an index.
 ```
 
@@ -298,10 +298,10 @@ Step 7: Update documentation
 BEFORE modifying any existing file:
 1. Read the ENTIRE file first (don't just read the function you're changing)
 2. Understand what imports depend on this file (check usages)
-3. Check if the file has tests — update them too
-4. Make the minimum change needed — don't refactor unrelated code
+3. Check if the file has tests  -  update them too
+4. Make the minimum change needed  -  don't refactor unrelated code
 5. Preserve all existing error handling, logging, and validation
-6. If you're changing a DTO/type — check both frontend and backend usage
+6. If you're changing a DTO/type  -  check both frontend and backend usage
 
 AFTER modifying:
 1. Run type check: pnpm type-check
@@ -389,10 +389,10 @@ beitco/
 
 ```
 - ALL user-facing text MUST go through next-intl (frontend) or i18n service (backend)
-- Arabic is the PRIMARY language — design Arabic first, then English
+- Arabic is the PRIMARY language  -  design Arabic first, then English
 - Use RTL-aware CSS: margin-inline-start, padding-inline-end, etc.
 - Dates: use Hijri calendar option alongside Gregorian
-- Numbers: support both Arabic-Indic (١٢٣) and Western (123) — user preference
+- Numbers: support both Arabic-Indic (١٢٣) and Western (123)  -  user preference
 - Currency: always EGP, formatted as "1,500,000 ج.م" or "1,500,000 EGP"
 - Phone: always +20 prefix, 10-digit Egyptian mobile
 - Addresses: in Arabic by default, optional English transliteration

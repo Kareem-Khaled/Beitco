@@ -103,7 +103,7 @@ export class AdminListingsService {
         userId: p.ownerId,
         type: 'verification',
         title: 'وقفنا إعلانك',
-        body: `إعلان «${p.title}» اتوقف: ${reason} — عدّله وكلّمنا عشان يرجع.`,
+        body: `إعلان «${p.title}» اتوقف: ${reason}  -  عدّله وكلّمنا عشان يرجع.`,
       },
     });
     await this.audit.log(admin, 'listing.takedown', 'listing', id, {

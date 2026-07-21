@@ -38,7 +38,7 @@ function arMonthYear(d: Date): string {
   return `${AR_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-// Day/month/year in Egyptian Arabic with Latin numerals — matches the mock
+// Day/month/year in Egyptian Arabic with Latin numerals  -  matches the mock
 // store's Q&A date format (toLocaleDateString("ar-EG-u-nu-latn")).
 function arDate(d: Date): string {
   return d.toLocaleDateString('ar-EG-u-nu-latn');
@@ -209,14 +209,14 @@ const DEFAULT_QUALITY: QualityScores = {
   cleanliness: 7.5,
 };
 
-/** Full Property shape for the detail page (public — owner-only occupant data omitted). */
+/** Full Property shape for the detail page (public  -  owner-only occupant data omitted). */
 export function serializeProperty(
   p: PropertyRow,
   opts: { includeOccupants?: boolean } = {},
 ): Record<string, unknown> {
   const quality = (p.quality as QualityScores | null) ?? DEFAULT_QUALITY;
   const beds = bedSummary(p);
-  // Owner-only renter details — included only when the owner views their own
+  // Owner-only renter details  -  included only when the owner views their own
   // listings (the dashboard management grid). Never on the public detail page.
   const occ = (o?: OccupantRow | null) =>
     opts.includeOccupants && o
@@ -378,7 +378,7 @@ export function serializeSummary(p: PropertyRow): Record<string, unknown> {
     priceFrom: p.priceFrom ?? p.price,
     createdAt: p.createdAt.toISOString(),
     // Public room/bed layout so listing cards can group bed availability by room
-    // ("which beds share a room"). Intentionally omits occupant data — summaries
+    // ("which beds share a room"). Intentionally omits occupant data  -  summaries
     // are public. Empty for whole-apartment listings (the card uses spec there).
     rooms: (p.rooms ?? []).map((r) => ({
       id: r.id,

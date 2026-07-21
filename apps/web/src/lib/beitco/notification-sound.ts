@@ -5,7 +5,7 @@
 // mute preference lives in localStorage (notifications can be annoying, so users
 // must be able to silence them). Browsers block audio until the user has
 // interacted with the page; by the time a notification arrives the user is
-// active, so resume() succeeds — and if it's still blocked, it silently no-ops.
+// active, so resume() succeeds  -  and if it's still blocked, it silently no-ops.
 import { useEffect, useRef, useState } from "react";
 
 const SOUND_KEY = "beitco:notifSound"; // "on" | "off" (default on)
@@ -53,7 +53,7 @@ export function playNotificationChime(): void {
       osc.stop(start + 0.32);
     }
   } catch {
-    // Audio blocked/unavailable — non-fatal.
+    // Audio blocked/unavailable  -  non-fatal.
   }
 }
 

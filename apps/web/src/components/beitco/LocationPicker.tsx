@@ -193,7 +193,7 @@ function InteractivePicker({ lat, lng, area, onChange }: PickerProps) {
       },
       () => {
         setLocating(false);
-        setGeoError("مقدرناش نجيب موقعك — اسمح للمتصفح بالوصول للموقع أو حدده يدوي على الخريطة.");
+        setGeoError("مقدرناش نجيب موقعك  -  اسمح للمتصفح بالوصول للموقع أو حدده يدوي على الخريطة.");
       },
       { enableHighAccuracy: true, timeout: 10000 },
     );
@@ -244,7 +244,7 @@ function EmbedPicker({ lat, lng, area, onChange }: PickerProps) {
   const [locating, setLocating] = useState(false);
   const [geoError, setGeoError] = useState<string | null>(null);
   // "precise" once the owner uses GPS: then we center on the exact pin. Before
-  // that, the map follows the area TEXT — Google geocodes it inside the iframe,
+  // that, the map follows the area TEXT  -  Google geocodes it inside the iframe,
   // so changing المنطقة always moves the map, for ANY Egyptian area (not just a
   // hardcoded shortlist). Picking a new area returns to the area-text view.
   const [precise, setPrecise] = useState(lat != null && lng != null);
@@ -272,7 +272,7 @@ function EmbedPicker({ lat, lng, area, onChange }: PickerProps) {
       },
       () => {
         setLocating(false);
-        setGeoError("مقدرناش نجيب موقعك — اسمح للمتصفح بالوصول للموقع.");
+        setGeoError("مقدرناش نجيب موقعك  -  اسمح للمتصفح بالوصول للموقع.");
       },
       { enableHighAccuracy: true, timeout: 10000 },
     );
@@ -300,7 +300,7 @@ function EmbedPicker({ lat, lng, area, onChange }: PickerProps) {
           <MapPin className="h-3.5 w-3.5" />
           {precise
             ? "ده مكانك بالظبط."
-            : "الخريطة بتتبع المنطقة اللي اخترتها — دوس «موقعي الحالي» وانت في الشقة عشان تظبط المكان بالظبط."}
+            : "الخريطة بتتبع المنطقة اللي اخترتها  -  دوس «موقعي الحالي» وانت في الشقة عشان تظبط المكان بالظبط."}
         </p>
         <button
           type="button"

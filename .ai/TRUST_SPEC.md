@@ -1,11 +1,11 @@
-# Trust System — Technical Spec
+# Trust System  -  Technical Spec
 
 > **Status:** Prototype shipped (T-1 → T-5) · **Owner:** TBD · **Last updated:** June 17, 2026
 > **Parent:** `.ai/PRD.md` §7. This spec turns the trust wedge from cosmetic (hardcoded seed values) into a real, computed, transparent system.
 >
 > **Build state:** The engine lives in `apps/web/src/lib/beitco/trust.ts` (pure functions) and is wired into `store.ts` (`recompute*Trust`, recompute-all on seed). Listing, owner & **renter** scores, Bayesian smoothing, the verification cap, quality-from-reviews, **real response-rate from `ResponseEvent` tracking (T-3)**, and **two-sided renter reputation (T-4)** are all **done**, with the transparency popover (T-5) showing live computed components. Only the owner "raise your score" actionable checklist remains before backend port.
 >
-> **Principle:** Trust must be *earned, computed, and explainable*. We never let money buy a higher score, and we always show *why* a score is what it is — same transparency ethos as the matching engine.
+> **Principle:** Trust must be *earned, computed, and explainable*. We never let money buy a higher score, and we always show *why* a score is what it is  -  same transparency ethos as the matching engine.
 
 ---
 
@@ -19,11 +19,11 @@ Today every `trust`, `responseRate`, and `quality.*` value is a hardcoded number
 
 In scope:
 1. **Listing trust score** (per property, 0–10).
-2. **Owner/landlord trust score** (per owner, 0–10) — aggregates their listings + behavior.
-3. **Renter reputation** (per renter, 0–10) — new, closes the two-sided loop.
-4. **Quality scores** (per property) — derived from review category ratings, not hand-set.
-5. **Response rate** (per owner) — derived from real message/lead behavior.
-6. **Transparency UI** — "ليه الدرجة دي؟" breakdown.
+2. **Owner/landlord trust score** (per owner, 0–10)  -  aggregates their listings + behavior.
+3. **Renter reputation** (per renter, 0–10)  -  new, closes the two-sided loop.
+4. **Quality scores** (per property)  -  derived from review category ratings, not hand-set.
+5. **Response rate** (per owner)  -  derived from real message/lead behavior.
+6. **Transparency UI**  -  "ليه الدرجة دي؟" breakdown.
 
 Out of scope (later): ML ranking, fraud-detection models, cross-listing collusion detection.
 
@@ -106,14 +106,14 @@ listingTrust =
   + w_recency  * recencyScore          // recent positive activity
 ```
 
-**reviewQuality (Bayesian smoothing — avoids 1-review listings looking perfect):**
+**reviewQuality (Bayesian smoothing  -  avoids 1-review listings looking perfect):**
 ```
 reviewQuality = (C * m + Σ ratings) / (C + n)
   where n = review count,
         m = global mean rating (e.g. 7.5),
         C = confidence constant (e.g. 5 "virtual" average reviews)
 ```
-This pulls low-volume listings toward the mean until they earn enough reviews — directly fixes the "1 fake 10-star review" exploit.
+This pulls low-volume listings toward the mean until they earn enough reviews  -  directly fixes the "1 fake 10-star review" exploit.
 
 **tenureWeight:** normalize avg months-lived across reviews to 0–1 (e.g. cap at 24 months).
 
@@ -156,7 +156,7 @@ Bayesian-smoothed average of `RenterReview.rating`, same smoothing as listings. 
 
 ## 7. Transparency UI
 
-- ✅ **Built (display-only):** the **"ليه الدرجة دي؟"** popover (`TrustBadgeExplained`) shows the component breakdown (verification, reviews count, response rate, residents) — live on the property trust section + `/u/$id` profile header. ⚠️ It currently surfaces the **hardcoded** values; once §4 lands it shows computed components.
+- ✅ **Built (display-only):** the **"ليه الدرجة دي؟"** popover (`TrustBadgeExplained`) shows the component breakdown (verification, reviews count, response rate, residents)  -  live on the property trust section + `/u/$id` profile header. ⚠️ It currently surfaces the **hardcoded** values; once §4 lands it shows computed components.
 - TODO: Property page link "إزاي بنحسب الثقة" → `/trust` wired to real components.
 - TODO: Owner dashboard "إزاي تعلّي درجتك" actionable checklist driven by the *weakest* component.
 
@@ -164,7 +164,7 @@ Bayesian-smoothed average of `RenterReview.rating`, same smoothing as listings. 
 
 ## 8. Build Plan
 
-**Prototype (localStorage, do first — proves the wedge):**
+**Prototype (localStorage, do first  -  proves the wedge):**
 1. Add `TRUST_WEIGHTS` config + `computeListingTrust`, `computeOwnerTrust`, `computeRenterReputation` in `store.ts`.
 2. Derive `quality` from reviews; Bayesian-smooth ratings.
 3. Recompute on review/Q&A/response actions; persist breakdown in the property/user records.

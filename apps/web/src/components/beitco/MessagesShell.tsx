@@ -7,8 +7,8 @@ import { SiteHeader } from "@/components/beitco/SiteHeader";
 
 // Messenger-style two-pane shell for the messages section: a conversations list
 // (contacts) on the start side + the active conversation on the end side. On
-// mobile only one pane shows at a time — the list at /messages, the conversation
-// at /messages/$threadId — which keeps the phone-first UX clean.
+// mobile only one pane shows at a time  -  the list at /messages, the conversation
+// at /messages/$threadId  -  which keeps the phone-first UX clean.
 export function MessagesShell({
   activeId,
   children,
@@ -107,7 +107,7 @@ function ConversationList({
                     {new Date(t.lastMessageAt).toLocaleDateString("ar-EG-u-nu-latn")}
                   </span>
                 </div>
-                <p className="truncate text-xs text-muted-foreground">{p?.title ?? "—"}</p>
+                <p className="truncate text-xs text-muted-foreground">{p?.title ?? " - "}</p>
                 {last ? (
                   <p
                     className={`mt-0.5 line-clamp-1 text-sm ${

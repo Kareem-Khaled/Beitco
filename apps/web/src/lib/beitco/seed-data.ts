@@ -1,4 +1,4 @@
-// Seed data for the Beitoon mock store — demo properties and users.
+// Seed data for the Beitoon mock store  -  demo properties and users.
 // Pure data (no behavior); imported by store.ts. Swap for a real DB seed later.
 
 import heroImg from "@/assets/hero-home.jpg";

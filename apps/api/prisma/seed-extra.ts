@@ -1,5 +1,5 @@
 /**
- * Dev-only bulk listing generator — adds a batch of varied published listings so
+ * Dev-only bulk listing generator  -  adds a batch of varied published listings so
  * pagination / infinite-scroll is visible with realistic volume. Idempotent:
  * every listing it makes has a `bulk-` id prefix, and it deletes those first, so
  * you can re-run it freely. It does NOT touch the canonical seed data.
@@ -130,7 +130,7 @@ async function main() {
       await prisma.property.create({
         data: {
           ...base,
-          title: `${pick(APT_TITLES)} — للبيع`,
+          title: `${pick(APT_TITLES)}  -  للبيع`,
           description: 'شقة تمليك جاهزة للمعاينة، بموقع متميز وقريبة من كل الخدمات.',
           type: 'apartment',
           status: 'published',
@@ -165,7 +165,7 @@ async function main() {
         },
       });
     } else {
-      // bed or room — build rooms (+ beds for by_bed)
+      // bed or room  -  build rooms (+ beds for by_bed)
       const isBed = kind === 'bed';
       const roomCount = between(2, 4);
       const bedPrice = between(1800, 5000);

@@ -72,7 +72,7 @@ function PreferencesPage() {
   const intent = draft.intent ?? "rent";
   const lookingFor = draft.lookingFor ?? [];
   // Housemate-only fields (gender of flatmates, smoking) only matter when the
-  // renter wants shared housing — a bed or a private room, not a whole flat or a purchase.
+  // renter wants shared housing  -  a bed or a private room, not a whole flat or a purchase.
   const wantsShared = intent === "rent" && lookingFor.some((t) => t === "سرير" || t === "أوضة");
   const setIntent = (next: "rent" | "buy") =>
     next === "buy" ? set({ intent: "buy", lookingFor: ["شقة"] }) : set({ intent: "rent" });
@@ -133,7 +133,7 @@ function PreferencesPage() {
         </div>
       </header>
 
-      {/* Rent vs buy intent — drives the rest of the form + matching */}
+      {/* Rent vs buy intent  -  drives the rest of the form + matching */}
       <Section
         icon={KeyRound}
         title="بتدوّر على إيجار ولا تمليك؟"
@@ -181,7 +181,7 @@ function PreferencesPage() {
               onValueChange={(v) => set({ budgetMin: v })}
               className="w-28 text-center"
             />
-            <span className="text-sm text-muted-foreground">—</span>
+            <span className="text-sm text-muted-foreground"> - </span>
             <NumberInput
               placeholder="لـ"
               value={draft.budgetMax}
@@ -195,7 +195,7 @@ function PreferencesPage() {
         </div>
       </Section>
 
-      {/* Type — renters only (buying is whole apartments) */}
+      {/* Type  -  renters only (buying is whole apartments) */}
       {intent === "rent" && (
         <Section icon={Home} title="بتدوّر على إيه؟" hint="تقدر تختار أكتر من نوع.">
           <div className="flex flex-wrap gap-2">
@@ -261,9 +261,9 @@ function PreferencesPage() {
         </div>
       </Section>
 
-      {/* Move-in date — renters only */}
+      {/* Move-in date  -  renters only */}
       {intent === "rent" && (
-        <Section icon={CalendarClock} title="هتنقل إمتى؟" hint="تقريبًا — عشان نرتّب الأولوية.">
+        <Section icon={CalendarClock} title="هتنقل إمتى؟" hint="تقريبًا  -  عشان نرتّب الأولوية.">
           <div className="max-w-xs">
             <DatePicker
               value={draft.moveInBy}
@@ -275,7 +275,7 @@ function PreferencesPage() {
         </Section>
       )}
 
-      {/* Must-have amenities — renters only */}
+      {/* Must-have amenities  -  renters only */}
       {intent === "rent" && (
         <Section icon={ListChecks} title="لازم يكون فيه إيه؟" hint="المميزات اللي مش هتتنازل عنها.">
           <div className="space-y-4">
@@ -419,7 +419,7 @@ function PreferencesPage() {
         </div>
       </Section>
 
-      {/* Furnishing — only relevant for renters */}
+      {/* Furnishing  -  only relevant for renters */}
       {intent === "rent" && (
         <Section icon={Sofa} title="الفرش" hint="الشقة تكون مفروشة قد إيه.">
           <div className="flex flex-wrap gap-2">
@@ -436,7 +436,7 @@ function PreferencesPage() {
         </Section>
       )}
 
-      {/* About you — renter context (reassures owners); not shown for buyers */}
+      {/* About you  -  renter context (reassures owners); not shown for buyers */}
       {intent === "rent" && (
         <Section icon={Users2} title="عنك إنت" hint="بيساعد أصحاب البيوت يطمنّوا ليك.">
           <div className="space-y-4">

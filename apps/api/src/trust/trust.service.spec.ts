@@ -1,7 +1,7 @@
 import { PrismaService } from '../prisma/prisma.service';
 import { TrustService } from './trust.service';
 
-// TEST-1: TrustService — the engine wiring (the pure math is covered by
+// TEST-1: TrustService  -  the engine wiring (the pure math is covered by
 // trust.engine.spec). Mocked Prisma verifies that recompute reads the right
 // rows (incl. the ADMIN-4 removedAt filter), persists a score, and cascades
 // listing→owner; and the renter-reputation null/compute branches.

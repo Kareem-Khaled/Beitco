@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Beitoon design system — trust, calm, housing intelligence.
+ * Beitoon design system  -  trust, calm, housing intelligence.
  * Palette: deep teal-green (primary trust), warm sand (background),
  * soft cream surfaces, amber accent for ratings/highlights.
  * All colors in oklch. Never use raw colors in components.
@@ -113,7 +113,7 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.02 180);
 
-  /* Primary: deep teal-green — trustworthy, modern, not corporate blue */
+  /* Primary: deep teal-green  -  trustworthy, modern, not corporate blue */
   --primary: oklch(0.38 0.07 180);
   --primary-foreground: oklch(0.985 0.008 85);
 
@@ -231,7 +231,7 @@
 }
 
 /*
- * Arabic script shouldn't be negatively tracked — it cramps the connected
+ * Arabic script shouldn't be negatively tracked  -  it cramps the connected
  * letterforms. Neutralize Tailwind's tight-tracking utilities app-wide.
  * Unlayered so it reliably wins over the utilities layer.
  */

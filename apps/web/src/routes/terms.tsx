@@ -6,10 +6,10 @@ import { SiteFooter } from "@/components/beitco/SiteFooter";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "الشروط والأحكام — بيتون" },
+      { title: "الشروط والأحكام  -  بيتون" },
       {
         name: "description",
-        content: "شروط استخدام بيتون — بوضوح وبساطة.",
+        content: "شروط استخدام بيتون  -  بوضوح وبساطة.",
       },
     ],
   }),
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/terms")({
 const sections: { title: string; body: string }[] = [
   {
     title: "بيتون منصة، مش وسيط",
-    body: "بيتون بتوصّل بين أصحاب الشقق والساكنين. إحنا مش طرف في أي عقد إيجار أو بيع — الاتفاق النهائي بينك وبين الطرف التاني.",
+    body: "بيتون بتوصّل بين أصحاب الشقق والساكنين. إحنا مش طرف في أي عقد إيجار أو بيع  -  الاتفاق النهائي بينك وبين الطرف التاني.",
   },
   {
     title: "إعلانات حقيقية بس",

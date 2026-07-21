@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/trust")({
   head: () => ({
     meta: [
-      { title: "إزاي بنبني الثقة — بيتون" },
+      { title: "إزاي بنبني الثقة  -  بيتون" },
       {
         name: "description",
         content:
@@ -32,7 +32,7 @@ const pillars = [
   {
     icon: Gauge,
     title: "درجات الجودة",
-    body: "كل مكان بياخد درجات على النت، الأمان، الدوشة، الصيانة، والنضافة — من تقييمات الناس اللي عاشت هناك فعلاً.",
+    body: "كل مكان بياخد درجات على النت، الأمان، الدوشة، الصيانة، والنضافة  -  من تقييمات الناس اللي عاشت هناك فعلاً.",
   },
   {
     icon: Activity,

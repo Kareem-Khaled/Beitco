@@ -2,7 +2,7 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EngagementService } from './engagement.service';
 
-// TEST-1: EngagementService — saves, the lead -> tenancy flow, and Q&A. Mocked
+// TEST-1: EngagementService  -  saves, the lead -> tenancy flow, and Q&A. Mocked
 // Prisma locks the ownership guards (403s), the save toggle, and the key rule
 // that completing a lead creates a tenancy idempotently (the gate for reviews).
 

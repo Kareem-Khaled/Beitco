@@ -1,4 +1,4 @@
-# Beitoon — Entry Prompt (Single Source of Truth)
+# Beitoon  -  Entry Prompt (Single Source of Truth)
 
 > **Read this first.** Every other doc serves this one. If anything contradicts this file, this file wins.
 
@@ -8,9 +8,9 @@
 
 **Beitoon is a trust-first housing marketplace for Egypt that rents at the bed level, not just the apartment level.**
 
-Think Airbnb meets Glassdoor for Egyptian housing — but the unit of inventory is a **bed in a shared apartment**, not the apartment itself. Owners list how many beds are available *right now*. Renters filter by what they actually need (budget, area, vibe) and book a bed, a private room, or a whole apartment.
+Think Airbnb meets Glassdoor for Egyptian housing  -  but the unit of inventory is a **bed in a shared apartment**, not the apartment itself. Owners list how many beds are available *right now*. Renters filter by what they actually need (budget, area, vibe) and book a bed, a private room, or a whole apartment.
 
-The product wedge isn't price or supply — it's **trust**. Every listing carries verification status, a trust score, real reviews from past residents (with months-lived), quality scores (internet, safety, noise, maintenance, cleanliness), landlord response rate, and a public Q&A.
+The product wedge isn't price or supply  -  it's **trust**. Every listing carries verification status, a trust score, real reviews from past residents (with months-lived), quality scores (internet, safety, noise, maintenance, cleanliness), landlord response rate, and a public Q&A.
 
 ---
 
@@ -46,9 +46,9 @@ Trust score updates → loop strengthens
 
 ## Why This Wins in Egypt
 
-1. **Bed-level supply matches real demand.** Students, young professionals, and remote workers in Cairo/Alex/Zayed already share apartments. Existing portals (OLX, Property Finder) only sell whole units — the shared market is invisible and runs on Facebook groups and word-of-mouth.
+1. **Bed-level supply matches real demand.** Students, young professionals, and remote workers in Cairo/Alex/Zayed already share apartments. Existing portals (OLX, Property Finder) only sell whole units  -  the shared market is invisible and runs on Facebook groups and word-of-mouth.
 2. **Trust is the #1 unsolved pain.** Egyptian renters get burned by fake listings, ghost landlords, hidden fees, and unsafe buildings. We make trust visible and earned.
-3. **Arabic-first, Egyptian dialect.** Not stiff MSA — copy reads like a friend giving advice. ("لاقي سريرك في مصر", "حط شقتك", "متأكدين منه").
+3. **Arabic-first, Egyptian dialect.** Not stiff MSA  -  copy reads like a friend giving advice. ("لاقي سريرك في مصر", "حط شقتك", "متأكدين منه").
 
 ---
 
@@ -87,13 +87,13 @@ Run backend: `pnpm api` (port 3001)
 - **DB:** UUID PKs, `snake_case` columns (Prisma `@map`), `camelCase` in TS, soft-delete via `deleted_at`.
 - **Pagination:** cursor-based only. No offset.
 - **i18n:** Arabic-first, RTL default, Egyptian colloquial dialect (not MSA).
-- **Layout:** CSS logical properties (`ms-`, `me-`, `ps-`, `pe-`, `start-`, `end-`) — never `ml-`/`mr-`/`left-`/`right-`.
+- **Layout:** CSS logical properties (`ms-`, `me-`, `ps-`, `pe-`, `start-`, `end-`)  -  never `ml-`/`mr-`/`left-`/`right-`.
 - **Frontend:** Server Components default; `'use client'` only for interactivity.
 - **NestJS:** one module per feature, services inject `PrismaService`.
 
 ---
 
-## Permission Model (actual — corrected June 23, 2026)
+## Permission Model (actual  -  corrected June 23, 2026)
 
 > The 5-tier `@RequireTier` system was inherited from the pre-pivot social app and **never built.** The real model is identity + verification + ownership:
 
@@ -111,18 +111,18 @@ See `.ai/CURRENT_STATE.md` for the authoritative description.
 
 ## Reference Files
 
-- `.ai/CURRENT_STATE.md` — what's actually built right now (**start here**)
-- `.ai/NEXT_STEPS.md` — the prioritized backlog + audit scorecard
-- `.ai/PROD_READINESS.md` — go-live checklist + deploy runbook + go/no-go
-- `.ai/SCALE_READINESS.md` — scale & correctness review (thousands-of-users readiness)
-- `.ai/ADMIN_PLAN.md` — operator-portal feature spec (ADMIN-1…13)
-- `.ai/PROJECT_OVERVIEW.md` — product vision, personas, MVP scope
-- `.ai/PRD.md` — product requirements + feature inventory + roadmap
-- `.ai/TRUST_SPEC.md` — the computed trust system (T-1→T-5)
-- `.ai/BUSINESS_MODEL.md` — monetization & unit economics
-- `.ai/BACKEND_TASKS.md` — backend build log · `.ai/TASKS.md` — frontend board
-- `.ai/ROADMAP.md` — phased plan
-- `.ai/AI_RULES.md` — detailed coding standards
-- `.ai/ARCHITECTURE.md` — current system design (post-pivot, full-stack)
-- `.ai/DB_SCHEMA.md` — schema map (source of truth: `apps/api/prisma/schema.prisma`)
-- `.ai/API_SPEC.md` — endpoint inventory (Swagger: `/api/docs`)
+- `.ai/CURRENT_STATE.md`  -  what's actually built right now (**start here**)
+- `.ai/NEXT_STEPS.md`  -  the prioritized backlog + audit scorecard
+- `.ai/PROD_READINESS.md`  -  go-live checklist + deploy runbook + go/no-go
+- `.ai/SCALE_READINESS.md`  -  scale & correctness review (thousands-of-users readiness)
+- `.ai/ADMIN_PLAN.md`  -  operator-portal feature spec (ADMIN-1…13)
+- `.ai/PROJECT_OVERVIEW.md`  -  product vision, personas, MVP scope
+- `.ai/PRD.md`  -  product requirements + feature inventory + roadmap
+- `.ai/TRUST_SPEC.md`  -  the computed trust system (T-1→T-5)
+- `.ai/BUSINESS_MODEL.md`  -  monetization & unit economics
+- `.ai/BACKEND_TASKS.md`  -  backend build log · `.ai/TASKS.md`  -  frontend board
+- `.ai/ROADMAP.md`  -  phased plan
+- `.ai/AI_RULES.md`  -  detailed coding standards
+- `.ai/ARCHITECTURE.md`  -  current system design (post-pivot, full-stack)
+- `.ai/DB_SCHEMA.md`  -  schema map (source of truth: `apps/api/prisma/schema.prisma`)
+- `.ai/API_SPEC.md`  -  endpoint inventory (Swagger: `/api/docs`)

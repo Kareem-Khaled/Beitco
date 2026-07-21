@@ -1,6 +1,6 @@
 # Production-style compose (OPS-2): builds + runs the apps alongside the data
 # services. For local prod-parity: `docker compose -f docker-compose.prod.yml up --build`.
-# Secrets come from a `.env` next to this file (NEVER commit it) — see .env.example.
+# Secrets come from a `.env` next to this file (NEVER commit it)  -  see .env.example.
 # In real prod these run on managed Postgres/Redis + a deployed API/web; this file
 # is the single-host reference wiring.
 

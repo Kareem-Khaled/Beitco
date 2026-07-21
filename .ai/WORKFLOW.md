@@ -1,4 +1,4 @@
-# Beitoon — AI Workflow Guide
+# Beitoon  -  AI Workflow Guide
 
 > **How to go from idea → task → implementation → documentation update.**
 
@@ -9,10 +9,10 @@
 Every AI session should start with:
 
 ```
-1. Read `.ai/ENTRY_PROMPT.md` — get full project context (30 seconds)
-2. Read `.ai/CURRENT_STATE.md` — know what's done and what's not
-3. Read `.ai/TASKS.md` — find the next task to work on
-4. Check `.ai/SESSION_LOG.md` — see what the last session did
+1. Read `.ai/ENTRY_PROMPT.md`  -  get full project context (30 seconds)
+2. Read `.ai/CURRENT_STATE.md`  -  know what's done and what's not
+3. Read `.ai/TASKS.md`  -  find the next task to work on
+4. Check `.ai/SESSION_LOG.md`  -  see what the last session did
 5. Ask: "What would you like to work on?" (or continue from task board)
 ```
 
@@ -209,16 +209,16 @@ Update these files:
 ### Session Log Format
 
 ```markdown
-## Session YYYY-MM-DD — [Summary]
+## Session YYYY-MM-DD  -  [Summary]
 
 **Duration:** ~X hours
 **Tasks Worked On:** T-XXX, T-XXX
 **AI Assistant:** [Cursor/Copilot/Claude/etc.]
 
 ### What Was Done
-- Created `path/to/file.ts` — description
-- Modified `path/to/file.ts` — what changed
-- Fixed bug in X — details
+- Created `path/to/file.ts`  -  description
+- Modified `path/to/file.ts`  -  what changed
+- Fixed bug in X  -  details
 
 ### Decisions Made
 - Chose X over Y because Z

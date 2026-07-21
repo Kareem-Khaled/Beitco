@@ -17,7 +17,7 @@ import {
 
 const KEY_CURRENT_USER = "beitco:currentUser";
 const KEY_PENDING_PHONE = "beitco:pendingPhone";
-const MOCK_OTP = "1234"; // dev-only — any input works, but this is the "real" one
+const MOCK_OTP = "1234"; // dev-only  -  any input works, but this is the "real" one
 
 // The frontend captures gender in Arabic; the API uses male/female.
 const genderToApi = (g: Gender): "male" | "female" => (g === "ذكر" ? "male" : "female");

@@ -1,4 +1,4 @@
-# DESIGN.md — Beitco Design System
+# DESIGN.md  -  Beitco Design System
 
 > **Egyptian real estate social network.** Arabic-first, RTL-default, mobile-first.
 > Drop this file in the project root so any AI agent generates visually consistent UI.
@@ -7,19 +7,19 @@
 
 ## 1. Visual Theme & Atmosphere
 
-Beitco is a warm, trust-forward real estate social network designed for the Egyptian market. The design blends **marketplace clarity** (inspired by Airbnb's property listings) with **social feed warmth** (inspired by Pinterest's cozy browsing). Every screen feels like scrolling through a trusted community — not a cold classifieds site.
+Beitco is a warm, trust-forward real estate social network designed for the Egyptian market. The design blends **marketplace clarity** (inspired by Airbnb's property listings) with **social feed warmth** (inspired by Pinterest's cozy browsing). Every screen feels like scrolling through a trusted community  -  not a cold classifieds site.
 
-The foundation is a clean white canvas (`#FFFFFF`) with **Trust Blue** (`#1A56DB`) as the primary brand color — chosen to convey reliability in a market where real estate scams erode trust. **Egyptian Gold** (`#F59E0B`) serves as the premium/accent — a cultural nod to Egyptian heritage and warmth. **Success Green** (`#059669`) represents growth and money (Egyptian pound).
+The foundation is a clean white canvas (`#FFFFFF`) with **Trust Blue** (`#1A56DB`) as the primary brand color  -  chosen to convey reliability in a market where real estate scams erode trust. **Egyptian Gold** (`#F59E0B`) serves as the premium/accent  -  a cultural nod to Egyptian heritage and warmth. **Success Green** (`#059669`) represents growth and money (Egyptian pound).
 
-Arabic is the primary language. All layouts are **RTL by default** using CSS logical properties (`padding-inline-start`, not `padding-left`). The typography uses **IBM Plex Arabic** for Arabic text and **Inter** for English — both are clean, professional, and excellent at small sizes. Numbers use **IBM Plex Mono** for prices and statistics, giving financial data a trustworthy, precise feel.
+Arabic is the primary language. All layouts are **RTL by default** using CSS logical properties (`padding-inline-start`, not `padding-left`). The typography uses **IBM Plex Arabic** for Arabic text and **Inter** for English  -  both are clean, professional, and excellent at small sizes. Numbers use **IBM Plex Mono** for prices and statistics, giving financial data a trustworthy, precise feel.
 
-The 5-tier permission system has a visual language: verification badges (✅), tier-specific CTA labels ("نشر" for verified, "إرسال للموافقة" for members), and subtle color coding. The UI adapts to the user's tier — not just hiding features, but contextually guiding users toward verification.
+The 5-tier permission system has a visual language: verification badges (✅), tier-specific CTA labels ("نشر" for verified, "إرسال للموافقة" for members), and subtle color coding. The UI adapts to the user's tier  -  not just hiding features, but contextually guiding users toward verification.
 
 **Key Characteristics:**
-- Arabic-first, RTL-default — CSS logical properties everywhere
+- Arabic-first, RTL-default  -  CSS logical properties everywhere
 - Warm white canvas with Trust Blue (`#1A56DB`) as primary brand accent
 - Egyptian Gold (`#F59E0B`) for premium tiers, featured content, and cultural warmth
-- IBM Plex Arabic + Inter — professional, readable at all sizes
+- IBM Plex Arabic + Inter  -  professional, readable at all sizes
 - Photography-first listing cards (Airbnb-inspired marketplace pattern)
 - Social feed with mixed content: text posts, images, videos, listings (Pinterest-inspired density)
 - Trust indicators everywhere: verification badges, tier labels, approval status
@@ -33,7 +33,7 @@ The 5-tier permission system has a visual language: verification badges (✅), t
 ## 2. Color Palette & Roles
 
 ### Primary Brand
-- **Trust Blue** (`#1A56DB`): Primary CTA, brand accent, links, active navigation — conveys reliability
+- **Trust Blue** (`#1A56DB`): Primary CTA, brand accent, links, active navigation  -  conveys reliability
 - **Trust Blue Dark** (`#1E40AF`): Hover/pressed state for primary buttons
 - **Trust Blue Light** (`#DBEAFE`): Light tint for backgrounds, selected states, chips
 
@@ -52,7 +52,7 @@ The 5-tier permission system has a visual language: verification badges (✅), t
 - **Info Blue** (`#3B82F6`): Informational banners, tooltips
 
 ### Text
-- **Primary Text** (`#0F172A`): Headlines, body text — near-black, warm
+- **Primary Text** (`#0F172A`): Headlines, body text  -  near-black, warm
 - **Secondary Text** (`#64748B`): Descriptions, timestamps, metadata
 - **Tertiary Text** (`#94A3B8`): Placeholders, disabled labels
 - **Inverse Text** (`#F8FAFC`): Text on dark/colored surfaces
@@ -73,11 +73,11 @@ The 5-tier permission system has a visual language: verification badges (✅), t
 - **Text Secondary Dark** (`#94A3B8`): Secondary text
 
 ### Tier Colors (Permission System)
-- **Tier 1 — Admin**: Trust Blue (`#1A56DB`) badge outline
-- **Tier 2 — Verified Contributor**: Success Green (`#059669`) ✅ badge
-- **Tier 3 — Trusted Member**: Egyptian Gold (`#F59E0B`) badge
-- **Tier 4 — New User**: Secondary Text (`#64748B`) — no badge, subtle prompt to verify
-- **Tier 5 — Restricted**: Error Red (`#DC2626`) indicator (admin view only)
+- **Tier 1  -  Admin**: Trust Blue (`#1A56DB`) badge outline
+- **Tier 2  -  Verified Contributor**: Success Green (`#059669`) ✅ badge
+- **Tier 3  -  Trusted Member**: Egyptian Gold (`#F59E0B`) badge
+- **Tier 4  -  New User**: Secondary Text (`#64748B`)  -  no badge, subtle prompt to verify
+- **Tier 5  -  Restricted**: Error Red (`#DC2626`) indicator (admin view only)
 
 ---
 
@@ -106,11 +106,11 @@ The 5-tier permission system has a visual language: verification badges (✅), t
 | Stat | IBM Plex Mono | 14px (0.875rem) | 500 | 1.29 | normal | Follower counts, view counts |
 
 ### Principles
-- **Arabic-first sizing**: All sizes tuned for Arabic readability. Arabic text tends to be wider/taller than Latin — line heights are generous (1.33–1.50).
+- **Arabic-first sizing**: All sizes tuned for Arabic readability. Arabic text tends to be wider/taller than Latin  -  line heights are generous (1.33–1.50).
 - **Weight range 400–700**: No thin weights. Arabic fonts need substance for readability. 400 for body, 500 for emphasis, 600 for sub-heads, 700 for headlines.
-- **Monospace for money**: Property prices, statistics, and numerical data use IBM Plex Mono. This creates visual distinction and trust — numbers look precise and professional.
+- **Monospace for money**: Property prices, statistics, and numerical data use IBM Plex Mono. This creates visual distinction and trust  -  numbers look precise and professional.
 - **Negative tracking on headlines**: -0.3px to -0.5px on Display/H1 creates intimate, confident headings.
-- **Never truncate Arabic mid-word**: Arabic characters connect — truncation must happen at word boundaries. Use `overflow-wrap: break-word` and `word-break: normal`.
+- **Never truncate Arabic mid-word**: Arabic characters connect  -  truncation must happen at word boundaries. Use `overflow-wrap: break-word` and `word-break: normal`.
 
 ---
 
@@ -288,13 +288,13 @@ The 5-tier permission system has a visual language: verification badges (✅), t
 
 ### Spacing System (4px base)
 ```
-xs:   4px    — tight gaps (badge padding, icon spacing)
-sm:   8px    — compact spacing (between inline elements)
-md:   16px   — standard spacing (card padding, section gaps)
-lg:   24px   — comfortable spacing (between cards in feed)
-xl:   32px   — section separators
-2xl:  48px   — major section breaks
-3xl:  64px   — page-level padding top/bottom
+xs:   4px     -  tight gaps (badge padding, icon spacing)
+sm:   8px     -  compact spacing (between inline elements)
+md:   16px    -  standard spacing (card padding, section gaps)
+lg:   24px    -  comfortable spacing (between cards in feed)
+xl:   32px    -  section separators
+2xl:  48px    -  major section breaks
+3xl:  64px    -  page-level padding top/bottom
 ```
 
 ### Grid & Container
@@ -314,7 +314,7 @@ xl:   32px   — section separators
 - Responsive columns: 1 (mobile) → 2 (tablet) → 3 (desktop)
 - 16px gap between cards
 - Image carousel on each card
-- Masonry layout NOT used — uniform card heights for RTL grid alignment
+- Masonry layout NOT used  -  uniform card heights for RTL grid alignment
 
 ### RTL Layout Rules
 - **ALL positioning uses CSS logical properties**:
@@ -323,26 +323,26 @@ xl:   32px   — section separators
   - `inset-inline-start` NOT `left`
   - `border-start-start-radius` NOT `border-top-left-radius`
   - `float: inline-start` NOT `float: left`
-- **Flexbox**: `flex-direction: row` auto-reverses in RTL — no manual flipping needed
+- **Flexbox**: `flex-direction: row` auto-reverses in RTL  -  no manual flipping needed
 - **Icons**: Directional icons (arrows, chevrons, reply) must flip in RTL. Non-directional icons (heart, star, home) do NOT flip.
 - **HTML**: `<html lang="ar" dir="rtl">` as default. English sections use `dir="ltr"` attribute.
 - **Numbers**: Always LTR. Wrap in `<span dir="ltr">` or use `unicode-bidi: isolate`.
 - **Phone fields**: Always LTR input with `dir="ltr"`.
 
 ### Whitespace Philosophy
-- **Social-feed rhythm**: Post cards have generous 16px gaps — enough breathing room to distinguish posts, tight enough to feel like a flowing feed.
-- **Listing browse pace**: Listing grid is denser — 3 columns on desktop with 16px gaps. Users are comparison shopping.
+- **Social-feed rhythm**: Post cards have generous 16px gaps  -  enough breathing room to distinguish posts, tight enough to feel like a flowing feed.
+- **Listing browse pace**: Listing grid is denser  -  3 columns on desktop with 16px gaps. Users are comparison shopping.
 - **Chat density**: Messages are compact with 4px between consecutive messages from the same sender, 16px between different senders.
 - **Content-first**: The UI chrome (headers, tabs, nav) is minimal and neutral. Content (posts, listings, images) provides all the visual energy.
 
 ### Border Radius Scale
 ```
-sm:    6px    — buttons, inputs, small elements
-md:    12px   — post cards, listing cards, containers
-lg:    16px   — modals, bottom sheets, featured cards
-xl:    24px   — featured listing cards, hero elements
-pill:  9999px — search bar, avatars, pill badges
-circle: 50%   — avatar images, icon buttons, FAB
+sm:    6px     -  buttons, inputs, small elements
+md:    12px    -  post cards, listing cards, containers
+lg:    16px    -  modals, bottom sheets, featured cards
+xl:    24px    -  featured listing cards, hero elements
+pill:  9999px  -  search bar, avatars, pill badges
+circle: 50%    -  avatar images, icon buttons, FAB
 ```
 
 ---
@@ -357,7 +357,7 @@ circle: 50%   — avatar images, icon buttons, FAB
 | Level 3 (Overlay) | `0 8px 24px rgba(0,0,0,0.12), 0 16px 48px rgba(0,0,0,0.08)` | Modals, bottom sheets, dialogs |
 | Level 4 (Top) | `0 12px 32px rgba(0,0,0,0.16), 0 24px 64px rgba(0,0,0,0.1)` | Floating action button, toast notifications |
 
-**Shadow Philosophy**: Shadows are warm and graduated — two layers each (subtle ambient + primary lift). Never use pure black (`#000000`) shadows — always use `rgba(0,0,0,0.04–0.16)`. Shadows provide gentle elevation without feeling heavy. In dark mode, shadows are minimal — use border `#334155` for card separation instead.
+**Shadow Philosophy**: Shadows are warm and graduated  -  two layers each (subtle ambient + primary lift). Never use pure black (`#000000`) shadows  -  always use `rgba(0,0,0,0.04–0.16)`. Shadows provide gentle elevation without feeling heavy. In dark mode, shadows are minimal  -  use border `#334155` for card separation instead.
 
 ---
 
@@ -366,29 +366,29 @@ circle: 50%   — avatar images, icon buttons, FAB
 ### Do
 - Use CSS logical properties for ALL positioning (`inline-start`, `inline-end`, `block-start`, `block-end`)
 - Set `dir="rtl"` on `<html>` as the default
-- Use IBM Plex Arabic for all Arabic text — never fall back to system Arabic fonts in mocks
-- Use IBM Plex Mono for prices and statistics — monospace numbers look trustworthy
-- Apply Trust Blue (`#1A56DB`) for primary CTAs — it's the singular brand action color
+- Use IBM Plex Arabic for all Arabic text  -  never fall back to system Arabic fonts in mocks
+- Use IBM Plex Mono for prices and statistics  -  monospace numbers look trustworthy
+- Apply Trust Blue (`#1A56DB`) for primary CTAs  -  it's the singular brand action color
 - Show tier badges next to usernames everywhere (posts, comments, profiles, listings)
-- Use 4:3 aspect ratio for listing images — consistent card heights
+- Use 4:3 aspect ratio for listing images  -  consistent card heights
 - Use skeleton loading for all async content (never empty blank states)
 - Provide Arabic placeholder text in all designs: "ابحث..." not "Search..."
-- Use `gap` property for spacing in flex/grid — never margin hacks
+- Use `gap` property for spacing in flex/grid  -  never margin hacks
 - Respect safe area insets on mobile (bottom nav, notch)
 - Use `next/image` with `blur` placeholder for all images
 
 ### Don't
-- Don't use `left`, `right`, `margin-left`, `padding-right` — always logical properties
-- Don't use pure black (`#000000`) for text — always `#0F172A` (warm near-black)
-- Don't use thin font weights (300) for Arabic — minimum 400
-- Don't truncate Arabic text mid-character — word boundaries only
-- Don't hardcode text direction — always use `dir` attributes and logical CSS
+- Don't use `left`, `right`, `margin-left`, `padding-right`  -  always logical properties
+- Don't use pure black (`#000000`) for text  -  always `#0F172A` (warm near-black)
+- Don't use thin font weights (300) for Arabic  -  minimum 400
+- Don't truncate Arabic text mid-character  -  word boundaries only
+- Don't hardcode text direction  -  always use `dir` attributes and logical CSS
 - Don't mix Arabic and English fonts in the same line without proper `unicode-bidi`
-- Don't use masonry layout for listings — uniform heights work better for RTL grids
-- Don't place primary actions at the top of the screen on mobile — thumb zone is bottom
-- Don't use color alone to convey meaning — always pair with icons or text (accessibility)
-- Don't auto-play videos with sound — always muted until explicit user interaction
-- Don't show empty states without a CTA — "No posts yet? Follow some contributors!" not just "No posts"
+- Don't use masonry layout for listings  -  uniform heights work better for RTL grids
+- Don't place primary actions at the top of the screen on mobile  -  thumb zone is bottom
+- Don't use color alone to convey meaning  -  always pair with icons or text (accessibility)
+- Don't auto-play videos with sound  -  always muted until explicit user interaction
+- Don't show empty states without a CTA  -  "No posts yet? Follow some contributors!" not just "No posts"
 
 ---
 
@@ -420,7 +420,7 @@ circle: 50%   — avatar images, icon buttons, FAB
 
 ### Image Behavior
 - Listing photos: responsive `srcset`, WebP with JPEG fallback
-- Always maintain aspect ratio — never stretch
+- Always maintain aspect ratio  -  never stretch
 - Lazy loading with blur-up placeholder
 - Carousel: swipe on mobile, arrow buttons on desktop
 - Video: inline autoplay muted in feed, full player on tap
@@ -465,16 +465,16 @@ Prices:    font-family: 'IBM Plex Mono', monospace
 - **Admin Dashboard**: "Build admin stats grid: 4 cards in responsive grid. Each card: white bg, 12px radius, shadow level 1. Stat number in IBM Plex Mono 28px weight 700. Label in IBM Plex Arabic 14px #64748B. Small trend indicator (green up arrow or red down)."
 
 ### Iteration Guide
-1. **Start with Arabic** — all text should be Arabic first, English is the afterthought
-2. **RTL everything** — use `dir="rtl"`, CSS logical properties, flex auto-reverses
-3. **Trust Blue for actions** — primary buttons, links, active states. One brand color.
-4. **Gold for premium** — featured badges, upgrade CTAs, star ratings
-5. **Green for trust** — verified badges, success states, available listings
-6. **Monospace for money** — prices, stats, counts. It looks precise and trustworthy.
-7. **12px radius on cards** — warm and rounded, not sharp, not pill-shaped
-8. **Bottom nav on mobile** — thumb-zone first. No hamburger menus.
-9. **Skeleton loading everywhere** — never show blank screens while data loads
-10. **Permission-aware UI** — show/hide/modify CTAs based on user's tier level
+1. **Start with Arabic**  -  all text should be Arabic first, English is the afterthought
+2. **RTL everything**  -  use `dir="rtl"`, CSS logical properties, flex auto-reverses
+3. **Trust Blue for actions**  -  primary buttons, links, active states. One brand color.
+4. **Gold for premium**  -  featured badges, upgrade CTAs, star ratings
+5. **Green for trust**  -  verified badges, success states, available listings
+6. **Monospace for money**  -  prices, stats, counts. It looks precise and trustworthy.
+7. **12px radius on cards**  -  warm and rounded, not sharp, not pill-shaped
+8. **Bottom nav on mobile**  -  thumb-zone first. No hamburger menus.
+9. **Skeleton loading everywhere**  -  never show blank screens while data loads
+10. **Permission-aware UI**  -  show/hide/modify CTAs based on user's tier level
 
 ---
 
@@ -485,9 +485,9 @@ The UI adapts based on the user's permission tier:
 
 | Tier | Create Post Button | Post Flow | Badge |
 |------|-------------------|-----------|-------|
-| Tier 1 (Admin) | "نشر" (Publish) — blue | Auto-publish | 🛡 Blue shield |
-| Tier 2 (Verified) | "نشر" (Publish) — blue | Auto-publish | ✅ Green check |
-| Tier 3 (Member) | "إرسال للموافقة" (Submit) — gold outline | Pending review | 🔶 Gold dot |
+| Tier 1 (Admin) | "نشر" (Publish)  -  blue | Auto-publish | 🛡 Blue shield |
+| Tier 2 (Verified) | "نشر" (Publish)  -  blue | Auto-publish | ✅ Green check |
+| Tier 3 (Member) | "إرسال للموافقة" (Submit)  -  gold outline | Pending review | 🔶 Gold dot |
 | Tier 4 (New User) | Hidden / "تحقق للنشر" (Verify to post) | Cannot post | None |
 | Tier 5 (Restricted) | Hidden | Cannot interact | 🚫 (admin view) |
 

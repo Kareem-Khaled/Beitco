@@ -14,8 +14,8 @@ export const Route = createFileRoute("/u/$id")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData?.name ?? "حساب"} — بيتون` },
-      { name: "description", content: "ملف عام على بيتون — إعلانات وآراء حقيقية." },
+      { title: `${loaderData?.name ?? "حساب"}  -  بيتون` },
+      { name: "description", content: "ملف عام على بيتون  -  إعلانات وآراء حقيقية." },
     ],
   }),
   component: ProfilePage,
@@ -72,12 +72,12 @@ function ProfilePage() {
             <Stat
               icon={Star}
               label="متوسط التقييم"
-              value={profile.avgRating ? profile.avgRating.toFixed(1) : "—"}
+              value={profile.avgRating ? profile.avgRating.toFixed(1) : " - "}
             />
             <Stat
               icon={MessageCircle}
               label="بيرد بسرعة"
-              value={profile.responseRate != null ? `${profile.responseRate}%` : "—"}
+              value={profile.responseRate != null ? `${profile.responseRate}%` : " - "}
             />
           </div>
         </section>

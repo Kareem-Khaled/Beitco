@@ -49,7 +49,7 @@ function VerifyPage() {
       });
       // Keep the session user in sync so the badge/status updates everywhere.
       updateUser({ verificationStatus: "pending" });
-      toast.success("اتبعت طلب التوثيق — هنراجعه ونبلّغك");
+      toast.success("اتبعت طلب التوثيق  -  هنراجعه ونبلّغك");
     } catch {
       toast.error("مقدرناش نبعت الطلب دلوقتي. جرّب تاني.");
     } finally {
@@ -66,8 +66,8 @@ function VerifyPage() {
         <h1 className="font-display text-2xl font-bold sm:text-3xl">وثّق حسابك</h1>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
           {isOwner
-            ? "التوثيق بيدّي الناس ثقة إن إعلاناتك حقيقية — وبيخلّي شققك تظهر بعلامة «موثّق» وتترتّب أعلى."
-            : "التوثيق بيدّي أصحاب الشقق اطمئنان إنك شخص حقيقي — وبيخلّي طلباتك تتقبل أسرع."}
+            ? "التوثيق بيدّي الناس ثقة إن إعلاناتك حقيقية  -  وبيخلّي شققك تظهر بعلامة «موثّق» وتترتّب أعلى."
+            : "التوثيق بيدّي أصحاب الشقق اطمئنان إنك شخص حقيقي  -  وبيخلّي طلباتك تتقبل أسرع."}
         </p>
       </div>
 
@@ -116,14 +116,14 @@ function VerifyPage() {
             <DocUpload
               icon={IdCard}
               title="صورة البطاقة"
-              subtitle="وجه البطاقة الشخصية — بنتأكد من هويتك بس."
+              subtitle="وجه البطاقة الشخصية  -  بنتأكد من هويتك بس."
               value={idDoc}
               onChange={setIdDoc}
             />
             <DocUpload
               icon={ScanFace}
               title="سيلفي وانت ماسك البطاقة"
-              subtitle="صورة لوشك وانت ماسك بطاقتك جنب وشك — عشان نتأكد إنها فعلاً إنت."
+              subtitle="صورة لوشك وانت ماسك بطاقتك جنب وشك  -  عشان نتأكد إنها فعلاً إنت."
               value={selfieDoc}
               onChange={setSelfieDoc}
               selfie
@@ -140,7 +140,7 @@ function VerifyPage() {
           </div>
 
           <p className="mt-4 text-center text-[11px] text-muted-foreground">
-            مستنداتك سرّية وبتُستخدم للتوثيق بس — مش بتظهر لأي حد.
+            مستنداتك سرّية وبتُستخدم للتوثيق بس  -  مش بتظهر لأي حد.
           </p>
 
           <Button
@@ -215,7 +215,7 @@ function DocUpload({
       <div className="min-w-0 flex-1">
         <div className="text-sm font-semibold">{title}</div>
         <div className="text-[11px] text-muted-foreground">
-          {value ? "تم الرفع — اضغط للتغيير" : subtitle}
+          {value ? "تم الرفع  -  اضغط للتغيير" : subtitle}
         </div>
       </div>
       <span className="inline-flex items-center gap-1 text-xs text-primary">

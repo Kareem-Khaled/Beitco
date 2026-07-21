@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# Web (TanStack Start SSR) image — OPS-2.
+# Web (TanStack Start SSR) image  -  OPS-2.
 #
 # NOTE: the web app's Vite config (@lovable.dev/vite-tanstack-config) targets
 # **Cloudflare** by default, so the primary deploy path is Cloudflare Pages/
