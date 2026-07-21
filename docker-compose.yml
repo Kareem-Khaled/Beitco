@@ -1,3 +1,7 @@
+# Pinned project name so containers/volumes stay 'beitoon' regardless of the
+# folder name (keeps a folder rename from orphaning the data volumes).
+name: beitoon
+
 services:
   # ─── PostgreSQL 16 + PostGIS ────────────────────────
   postgres:
