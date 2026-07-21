@@ -611,8 +611,8 @@ This session completed the final two backend modules. The entire NestJS backend 
 
 #### Decisions Made
 - Test runner pattern: bash script kills port 3001, builds, starts server, waits for health, runs test .mjs file
-- OTP stored in Redis with `otp:{phone}` key, retrievable for tests via `docker exec beitco-redis redis-cli GET otp:{phone}`
-- Tier manipulation in tests via `docker exec beitco-postgres psql -U beitco -d beitco_dev -c "UPDATE users SET permission_tier='...' WHERE id='...'"`
+- OTP stored in Redis with `otp:{phone}` key, retrievable for tests via `docker exec beitoon-redis redis-cli GET otp:{phone}`
+- Tier manipulation in tests via `docker exec beitoon-postgres psql -U beitco -d beitoon_dev -c "UPDATE users SET permission_tier='...' WHERE id='...'"`
 - Google/Apple OAuth return 501 NOT_IMPLEMENTED (stubs for now)
 - Hashtag regex supports Arabic: `/#([\p{L}\p{N}_]+)/gu`
 
@@ -631,7 +631,7 @@ This session completed the final two backend modules. The entire NestJS backend 
   - Disabled `noUnusedLocals`/`noUnusedParameters` in API tsconfig (NestJS DI pattern)
   - API builds clean with all modules
 - **T-003: Docker Compose verified**
-  - Updated `docker-compose.yml` credentials to match `.env` (beitco/beitco_dev)
+  - Updated `docker-compose.yml` credentials to match `.env` (beitco/beitoon_dev)
   - Docker daemon not running on machine  -  config is correct, needs Docker Desktop
 - **T-004: Full Prisma schema (20 models, 18 enums)**
   - Replaced minimal User-only schema with complete DB_SCHEMA.md

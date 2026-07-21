@@ -65,20 +65,20 @@ The dev OTP is **always `123456`**. Admin portal: **http://localhost:8080/admin*
 | Swagger | http://localhost:3001/api/docs | full endpoint explorer |
 | Readiness | http://localhost:3001/api/v1/health/ready | `db:up, redis:up` |
 | Prisma Studio | http://localhost:5555 | `pnpm db:studio` |
-| Meilisearch | http://localhost:7700 | key `beitco_master_key_dev` |
+| Meilisearch | http://localhost:7700 | key `beitoon_master_key_dev` |
 
 ---
 
 ## 5. Seeing the database
 - **Visual:** `pnpm db:studio` → http://localhost:5555
-- **psql:** `docker exec -it beitco-postgres psql -U beitco -d beitco_dev`
-- **GUI (TablePlus/DBeaver):** host `localhost`, **port 5433**, user `beitco`, pass `beitco_dev`, db `beitco_dev`
+- **psql:** `docker exec -it beitoon-postgres psql -U beitco -d beitoon_dev`
+- **GUI (TablePlus/DBeaver):** host `localhost`, **port 5433**, user `beitco`, pass `beitoon_dev`, db `beitoon_dev`
 
 ## 6. Seeing the OTP
 The code lives in **Redis** (not Postgres), 5-min TTL. Get it 3 ways:
 - it's always **`123456`** in dev
 - API returns it: `curl -s -X POST :3001/api/v1/auth/otp/send -d '{"phone":"+201..."}' -H 'Content-Type: application/json'`
-- from Redis: `docker exec beitco-redis redis-cli GET "otp:+201000000000"`
+- from Redis: `docker exec beitoon-redis redis-cli GET "otp:+201000000000"`
 
 ---
 

@@ -56,7 +56,7 @@ NestJS  -  **one module per feature**, services inject `PrismaService`. Cross-cu
 
 - **Bootstrap (`main.ts`):** `cookie-parser`, CORS (credentialed, origins from `CORS_ORIGINS`), `/api` prefix + URI versioning (`v1`), global `AllExceptionsFilter` + `ResponseEnvelopeInterceptor`, strict `ValidationPipe` (`whitelist` + `forbidNonWhitelisted` + transform), Swagger at `/api/docs`.
 - **Response envelope (always):** `{ success, data, meta?: { cursor, hasMore }, error?: { code, message } }`.
-- **Auth:** global `JwtAuthGuard` (skips `@Public()`); access+refresh JWTs in **httpOnly cookies** (`beitco_at`); OTP + refresh state + blacklist in Redis.
+- **Auth:** global `JwtAuthGuard` (skips `@Public()`); access+refresh JWTs in **httpOnly cookies** (`beitoon_at`); OTP + refresh state + blacklist in Redis.
 - **Authz:** ownership checks in services (403); `AdminGuard` (`isAdmin`) for moderation; chat is participant-checked; the WS gateway re-verifies the cookie JWT.
 - **Trust/matching:** pure engines (`trust/trust.engine.ts`, `matching/matching.engine.ts`) + services that read Prisma, compute, and persist. Trust recompute is triggered by the writes that should move a score (review, owner reply via `ResponseEvent`, verification).
 

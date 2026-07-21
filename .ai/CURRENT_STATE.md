@@ -92,9 +92,9 @@ Treat this section as the source of truth over any `@RequireTier` references els
 
 ## Infra (`docker-compose.yml`)
 
-- **Postgres 16 + PostGIS** (`beitco-postgres`). Dev runs on **host port 5433** via the gitignored `docker-compose.override.yml` (a native Postgres occupies 5432). A trigger-maintained, **GiST-indexed `geog` column** (derived from `lat`/`lng`) powers `ST_DWithin` radius search (PROD-4).
-- **Redis 7** (`beitco-redis`)  -  OTP store + notification last-seen marker + **BullMQ** queue backend (SCALE-1 saved-search fan-out worker).
-- **Meilisearch v1.11** (`beitco-meilisearch`)  -  **integrated** (PROD-3): typo-tolerant, Arabic-aware `?q=` with relevance ordering + a DB `contains` fallback when it's unreachable/unset.
+- **Postgres 16 + PostGIS** (`beitoon-postgres`). Dev runs on **host port 5433** via the gitignored `docker-compose.override.yml` (a native Postgres occupies 5432). A trigger-maintained, **GiST-indexed `geog` column** (derived from `lat`/`lng`) powers `ST_DWithin` radius search (PROD-4).
+- **Redis 7** (`beitoon-redis`)  -  OTP store + notification last-seen marker + **BullMQ** queue backend (SCALE-1 saved-search fan-out worker).
+- **Meilisearch v1.11** (`beitoon-meilisearch`)  -  **integrated** (PROD-3): typo-tolerant, Arabic-aware `?q=` with relevance ordering + a DB `contains` fallback when it's unreachable/unset.
 
 ---
 

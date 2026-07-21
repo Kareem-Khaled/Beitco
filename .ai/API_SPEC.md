@@ -8,7 +8,7 @@
 ## Conventions
 
 - **Response envelope (every endpoint):** `{ success: boolean, data: T, meta?: { cursor: string|null, hasMore: boolean }, error?: { code, message } }`  -  applied globally by `ResponseEnvelopeInterceptor` + `AllExceptionsFilter`.
-- **Auth:** global `JwtAuthGuard`. Routes are **authenticated by default**; only `@Public()` ones are open. Session = access+refresh JWTs in **httpOnly cookies** (`beitco_at`); browsers send them automatically (`credentials: include`).
+- **Auth:** global `JwtAuthGuard`. Routes are **authenticated by default**; only `@Public()` ones are open. Session = access+refresh JWTs in **httpOnly cookies** (`beitoon_at`); browsers send them automatically (`credentials: include`).
 - **Authz failures:** `401` (no/invalid session), `403` (authenticated but not owner/participant/admin).
 - **Validation:** strict (`whitelist` + `forbidNonWhitelisted`)  -  unknown body fields are rejected.
 - **Pagination:** cursor-based via `meta.cursor` / `meta.hasMore` (no offset).

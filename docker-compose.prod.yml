@@ -9,13 +9,13 @@ services:
     image: postgis/postgis:16-3.4
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-beitco}
+      POSTGRES_USER: ${POSTGRES_USER:-beitoon}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB:-beitco}
+      POSTGRES_DB: ${POSTGRES_DB:-beitoon}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-beitco}']
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-beitoon}']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -40,7 +40,7 @@ services:
     environment:
       NODE_ENV: production
       API_PORT: 3001
-      DATABASE_URL: postgresql://${POSTGRES_USER:-beitco}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-beitco}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-beitoon}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-beitoon}
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET (>=32 chars)}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?set JWT_REFRESH_SECRET (>=32 chars, != JWT_SECRET)}
