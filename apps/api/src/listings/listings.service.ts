@@ -208,11 +208,12 @@ export class ListingsService {
         return [{ price: 'asc' }, { id: 'asc' }];
       case 'price_desc':
         return [{ price: 'desc' }, { id: 'asc' }];
-      case 'newest':
-        return [{ createdAt: 'desc' }, { id: 'asc' }];
       case 'trust':
-      default:
         return [{ trust: 'desc' }, { id: 'asc' }];
+      case 'newest':
+      default:
+        // Default: newest first.
+        return [{ createdAt: 'desc' }, { id: 'asc' }];
     }
   }
 }

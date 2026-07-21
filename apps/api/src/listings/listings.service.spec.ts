@@ -117,8 +117,16 @@ describe('ListingsService', () => {
   });
 
   describe('list  -  sort + pagination', () => {
-    it('defaults to trust desc, then id', async () => {
+    it('defaults to newest (createdAt desc), then id', async () => {
       await service.list({});
+      expect(prisma.property.findMany.mock.calls[0][0].orderBy).toEqual([
+        { createdAt: 'desc' },
+        { id: 'asc' },
+      ]);
+    });
+
+    it('sorts by trust desc, then id', async () => {
+      await service.list({ sort: 'trust' });
       expect(prisma.property.findMany.mock.calls[0][0].orderBy).toEqual([
         { trust: 'desc' },
         { id: 'asc' },
