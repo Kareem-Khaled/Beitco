@@ -10,10 +10,10 @@ import {
   Sparkles,
   ScanFace,
 } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
-import { getVerificationStatus } from "@/lib/beitco/store";
-import { submitVerification } from "@/lib/beitco/queries";
-import { uploadImage } from "@/lib/beitco/uploads";
+import { useAuth } from "@/lib/beitoon/auth";
+import { getVerificationStatus } from "@/lib/beitoon/store";
+import { submitVerification } from "@/lib/beitoon/queries";
+import { uploadImage } from "@/lib/beitoon/uploads";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 

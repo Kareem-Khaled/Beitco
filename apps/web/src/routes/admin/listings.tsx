@@ -19,9 +19,9 @@ import {
   adminRestoreListing,
   adminSetListingVerified,
   adminDeleteListing,
-} from "@/lib/beitco/queries";
-import { formatDate } from "@/lib/beitco/store";
-import type { AdminListing } from "@/lib/beitco/types";
+} from "@/lib/beitoon/queries";
+import { formatDate } from "@/lib/beitoon/store";
+import type { AdminListing } from "@/lib/beitoon/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";

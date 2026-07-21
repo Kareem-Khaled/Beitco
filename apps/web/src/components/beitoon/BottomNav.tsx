@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Search, Plus, MessageCircle, User as UserIcon, LogIn } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
-import { useThreads } from "@/lib/beitco/queries";
+import { useAuth } from "@/lib/beitoon/auth";
+import { useThreads } from "@/lib/beitoon/queries";
 
 // Mobile-only bottom tab bar  -  the expected navigation pattern for a phone-first
 // Egyptian marketplace (and for the Capacitor shell later). Hidden on md+, where

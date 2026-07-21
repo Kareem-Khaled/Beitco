@@ -12,9 +12,9 @@ import {
   Star,
   TrendingUp,
 } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
-import { isPlatformAdmin } from "@/lib/beitco/store";
-import { useModerationCount, useVerificationCount, useReportsCount } from "@/lib/beitco/queries";
+import { useAuth } from "@/lib/beitoon/auth";
+import { isPlatformAdmin } from "@/lib/beitoon/store";
+import { useModerationCount, useVerificationCount, useReportsCount } from "@/lib/beitoon/queries";
 
 // ADMIN-1: the platform-operator portal (Beitoon staff only). Separate from the
 // landlord dashboard at /dashboard. Bounces anyone without isAdmin.

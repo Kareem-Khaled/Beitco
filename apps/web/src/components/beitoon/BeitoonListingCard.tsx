@@ -15,7 +15,7 @@ import { TrustBadge } from "./TrustBadge";
 import { OptimizedImage } from "./OptimizedImage";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import type { Property, PropertySummary, Room, BedStatus } from "@/lib/beitco/types";
+import type { Property, PropertySummary, Room, BedStatus } from "@/lib/beitoon/types";
 
 type CardProperty = PropertySummary | Property;
 
@@ -45,11 +45,11 @@ export function BeitoonListingCard({ p, className }: { p: CardProperty; classNam
       to="/property/$id"
       params={{ id: p.id }}
       className={cn(
-        "group block overflow-hidden rounded-2xl border border-border bg-surface transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-elevated)]",
+        "group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-elevated)]",
         className,
       )}
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+      <div className="relative aspect-[4/3] shrink-0 overflow-hidden bg-muted">
         {p.image ? (
           <OptimizedImage
             src={p.image}
@@ -103,7 +103,7 @@ export function BeitoonListingCard({ p, className }: { p: CardProperty; classNam
         </div>
       </div>
 
-      <div className="p-4">
+      <div className="flex flex-1 flex-col p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h3 className="truncate font-display text-sm font-semibold">{p.title}</h3>
@@ -158,7 +158,7 @@ export function BeitoonListingCard({ p, className }: { p: CardProperty; classNam
         ) : null}
 
         {isSale ? (
-          <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+          <div className="mt-auto flex items-center justify-between pt-3 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1">
               <Home className="h-3 w-3" />
               {p.spec?.furnished ? "مفروشة" : "مش مفروشة"}
@@ -169,7 +169,7 @@ export function BeitoonListingCard({ p, className }: { p: CardProperty; classNam
             {p.negotiable && <span>قابل للتفاوض</span>}
           </div>
         ) : (
-          <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+          <div className="mt-auto flex items-center justify-between pt-3 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1">
               <Users className="h-3 w-3" />
               {p.residents} ساكن

@@ -2,9 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Search, X, Star, Trash2, RotateCcw, ExternalLink, ThumbsUp } from "lucide-react";
-import { useAdminReviews, adminRemoveReview, adminRestoreReview } from "@/lib/beitco/queries";
-import { formatDate } from "@/lib/beitco/store";
-import type { AdminReviewRow } from "@/lib/beitco/types";
+import { useAdminReviews, adminRemoveReview, adminRestoreReview } from "@/lib/beitoon/queries";
+import { formatDate } from "@/lib/beitoon/store";
+import type { AdminReviewRow } from "@/lib/beitoon/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {

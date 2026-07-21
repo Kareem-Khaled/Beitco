@@ -22,10 +22,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuth } from "@/lib/beitco/auth";
-import { useNotificationUnreadCount, useUnreadMessageCount } from "@/lib/beitco/queries";
-import { useNotificationSound, useNotifSoundPref } from "@/lib/beitco/notification-sound";
-import { getStoredTheme, resolveTheme, setTheme } from "@/lib/beitco/theme";
+import { useAuth } from "@/lib/beitoon/auth";
+import { useNotificationUnreadCount, useUnreadMessageCount } from "@/lib/beitoon/queries";
+import { useNotificationSound, useNotifSoundPref } from "@/lib/beitoon/notification-sound";
+import { getStoredTheme, resolveTheme, setTheme } from "@/lib/beitoon/theme";
 
 export function UserMenu() {
   const { user, logout, isLoading } = useAuth();

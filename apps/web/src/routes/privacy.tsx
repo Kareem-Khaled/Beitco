@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Lock } from "lucide-react";
-import { SiteHeader } from "@/components/beitco/SiteHeader";
-import { SiteFooter } from "@/components/beitco/SiteFooter";
+import { SiteHeader } from "@/components/beitoon/SiteHeader";
+import { SiteFooter } from "@/components/beitoon/SiteFooter";
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({

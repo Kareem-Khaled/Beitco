@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Heart, Search } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/lib/beitco/auth";
-import { useSavedListings, toggleSavedListing } from "@/lib/beitco/queries";
-import { BeitoonListingCard } from "@/components/beitco/BeitoonListingCard";
-import { EmptyState } from "@/components/beitco/EmptyState";
+import { useAuth } from "@/lib/beitoon/auth";
+import { useSavedListings, toggleSavedListing } from "@/lib/beitoon/queries";
+import { BeitoonListingCard } from "@/components/beitoon/BeitoonListingCard";
+import { EmptyState } from "@/components/beitoon/EmptyState";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/me/saved")({

@@ -13,9 +13,9 @@ import {
   TrendingUp,
   CheckCircle2,
 } from "lucide-react";
-import { useAdminStats } from "@/lib/beitco/queries";
-import { formatDate } from "@/lib/beitco/store";
-import type { PlatformStats } from "@/lib/beitco/types";
+import { useAdminStats } from "@/lib/beitoon/queries";
+import { formatDate } from "@/lib/beitoon/store";
+import type { PlatformStats } from "@/lib/beitoon/types";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminOverview,

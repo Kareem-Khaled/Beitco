@@ -12,10 +12,10 @@ import {
   BarChart3,
   MessageCircle,
 } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
-import { getOwnerAnalytics, ownerAnalyticsFromData } from "@/lib/beitco/store";
-import { USE_API } from "@/lib/beitco/api";
-import { useOwnerProperties, useOwnerLeads } from "@/lib/beitco/queries";
+import { useAuth } from "@/lib/beitoon/auth";
+import { getOwnerAnalytics, ownerAnalyticsFromData } from "@/lib/beitoon/store";
+import { USE_API } from "@/lib/beitoon/api";
+import { useOwnerProperties, useOwnerLeads } from "@/lib/beitoon/queries";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/dashboard/")({

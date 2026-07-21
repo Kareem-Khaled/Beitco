@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { Logo } from "./Logo";
 import { UserMenu } from "./UserMenu";
-import { useAuth } from "@/lib/beitco/auth";
+import { useAuth } from "@/lib/beitoon/auth";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 

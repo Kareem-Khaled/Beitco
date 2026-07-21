@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { AuthLayout } from "@/components/beitco/AuthLayout";
-import { useAuth } from "@/lib/beitco/auth";
-import { USE_API } from "@/lib/beitco/api";
+import { AuthLayout } from "@/components/beitoon/AuthLayout";
+import { useAuth } from "@/lib/beitoon/auth";
+import { USE_API } from "@/lib/beitoon/api";
 
 export const Route = createFileRoute("/auth/verify")({
   component: VerifyPage,

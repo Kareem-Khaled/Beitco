@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { Star } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
-import { useOwnerProperties } from "@/lib/beitco/queries";
+import { useAuth } from "@/lib/beitoon/auth";
+import { useOwnerProperties } from "@/lib/beitoon/queries";
 
 export const Route = createFileRoute("/dashboard/reviews")({
   component: DashboardReviews,

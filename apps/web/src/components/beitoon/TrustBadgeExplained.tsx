@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { TrustBadge } from "./TrustBadge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import type { TrustBreakdown } from "@/lib/beitco/types";
+import type { TrustBreakdown } from "@/lib/beitoon/types";
 
 type TrustInputs = {
   score: number;

@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { MessageCircle } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
-import { MessagesShell } from "@/components/beitco/MessagesShell";
+import { useAuth } from "@/lib/beitoon/auth";
+import { MessagesShell } from "@/components/beitoon/MessagesShell";
 
 export const Route = createFileRoute("/messages/")({
   component: MessagesIndex,

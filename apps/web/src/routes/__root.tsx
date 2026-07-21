@@ -12,11 +12,11 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportError, initSentry } from "@/lib/sentry";
-import { AuthProvider } from "@/lib/beitco/auth";
-import { useChatSocket } from "@/lib/beitco/useChatSocket";
-import { initTheme, themeInitScript } from "@/lib/beitco/theme";
+import { AuthProvider } from "@/lib/beitoon/auth";
+import { useChatSocket } from "@/lib/beitoon/useChatSocket";
+import { initTheme, themeInitScript } from "@/lib/beitoon/theme";
 import { Toaster } from "@/components/ui/sonner";
-import { BottomNav } from "@/components/beitco/BottomNav";
+import { BottomNav } from "@/components/beitoon/BottomNav";
 
 function NotFoundComponent() {
   return (

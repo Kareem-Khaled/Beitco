@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  Search,
   SlidersHorizontal,
   BedDouble,
   ShieldCheck,
@@ -9,14 +8,15 @@ import {
   Building2,
   DoorOpen,
 } from "lucide-react";
-import { SiteHeader } from "@/components/beitco/SiteHeader";
-import { SiteFooter } from "@/components/beitco/SiteFooter";
-import { BeitoonListingCard } from "@/components/beitco/BeitoonListingCard";
-import { EmptyState } from "@/components/beitco/EmptyState";
+import { SiteHeader } from "@/components/beitoon/SiteHeader";
+import { SiteFooter } from "@/components/beitoon/SiteFooter";
+import { SearchAutocomplete } from "@/components/beitoon/SearchAutocomplete";
+import { BeitoonListingCard } from "@/components/beitoon/BeitoonListingCard";
+import { EmptyState } from "@/components/beitoon/EmptyState";
 import { Button } from "@/components/ui/button";
-import { usePublishedProperties } from "@/lib/beitco/queries";
-import { useAuth } from "@/lib/beitco/auth";
-import type { Property, PropertySummary } from "@/lib/beitco/types";
+import { usePublishedProperties } from "@/lib/beitoon/queries";
+import { useAuth } from "@/lib/beitoon/auth";
+import type { Property, PropertySummary } from "@/lib/beitoon/types";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -38,15 +38,16 @@ function HomePage() {
   const { data: properties = [] } = usePublishedProperties();
   const { user } = useAuth();
 
-  const onSearch = (overrides?: Record<string, unknown>) => {
+  const onSearch = (overrides?: Record<string, unknown>, term?: string) => {
     // Search + filters are registered-users-only. Send guests to login first.
     if (!user) {
       navigate({ to: "/auth/login" });
       return;
     }
+    const query = (term ?? q).trim();
     navigate({
       to: "/search",
-      search: { ...(q.trim() ? { q: q.trim() } : {}), ...(overrides ?? {}) },
+      search: { ...(query ? { q: query } : {}), ...(overrides ?? {}) },
     });
   };
 
@@ -71,15 +72,13 @@ function HomePage() {
             }}
             className="mx-auto mt-8 flex max-w-2xl flex-col gap-2 rounded-2xl border border-border bg-card p-2 sm:flex-row sm:items-center"
           >
-            <div className="flex flex-1 items-center gap-2 px-3 py-2">
-              <Search className="h-4 w-4 text-muted-foreground" />
-              <input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="دوّر بالمنطقة، الكومباوند، أو اسم المكان…"
-                className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-              />
-            </div>
+            <SearchAutocomplete
+              value={q}
+              onChange={setQ}
+              onSearch={(term) => onSearch(undefined, term)}
+              onClear={() => setQ("")}
+              className="px-3 py-2"
+            />
             <Button type="submit" size="lg" className="rounded-xl">
               دوّر
             </Button>

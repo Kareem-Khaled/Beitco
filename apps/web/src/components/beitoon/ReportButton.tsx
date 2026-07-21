@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Flag } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
-import { createReport } from "@/lib/beitco/queries";
-import type { ReportTargetType } from "@/lib/beitco/types";
+import { useAuth } from "@/lib/beitoon/auth";
+import { createReport } from "@/lib/beitoon/queries";
+import type { ReportTargetType } from "@/lib/beitoon/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {

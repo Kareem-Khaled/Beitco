@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { TrendingUp, Users, Home, Inbox, KeyRound, MapPin } from "lucide-react";
-import { useAdminTimeseries, useAdminFunnel, useAdminAreas } from "@/lib/beitco/queries";
-import type { TimeseriesMetric } from "@/lib/beitco/types";
+import { useAdminTimeseries, useAdminFunnel, useAdminAreas } from "@/lib/beitoon/queries";
+import type { TimeseriesMetric } from "@/lib/beitoon/types";
 
 export const Route = createFileRoute("/admin/analytics")({
   component: AdminAnalytics,

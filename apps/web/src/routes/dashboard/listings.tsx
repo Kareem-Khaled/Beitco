@@ -19,8 +19,8 @@ import {
   Clock,
   AlertCircle,
 } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
-import { timeAgo } from "@/lib/beitco/store";
+import { useAuth } from "@/lib/beitoon/auth";
+import { timeAgo } from "@/lib/beitoon/store";
 import {
   useOwnerProperties,
   deleteListing,
@@ -29,10 +29,10 @@ import {
   manageWholeOccupancy,
   manageRoomOccupancy,
   manageBedOccupancy,
-} from "@/lib/beitco/queries";
-import type { Property, BedStatus, Occupant, SaleStatus } from "@/lib/beitco/types";
+} from "@/lib/beitoon/queries";
+import type { Property, BedStatus, Occupant, SaleStatus } from "@/lib/beitoon/types";
 import { Button } from "@/components/ui/button";
-import { OccupancyDialog } from "@/components/beitco/OccupancyDialog";
+import { OccupancyDialog } from "@/components/beitoon/OccupancyDialog";
 import {
   AlertDialog,
   AlertDialogAction,

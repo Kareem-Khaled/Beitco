@@ -13,22 +13,22 @@ import {
   Trash2,
   ShieldCheck,
 } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
+import { useAuth } from "@/lib/beitoon/auth";
 import {
   getTenanciesForUser,
   profileCompleteness,
   getSavedSearches,
   deleteSavedSearch,
   getRenterReputation,
-} from "@/lib/beitco/store";
+} from "@/lib/beitoon/store";
 import {
   useSavedListings,
   useRenterLeads,
   useOwnerProperties,
   useMatches,
-} from "@/lib/beitco/queries";
-import type { SavedSearch } from "@/lib/beitco/types";
-import { MatchBadge } from "@/components/beitco/MatchBadge";
+} from "@/lib/beitoon/queries";
+import type { SavedSearch } from "@/lib/beitoon/types";
+import { MatchBadge } from "@/components/beitoon/MatchBadge";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/me/")({

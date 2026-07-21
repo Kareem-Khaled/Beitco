@@ -20,7 +20,7 @@ import {
   KeyRound,
   Tag,
 } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
+import { useAuth } from "@/lib/beitoon/auth";
 import {
   AREA_OPTIONS,
   ALL_AMENITIES,
@@ -28,7 +28,7 @@ import {
   FURNISHED_PREFS,
   CAIRO_METRO_LINES,
   profileCompleteness,
-} from "@/lib/beitco/store";
+} from "@/lib/beitoon/store";
 import { arabicIncludes } from "@beitoon/shared";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,7 @@ import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Textarea } from "@/components/ui/textarea";
-import type { RenterProfile, PropertyType, Occupation, FurnishedPref } from "@/lib/beitco/types";
+import type { RenterProfile, PropertyType, Occupation, FurnishedPref } from "@/lib/beitoon/types";
 
 export const Route = createFileRoute("/me/preferences")({
   component: PreferencesPage,

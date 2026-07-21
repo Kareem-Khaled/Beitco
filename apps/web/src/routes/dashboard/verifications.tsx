@@ -2,14 +2,14 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ScanFace, Check, X, IdCard, FileText, User as UserIcon } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
-import { isPlatformAdmin } from "@/lib/beitco/store";
+import { useAuth } from "@/lib/beitoon/auth";
+import { isPlatformAdmin } from "@/lib/beitoon/store";
 import {
   usePendingVerifications,
   approveVerification,
   rejectVerification,
-} from "@/lib/beitco/queries";
-import { EmptyState } from "@/components/beitco/EmptyState";
+} from "@/lib/beitoon/queries";
+import { EmptyState } from "@/components/beitoon/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {

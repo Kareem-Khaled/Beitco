@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { Logo } from "@/components/beitco/Logo";
+import { Logo } from "@/components/beitoon/Logo";
 
 // Shared shell for the auth flow (login / verify / profile). Matches the app's
 // header (logo + brand), then a clean centered form with the logo above it.

@@ -16,9 +16,9 @@ import {
   Monitor,
   Palette,
 } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
-import { getVerificationStatus, resetAllData } from "@/lib/beitco/store";
-import { getStoredTheme, setTheme, type Theme } from "@/lib/beitco/theme";
+import { useAuth } from "@/lib/beitoon/auth";
+import { getVerificationStatus, resetAllData } from "@/lib/beitoon/store";
+import { getStoredTheme, setTheme, type Theme } from "@/lib/beitoon/theme";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
@@ -34,7 +34,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import type { UserRole, NotificationPrefs } from "@/lib/beitco/types";
+import type { UserRole, NotificationPrefs } from "@/lib/beitoon/types";
 
 export const Route = createFileRoute("/me/settings")({
   component: SettingsPage,

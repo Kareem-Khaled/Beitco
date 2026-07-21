@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import { Home, User as UserIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AuthLayout } from "@/components/beitco/AuthLayout";
-import { useAuth } from "@/lib/beitco/auth";
-import type { UserRole, Gender } from "@/lib/beitco/types";
+import { AuthLayout } from "@/components/beitoon/AuthLayout";
+import { useAuth } from "@/lib/beitoon/auth";
+import type { UserRole, Gender } from "@/lib/beitoon/types";
 
 export const Route = createFileRoute("/auth/profile")({
   component: ProfilePage,

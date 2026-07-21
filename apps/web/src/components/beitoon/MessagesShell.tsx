@@ -1,9 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { MessageCircle, ShieldCheck } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
-import { useThreads, threadPropertyOf } from "@/lib/beitco/queries";
-import type { Thread } from "@/lib/beitco/types";
-import { SiteHeader } from "@/components/beitco/SiteHeader";
+import { useAuth } from "@/lib/beitoon/auth";
+import { useThreads, threadPropertyOf } from "@/lib/beitoon/queries";
+import type { Thread } from "@/lib/beitoon/types";
+import { SiteHeader } from "@/components/beitoon/SiteHeader";
 
 // Messenger-style two-pane shell for the messages section: a conversations list
 // (contacts) on the start side + the active conversation on the end side. On

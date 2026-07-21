@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { Inbox, Calendar, MessageCircle, Search } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
-import { useRenterLeads, usePropertyLookup, startThread } from "@/lib/beitco/queries";
-import type { Lead } from "@/lib/beitco/types";
+import { useAuth } from "@/lib/beitoon/auth";
+import { useRenterLeads, usePropertyLookup, startThread } from "@/lib/beitoon/queries";
+import type { Lead } from "@/lib/beitoon/types";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/beitco/EmptyState";
+import { EmptyState } from "@/components/beitoon/EmptyState";
 import { useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/me/applications")({

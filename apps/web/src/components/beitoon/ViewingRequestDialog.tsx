@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "@/components/ui/date-picker";
-import type { LeadUnit } from "@/lib/beitco/types";
+import type { LeadUnit } from "@/lib/beitoon/types";
 
 export function ViewingRequestDialog({
   open,

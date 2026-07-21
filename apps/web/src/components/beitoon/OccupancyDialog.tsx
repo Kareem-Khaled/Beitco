@@ -12,8 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "@/components/ui/date-picker";
-import { resolveInvitePhone } from "@/lib/beitco/store";
-import type { BedStatus, Occupant } from "@/lib/beitco/types";
+import { resolveInvitePhone } from "@/lib/beitoon/store";
+import type { BedStatus, Occupant } from "@/lib/beitoon/types";
 
 const STATUS_OPTIONS: {
   id: BedStatus;

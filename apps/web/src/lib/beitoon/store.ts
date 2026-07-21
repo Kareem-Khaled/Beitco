@@ -2389,7 +2389,7 @@ export const EGYPT_AREAS = [
 
 // Egypt locations + area helpers now live in @beitoon/shared  -  the single
 // source of truth shared with the API (so the two never drift). Re-exported
-// here so existing `@/lib/beitco/store` imports keep working unchanged.
+// here so existing `@/lib/beitoon/store` imports keep working unchanged.
 export {
   EGYPT_LOCATIONS,
   AREA_OPTIONS,

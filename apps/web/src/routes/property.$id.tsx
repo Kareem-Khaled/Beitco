@@ -44,18 +44,18 @@ import {
   ThumbsUp,
   CornerDownLeft,
 } from "lucide-react";
-import { SiteHeader } from "@/components/beitco/SiteHeader";
-import { SiteFooter } from "@/components/beitco/SiteFooter";
-import { TrustBadge } from "@/components/beitco/TrustBadge";
-import { TrustBadgeExplained } from "@/components/beitco/TrustBadgeExplained";
-import { ScoreBar } from "@/components/beitco/ScoreBar";
-import { PropertyGallery } from "@/components/beitco/PropertyGallery";
-import { PageSkeleton } from "@/components/beitco/PageSkeleton";
-import { ReportButton } from "@/components/beitco/ReportButton";
+import { SiteHeader } from "@/components/beitoon/SiteHeader";
+import { SiteFooter } from "@/components/beitoon/SiteFooter";
+import { TrustBadge } from "@/components/beitoon/TrustBadge";
+import { TrustBadgeExplained } from "@/components/beitoon/TrustBadgeExplained";
+import { ScoreBar } from "@/components/beitoon/ScoreBar";
+import { PropertyGallery } from "@/components/beitoon/PropertyGallery";
+import { PageSkeleton } from "@/components/beitoon/PageSkeleton";
+import { ReportButton } from "@/components/beitoon/ReportButton";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { getProperty, timeAgo, formatDate } from "@/lib/beitco/store";
-import { USE_API, apiGetProperty } from "@/lib/beitco/api";
+import { getProperty, timeAgo, formatDate } from "@/lib/beitoon/store";
+import { USE_API, apiGetProperty } from "@/lib/beitoon/api";
 import {
   useSavedListings,
   toggleSavedListing,
@@ -68,13 +68,13 @@ import {
   replyReview,
   startThread,
   sendChatMessage,
-} from "@/lib/beitco/queries";
-import { useAuth } from "@/lib/beitco/auth";
+} from "@/lib/beitoon/queries";
+import { useAuth } from "@/lib/beitoon/auth";
 import { toast } from "sonner";
-import { ViewingRequestDialog } from "@/components/beitco/ViewingRequestDialog";
-import { ReviewDialog, type ReviewSubmit } from "@/components/beitco/ReviewDialog";
-import { QuestionDialog } from "@/components/beitco/QuestionDialog";
-import type { Property, Room, BedStatus, NearbyType, LeadUnit } from "@/lib/beitco/types";
+import { ViewingRequestDialog } from "@/components/beitoon/ViewingRequestDialog";
+import { ReviewDialog, type ReviewSubmit } from "@/components/beitoon/ReviewDialog";
+import { QuestionDialog } from "@/components/beitoon/QuestionDialog";
+import type { Property, Room, BedStatus, NearbyType, LeadUnit } from "@/lib/beitoon/types";
 
 export const Route = createFileRoute("/property/$id")({
   loader: async ({ params }) => {
@@ -1436,7 +1436,7 @@ function SelectToggle({
       }`}
     >
       {selected ? <Check className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
-      {selected ? "متختارة" : label}
+      {selected ? "مختارة" : label}
     </button>
   );
 }

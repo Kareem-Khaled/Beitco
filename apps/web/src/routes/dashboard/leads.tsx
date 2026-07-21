@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Check, X, Calendar, BedDouble, DoorOpen, Star, ShieldCheck } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
+import { useAuth } from "@/lib/beitoon/auth";
 import {
   useOwnerLeads,
   useOwnerProperties,
@@ -10,11 +10,11 @@ import {
   submitRenterReview,
   renterReputationOf,
   ownerCanReview,
-} from "@/lib/beitco/queries";
-import type { Lead } from "@/lib/beitco/types";
+} from "@/lib/beitoon/queries";
+import type { Lead } from "@/lib/beitoon/types";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { RenterReviewDialog } from "@/components/beitco/RenterReviewDialog";
+import { RenterReviewDialog } from "@/components/beitoon/RenterReviewDialog";
 
 export const Route = createFileRoute("/dashboard/leads")({
   component: DashboardLeads,

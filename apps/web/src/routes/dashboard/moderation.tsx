@@ -2,11 +2,11 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ShieldCheck, Check, X, MapPin, ExternalLink, BedDouble } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
-import { isPlatformAdmin, formatDate } from "@/lib/beitco/store";
-import { usePendingListings, approveListing, rejectListing } from "@/lib/beitco/queries";
-import type { Property } from "@/lib/beitco/types";
-import { EmptyState } from "@/components/beitco/EmptyState";
+import { useAuth } from "@/lib/beitoon/auth";
+import { isPlatformAdmin, formatDate } from "@/lib/beitoon/store";
+import { usePendingListings, approveListing, rejectListing } from "@/lib/beitoon/queries";
+import type { Property } from "@/lib/beitoon/types";
+import { EmptyState } from "@/components/beitoon/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {

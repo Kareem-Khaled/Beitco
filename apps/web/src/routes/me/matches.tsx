@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sparkles, SlidersHorizontal, Check, X, SearchX } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
-import { profileCompleteness } from "@/lib/beitco/store";
-import { useMatches } from "@/lib/beitco/queries";
-import { BeitoonListingCard } from "@/components/beitco/BeitoonListingCard";
-import { MatchBadge } from "@/components/beitco/MatchBadge";
-import { EmptyState } from "@/components/beitco/EmptyState";
+import { useAuth } from "@/lib/beitoon/auth";
+import { profileCompleteness } from "@/lib/beitoon/store";
+import { useMatches } from "@/lib/beitoon/queries";
+import { BeitoonListingCard } from "@/components/beitoon/BeitoonListingCard";
+import { MatchBadge } from "@/components/beitoon/MatchBadge";
+import { EmptyState } from "@/components/beitoon/EmptyState";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/me/matches")({

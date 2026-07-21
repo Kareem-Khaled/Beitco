@@ -12,10 +12,10 @@ import {
   Eye,
   ExternalLink,
 } from "lucide-react";
-import { useAdminReports, adminUpdateReport } from "@/lib/beitco/queries";
-import { useAuth } from "@/lib/beitco/auth";
-import { formatDate } from "@/lib/beitco/store";
-import type { AdminReport, ReportTargetType } from "@/lib/beitco/types";
+import { useAdminReports, adminUpdateReport } from "@/lib/beitoon/queries";
+import { useAuth } from "@/lib/beitoon/auth";
+import { formatDate } from "@/lib/beitoon/store";
+import type { AdminReport, ReportTargetType } from "@/lib/beitoon/types";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { LocateFixed, MapPin, Loader2 } from "lucide-react";
-import { hasGoogleMapsKey, loadGoogleMaps, googleEmbedSrc } from "@/lib/beitco/google-maps";
+import { hasGoogleMapsKey, loadGoogleMaps, googleEmbedSrc } from "@/lib/beitoon/google-maps";
 
 // Approximate centers for major Egyptian areas, so the map opens somewhere
 // sensible before the owner drops the exact pin. Substring-matched on the area

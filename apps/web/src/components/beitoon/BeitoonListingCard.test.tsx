@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { BeitoonListingCard } from "./BeitoonListingCard";
-import type { PropertySummary } from "@/lib/beitco/types";
+import type { PropertySummary } from "@/lib/beitoon/types";
 
 // TEST-3: BeitoonListingCard renders a listing summary. We mock the router's
 // <Link> to a plain <a> (lighter than a full memory router for a unit test).

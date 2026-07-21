@@ -3,8 +3,8 @@ import { useState } from "react";
 import { Phone, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AuthLayout } from "@/components/beitco/AuthLayout";
-import { useAuth, isValidEgyptianPhone, normalizeEgyptianPhone } from "@/lib/beitco/auth";
+import { AuthLayout } from "@/components/beitoon/AuthLayout";
+import { useAuth, isValidEgyptianPhone, normalizeEgyptianPhone } from "@/lib/beitoon/auth";
 
 export const Route = createFileRoute("/auth/login")({
   component: LoginPage,

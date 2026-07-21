@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ReportButton } from "./ReportButton";
-import { getAdminReports } from "@/lib/beitco/store";
+import { getAdminReports } from "@/lib/beitoon/store";
 
 // TEST-3: ReportButton interaction. Mock the cross-cutting deps (auth, router,
 // toast); the report write itself goes through the real mock-mode store
@@ -11,7 +11,7 @@ import { getAdminReports } from "@/lib/beitco/store";
 const navigate = vi.fn();
 let currentUser: { id: string; name: string } | null = { id: "u-renter-ahmed", name: "أحمد" };
 
-vi.mock("@/lib/beitco/auth", () => ({
+vi.mock("@/lib/beitoon/auth", () => ({
   useAuth: () => ({ user: currentUser }),
 }));
 vi.mock("@tanstack/react-router", () => ({

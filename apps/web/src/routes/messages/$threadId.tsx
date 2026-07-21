@@ -2,9 +2,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, Send, ShieldCheck } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
-import { useThread, threadPropertyOf, sendChatMessage } from "@/lib/beitco/queries";
-import { MessagesShell } from "@/components/beitco/MessagesShell";
+import { useAuth } from "@/lib/beitoon/auth";
+import { useThread, threadPropertyOf, sendChatMessage } from "@/lib/beitoon/queries";
+import { MessagesShell } from "@/components/beitoon/MessagesShell";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 

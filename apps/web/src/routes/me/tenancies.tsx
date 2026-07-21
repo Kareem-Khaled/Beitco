@@ -1,14 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { KeyRound, Star, Search, BadgeCheck, Check, X } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
+import { useAuth } from "@/lib/beitoon/auth";
 import {
   getTenanciesForUser,
   getProperty,
   canUserReview,
   getPendingOccupantLinks,
   resolveOccupantLink,
-} from "@/lib/beitco/store";
+} from "@/lib/beitoon/store";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 

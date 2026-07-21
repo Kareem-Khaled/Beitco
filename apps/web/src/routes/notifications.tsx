@@ -2,12 +2,12 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Bell, Inbox, MessageCircle, Star, ShieldCheck, Search, BadgeCheck, ShieldAlert, Home } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
-import { type AppNotification, timeAgo } from "@/lib/beitco/store";
-import { useNotifications, markNotificationsSeen } from "@/lib/beitco/queries";
-import { SiteHeader } from "@/components/beitco/SiteHeader";
-import { SiteFooter } from "@/components/beitco/SiteFooter";
-import { EmptyState } from "@/components/beitco/EmptyState";
+import { useAuth } from "@/lib/beitoon/auth";
+import { type AppNotification, timeAgo } from "@/lib/beitoon/store";
+import { useNotifications, markNotificationsSeen } from "@/lib/beitoon/queries";
+import { SiteHeader } from "@/components/beitoon/SiteHeader";
+import { SiteFooter } from "@/components/beitoon/SiteFooter";
+import { EmptyState } from "@/components/beitoon/EmptyState";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/notifications")({

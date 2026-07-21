@@ -1,10 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ShieldCheck, Star, Home, MessageCircle, CalendarDays } from "lucide-react";
-import { SiteHeader } from "@/components/beitco/SiteHeader";
-import { SiteFooter } from "@/components/beitco/SiteFooter";
-import { TrustBadgeExplained } from "@/components/beitco/TrustBadgeExplained";
-import { BeitoonListingCard } from "@/components/beitco/BeitoonListingCard";
-import { getPublicProfile, formatDate } from "@/lib/beitco/store";
+import { SiteHeader } from "@/components/beitoon/SiteHeader";
+import { SiteFooter } from "@/components/beitoon/SiteFooter";
+import { TrustBadgeExplained } from "@/components/beitoon/TrustBadgeExplained";
+import { BeitoonListingCard } from "@/components/beitoon/BeitoonListingCard";
+import { getPublicProfile, formatDate } from "@/lib/beitoon/store";
 
 export const Route = createFileRoute("/u/$id")({
   loader: ({ params }) => {

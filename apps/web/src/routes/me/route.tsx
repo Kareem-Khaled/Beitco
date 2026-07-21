@@ -9,9 +9,9 @@ import {
   SlidersHorizontal,
   Settings,
 } from "lucide-react";
-import { useAuth } from "@/lib/beitco/auth";
-import { SiteHeader } from "@/components/beitco/SiteHeader";
-import { SiteFooter } from "@/components/beitco/SiteFooter";
+import { useAuth } from "@/lib/beitoon/auth";
+import { SiteHeader } from "@/components/beitoon/SiteHeader";
+import { SiteFooter } from "@/components/beitoon/SiteFooter";
 
 export const Route = createFileRoute("/me")({
   component: MeLayout,

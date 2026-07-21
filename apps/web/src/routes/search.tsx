@@ -15,19 +15,20 @@ import {
   Loader2,
 } from "lucide-react";
 import { z } from "zod";
-import { SiteHeader } from "@/components/beitco/SiteHeader";
-import { SiteFooter } from "@/components/beitco/SiteFooter";
-import { BeitoonListingCard, ListingCardSkeleton } from "@/components/beitco/BeitoonListingCard";
-import { EmptyState } from "@/components/beitco/EmptyState";
-import { EGYPT_AREAS } from "@/lib/beitco/store";
+import { SiteHeader } from "@/components/beitoon/SiteHeader";
+import { SiteFooter } from "@/components/beitoon/SiteFooter";
+import { SearchAutocomplete } from "@/components/beitoon/SearchAutocomplete";
+import { BeitoonListingCard, ListingCardSkeleton } from "@/components/beitoon/BeitoonListingCard";
+import { EmptyState } from "@/components/beitoon/EmptyState";
+import { EGYPT_AREAS } from "@/lib/beitoon/store";
 import { arabicIncludes } from "@beitoon/shared";
 import {
   useSearchProperties,
   useSavedSearches,
   createSavedSearch,
   alreadySavedIn,
-} from "@/lib/beitco/queries";
-import { useAuth } from "@/lib/beitco/auth";
+} from "@/lib/beitoon/queries";
+import { useAuth } from "@/lib/beitoon/auth";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { NumberInput } from "@/components/ui/number-input";
@@ -38,7 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { PropertyType } from "@/lib/beitco/types";
+import type { PropertyType } from "@/lib/beitoon/types";
 
 const searchSchema = z.object({
   q: z.string().optional(),
@@ -66,10 +67,10 @@ export const Route = createFileRoute("/search")({
 
 const TYPES: PropertyType[] = ["شقة", "أوضة", "سرير"];
 const SORT_OPTIONS = [
+  { id: "newest", label: "الأحدث" },
   { id: "trust", label: "الأكثر ثقة" },
   { id: "price_asc", label: "السعر: من الأقل" },
   { id: "price_desc", label: "السعر: من الأكتر" },
-  { id: "newest", label: "الأحدث" },
 ] as const;
 
 // Radix Select can't use an empty-string item value, so we use a sentinel for
@@ -95,6 +96,14 @@ function SearchPage() {
 
   const submit = (next: Partial<typeof params>) => {
     navigate({ search: (prev) => ({ ...prev, ...next }) });
+  };
+
+  // Run a search for a term: update the box + URL (recent is handled by the
+  // SearchAutocomplete component).
+  const runSearch = (term: string) => {
+    const t = term.trim();
+    setQ(t);
+    submit({ q: t || undefined });
   };
 
   const result = useSearchProperties(params);
@@ -160,7 +169,7 @@ function SearchPage() {
         .map((x) => x.p);
     }
 
-    const sort = params.sort ?? "trust";
+    const sort = params.sort ?? "newest";
     list.sort((a, b) => {
       if (sort === "trust") return b.trust - a.trust;
       if (sort === "price_asc") return a.price - b.price;
@@ -223,32 +232,16 @@ function SearchPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            submit({ q: q.trim() || undefined });
+            runSearch(q);
           }}
           className="mb-4 flex flex-col gap-2 rounded-2xl border border-border bg-card p-2 sm:flex-row sm:items-center"
         >
-          <div className="flex flex-1 items-center gap-2 px-3 py-2">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="دوّر بالمنطقة، الكومباوند، أو اسم المكان…"
-              className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-            />
-            {q ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setQ("");
-                  submit({ q: undefined });
-                }}
-                className="rounded-md p-1 text-muted-foreground hover:bg-muted"
-                aria-label="مسح"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            ) : null}
-          </div>
+          <SearchAutocomplete
+            value={q}
+            onChange={setQ}
+            onSearch={(term) => runSearch(term)}
+            className="px-3 py-2"
+          />
           <NearMeControl
             active={geoActive}
             radiusKm={params.radiusKm ?? 5}
@@ -484,7 +477,7 @@ function SearchPage() {
               ) : (
                 <Select
                   dir="rtl"
-                  value={params.sort ?? "trust"}
+                  value={params.sort ?? "newest"}
                   onValueChange={(v) => submit({ sort: v as typeof params.sort })}
                 >
                   <SelectTrigger className="h-9 w-auto gap-1.5 bg-surface text-xs">

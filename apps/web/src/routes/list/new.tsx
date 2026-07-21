@@ -33,7 +33,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
 import { Textarea } from "@/components/ui/textarea";
-import { LocationPicker } from "@/components/beitco/LocationPicker";
+import { LocationPicker } from "@/components/beitoon/LocationPicker";
 import {
   Select,
   SelectContent,
@@ -41,7 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAuth } from "@/lib/beitco/auth";
+import { useAuth } from "@/lib/beitoon/auth";
 import {
   loadDraft,
   saveDraft,
@@ -54,7 +54,7 @@ import {
   STEPS,
   type ListingDraft,
   type StepId,
-} from "@/lib/beitco/listing-draft";
+} from "@/lib/beitoon/listing-draft";
 import {
   getProperty,
   getInitialListingStatus,
@@ -69,11 +69,11 @@ import {
   ROOM_FEATURES,
   NEARBY_TYPES,
   CAIRO_METRO_LINES,
-} from "@/lib/beitco/store";
+} from "@/lib/beitoon/store";
 import { arabicIncludes } from "@beitoon/shared";
-import { USE_API, apiGetProperty } from "@/lib/beitco/api";
-import { saveListing } from "@/lib/beitco/queries";
-import { uploadImage } from "@/lib/beitco/uploads";
+import { USE_API, apiGetProperty } from "@/lib/beitoon/api";
+import { saveListing } from "@/lib/beitoon/queries";
+import { uploadImage } from "@/lib/beitoon/uploads";
 import type {
   Property,
   RentalMode,
@@ -85,7 +85,7 @@ import type {
   NearbyPlace,
   NearbyType,
   CustomSpec,
-} from "@/lib/beitco/types";
+} from "@/lib/beitoon/types";
 
 export const Route = createFileRoute("/list/new")({
   validateSearch: (s: Record<string, unknown>): { edit?: string } => ({
