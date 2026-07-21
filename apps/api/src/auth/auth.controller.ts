@@ -7,8 +7,8 @@ import { Public } from './decorators/public.decorator';
 import { CurrentUser, type AuthUser } from './decorators/current-user.decorator';
 import { SendOtpDto, VerifyOtpDto, CompleteProfileDto } from './dto/auth.dto';
 
-const AT_COOKIE = 'beitco_at';
-const RT_COOKIE = 'beitco_rt';
+const AT_COOKIE = 'beitoon_at';
+const RT_COOKIE = 'beitoon_rt';
 
 function setAuthCookies(res: Response, accessToken: string, refreshToken: string) {
   const secure = process.env.NODE_ENV === 'production';

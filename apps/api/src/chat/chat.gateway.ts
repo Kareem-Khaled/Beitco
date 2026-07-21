@@ -43,7 +43,7 @@ export class ChatGateway implements OnGatewayConnection {
 
   async handleConnection(client: Socket): Promise<void> {
     try {
-      const token = cookieValue(client.handshake.headers.cookie, 'beitco_at');
+      const token = cookieValue(client.handshake.headers.cookie, 'beitoon_at');
       if (!token) {
         client.disconnect();
         return;

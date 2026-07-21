@@ -16,7 +16,7 @@ export interface JwtPayload {
 // Pull the access token from the httpOnly cookie first, then the Bearer header
 // (lets the SSR frontend send a cookie and tools send a header).
 function cookieOrBearer(req: Request): string | null {
-  const cookieToken = (req.cookies as Record<string, string> | undefined)?.beitco_at;
+  const cookieToken = (req.cookies as Record<string, string> | undefined)?.beitoon_at;
   if (cookieToken) return cookieToken;
   return ExtractJwt.fromAuthHeaderAsBearerToken()(req);
 }
