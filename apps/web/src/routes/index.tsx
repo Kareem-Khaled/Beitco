@@ -15,16 +15,17 @@ import { BeitoonListingCard } from "@/components/beitco/BeitoonListingCard";
 import { EmptyState } from "@/components/beitco/EmptyState";
 import { Button } from "@/components/ui/button";
 import { usePublishedProperties } from "@/lib/beitco/queries";
+import { useAuth } from "@/lib/beitco/auth";
 import type { Property, PropertySummary } from "@/lib/beitco/types";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "بيتون — سكن بالسرير في مصر" },
+      { title: "بيتون  -  سكن بالسرير في مصر" },
       {
         name: "description",
         content:
-          "بيتون منصة سكن موثّقة في مصر. دوّر على شقة، أوضة، أو سرير — أو شقة للبيع — بأسعار واضحة وآراء ساكنين حقيقية.",
+          "بيتون منصة سكن موثّقة في مصر. دوّر على شقة، أوضة، أو سرير  -  أو شقة للبيع  -  بأسعار واضحة وآراء ساكنين حقيقية.",
       },
     ],
   }),
@@ -35,8 +36,14 @@ function HomePage() {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const { data: properties = [] } = usePublishedProperties();
+  const { user } = useAuth();
 
   const onSearch = (overrides?: Record<string, unknown>) => {
+    // Search + filters are registered-users-only. Send guests to login first.
+    if (!user) {
+      navigate({ to: "/auth/login" });
+      return;
+    }
     navigate({
       to: "/search",
       search: { ...(q.trim() ? { q: q.trim() } : {}), ...(overrides ?? {}) },
@@ -53,7 +60,7 @@ function HomePage() {
             أجّر <span className="text-trust">سرير</span>، أوضة، أو شقة كاملة
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground sm:text-lg">
-            بيتون أول منصة في مصر تأجّرك بالسرير — سكن متأكدين منه، بأسعار واضحة وآراء ساكنين حقيقية
+            بيتون أول منصة في مصر تأجّرك بالسرير  -  سكن متأكدين منه، بأسعار واضحة وآراء ساكنين حقيقية
             ودرجة ثقة لكل مكان.
           </p>
 
@@ -108,13 +115,14 @@ function HomePage() {
 
         <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-display text-xl font-semibold">أحدث الأماكن</h2>
-          <Link
-            to="/search"
+          <button
+            type="button"
+            onClick={() => onSearch()}
             className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
           >
             <SlidersHorizontal className="h-3.5 w-3.5" />
             فلترة متقدمة
-          </Link>
+          </button>
         </div>
 
         <div className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">

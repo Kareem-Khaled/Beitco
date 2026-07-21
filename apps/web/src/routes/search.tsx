@@ -82,11 +82,16 @@ const RADIUS_OPTIONS = [2, 5, 10, 25] as const;
 function SearchPage() {
   const params = Route.useSearch();
   const navigate = useNavigate({ from: "/search" });
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const qc = useQueryClient();
 
   const [q, setQ] = useState(params.q ?? "");
   useEffect(() => setQ(params.q ?? ""), [params.q]);
+
+  // Search + filters are for registered users only  -  bounce guests to login.
+  useEffect(() => {
+    if (!authLoading && !user) navigate({ to: "/auth/login" });
+  }, [authLoading, user, navigate]);
 
   const submit = (next: Partial<typeof params>) => {
     navigate({ search: (prev) => ({ ...prev, ...next }) });
@@ -97,7 +102,7 @@ function SearchPage() {
   const geoActive = params.lat != null && params.lng != null;
 
   // Infinite scroll: auto-load the next page when the sentinel scrolls into view
-  // (server mode only — mock mode returns everything in one page, hasMore=false).
+  // (server mode only  -  mock mode returns everything in one page, hasMore=false).
   const loadMoreRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = loadMoreRef.current;
@@ -138,7 +143,7 @@ function SearchPage() {
     if (params.minPrice != null) list = list.filter((p) => p.price >= params.minPrice!);
     if (params.maxPrice != null) list = list.filter((p) => p.price <= params.maxPrice!);
 
-    // PROD-4 (mock): "قريب مني" — haversine radius filter, ordered by distance
+    // PROD-4 (mock): "قريب مني"  -  haversine radius filter, ordered by distance
     // (proximity overrides the sort preference, mirroring the server).
     if (params.lat != null && params.lng != null) {
       const r = params.radiusKm ?? 5;
@@ -196,8 +201,11 @@ function SearchPage() {
     }
     await createSavedSearch(user.id, params);
     qc.invalidateQueries({ queryKey: ["savedSearches", user.id] });
-    toast.success("اتحفظ — هنبلّغك أول ما ينزل مكان يطابقه");
+    toast.success("اتحفظ  -  هنبلّغك أول ما ينزل مكان يطابقه");
   };
+
+  // Guests never see search/filters (the effect above redirects them to login).
+  if (!user) return null;
 
   return (
     <div dir="rtl" className="min-h-screen bg-background text-foreground">
@@ -374,7 +382,7 @@ function SearchPage() {
                     onValueChange={(v) => submit({ minPrice: v })}
                     className="w-full bg-surface tabular-nums"
                   />
-                  <span className="text-xs text-muted-foreground">—</span>
+                  <span className="text-xs text-muted-foreground"> - </span>
                   <NumberInput
                     placeholder="لـ"
                     value={params.maxPrice ?? undefined}
@@ -411,7 +419,7 @@ function SearchPage() {
 
           {/* Results */}
           <div className="min-w-0">
-            {/* Save-this-search prompt — only when filters are active */}
+            {/* Save-this-search prompt  -  only when filters are active */}
             {hasFilters && filtered.length > 0 ? (
               <div
                 className={`mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-3.5 transition-colors ${
@@ -436,7 +444,7 @@ function SearchPage() {
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {alreadySaved
-                        ? "حفظنالك اللي بتدوّر عليه — هنقولك أول ما ينزل مكان يطابقه."
+                        ? "حفظنالك اللي بتدوّر عليه  -  هنقولك أول ما ينزل مكان يطابقه."
                         : "احفظ اللي بتدوّر عليه، ونقولك أول ما ينزل مكان جديد يطابقه."}
                     </p>
                   </div>
@@ -701,7 +709,7 @@ function NearMeControl({
   );
 }
 
-// Great-circle distance in km — powers the mock-mode "قريب مني" radius filter
+// Great-circle distance in km  -  powers the mock-mode "قريب مني" radius filter
 // (the API path uses PostGIS ST_DWithin server-side instead).
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371;
